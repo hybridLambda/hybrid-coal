@@ -1,1 +1,1 @@
-/home/szh41/hybrid-lambda/hybrid-lambda/src/all_gene_topo.cpp
+../../../hybrid-lambda/hybrid-lambda/src/all_gene_topo.cpp
