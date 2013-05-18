@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+% \usepackage{fullpage}
+\usepackage{graphics,graphicx,subfig}
+\usepackage{amsmath,multicol,lscape,framed,amssymb}
+\usepackage{graphicx,epic,subfig,graphicx,tikz,pifont}
+%\usepackage{multirow,epic}
+% \usepackage{algorithmic,algorithm}
+\usepackage{hyperref,hypcap}
+\usepackage{natbib}%
+\usepackage{longtable}
+\usepackage{textcomp}%to use \textquotesingle
+% \captionsetup{type=figure}
+\hypersetup{
+colorlinks,%
+citecolor=blue,%
+filecolor=black,%
+linkcolor=blue,%
+urlcolor=blue,
+}
+\usepackage{setspace}
+\bibliographystyle{plain}
+
+\bibstyle{plain}
+\newcommand{\HRule}{\noindent\rule{\linewidth}{1.5pt}}
+\newtheorem{alg}{Algorithm}
+\newcommand{\cm}[1]{\begin{center}{\tt #1}\end{center}}
+\newcommand{\hs}{{\tt hybrid\_sim}}
+\newcommand{\PP}{{\mathbb P}}
+
+
+\begin{document}
+
+\title{Hybrid\_coal: }
+\author{Sha (Joe) Zhu}
+\maketitle
+
+\input{coal_manual.tex}
+\nocite{Zhu2011poster}
+\bibliography{article.bib}
+
+\end{document}
+  
