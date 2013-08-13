@@ -36,7 +36,7 @@
 #include<iomanip>
 #include<valarray>
 //#include <gmp.h>
-
+#include"node.hpp"
 using namespace std;
 
 #ifndef GLOBAL_H
@@ -46,131 +46,6 @@ using namespace std;
 
 
 
-/*! 
- */
- 
-
-
-//AC::AC(){
-	//pAC=0.0;
-	//}
-
-
-
-
-
-/*! \brief Node of a tree or network, it also represent the branch between this node and its parent node
- */
-class Node {
-	public:
-	//vector<int> descndnt;
-	vector<int> des_num_descndnt_interior;
-	vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
-	vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
-	Node* parent1; /*!< \brief pointer to its parent node. */
-	
-	string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
-	
-	string label; /*!< \brief String label of a node, each node has unique label */
-	string node_content; /*!< \brief node content, the subtree string at this node */
-	class Net * SubNetwork; /*!< \brief \todo pointer to the subtree of this node */
-	unsigned int e_num; /*!< \brief numbering the branch */
-	int rank; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
-	int num_child; /*!< \brief number of child \todo this can be replaced by child.size */
-	int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
-	int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
-	vector <double> path_time; 
-	double absolute_time; /*!< \brief distance to the bottom of the tree */
-	double brchlen1; /*!< \brief Branch length */
-	bool visited;
-	bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-	bool tip_bool; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-	
-	unsigned int node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
-	
-	
-	/* These members apply to only hybrid nodes */
-	bool hybrid; /*!< \brief Hybrid node only, indicator of a hybrid node */
-	Node* parent2; /*!< \brief Hybrid node only, pointer to its second parent node. */
-	unsigned int e_num2; /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
-	//double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
-	double brchlen2;/*!< \brief Hybrid node only, Branch length to the second parent*/
-
-	string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
-	
-	//vector < class AC > AC_list;
-		//vector < class CAC > CAC_list;
-
-	//vector < unsigned int > AC_list_sizes;
-	//vector < vector <unsigned int> > AC_list;
-	//double pAC;
-	
-	//vector <unsigned int> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
-	//vector <unsigned int> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
-	
-	Node(); /*!< \brief Initialize Node class*/
-	void print_net_Node();
-	void print_tree_Node();
-	void clear();
-	
-		
-};
-
-/*! \brief Collection of Networks in a vector container*/
-class Network_s{
-	public:
-	vector <class Net *> Net_vec;
-	void clear(){Net_vec.clear();};
-	
-	Network_s(){
-		vector <class Net *> Net_vec;
-	}
-	
-};
-
-/*! \brief Network class*/
-class Net{	
-	private:
-	//string checking_labeled(string in_str);
-	//string label_interior_node(string in_str);
-	int enumerate_internal_branch(Node *current,int e_num_old);
-	bool is_net_func(); /*!< \brief To determin if a Net is network or not. \return is_net */
-	
-	public:
-	string net_str; /*!< \brief species network string \todo this is new!!!*/
-	
-	class Network_s SubNetworkS; /*!< \brief sub species networks \todo this is new!!!*/
-	int max_rank;
-	vector< valarray <int> > descndnt;
-	vector< valarray <int> > descndnt2;
-	vector<string> tax_name;
-	vector<string> tip_name;
-	//vector <Node*> Net_nodes_ptr; /*!< \brief pointers to the nodes of Net \todo use this instead of Net_nodes */
-	vector <Node> Net_nodes;  /*!< \brief vector of nodes */
-	bool is_net; /*!< \brief true if Net is a network; false if it's a tree */
-	//bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
-	void clear(); 
-	void print_all_node();
-	bool is_ultrametric_func(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
-
-	Net (){
-		string net_str;
-		vector <string> tax_name;
-		vector <string> tip_name;
-		vector <Node> Net_nodes;
-		vector< valarray <int> > descndnt;
-		vector< valarray <int> > descndnt2;
-		//vector <Node*> Net_nodes_ptr;
-	}
-	
-	//~Net(){
-		//tax_name.clear();
-		//tip_name.clear();
-		//Net_nodes.clear();
-	//}
-	
-	Net(string Net_str);
-};
 
 bool start_of_tax_name(string in_str,size_t i);
 

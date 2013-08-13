@@ -1,8 +1,9 @@
 bin_PROGRAMS = hybrid_coal #test_hybrid_coal
 PROG = HYBRID_COAL
-hybrid_coal_SOURCES = all_gene_topo.cpp  all_gene_topo.hpp \  
-coal.cpp  coal.hpp  \ 
-main.cpp  \ 
+hybrid_coal_SOURCES = all_gene_topo.cpp  all_gene_topo.hpp \
+node.cpp node.hpp \
+coal.cpp  coal.hpp  \
+main.cpp  \
 rm_hybrid.cpp  rm_hybrid.hpp \
 utility.cpp  utility.hpp \
 export.cpp export.hpp
