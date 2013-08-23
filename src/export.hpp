@@ -41,7 +41,7 @@ void plot_in_latex_file(const char* file_name, Net net_dummy, int plot_option);
 
 void latex_header(const char* file_name);
 void latex_nt_body1(const char* file_name,size_t topo_idx,string topo);
-void latex_nt_body2(const char* file_name,vec_Net_wiz_prior_p net_str_s,size_t i);
+//void latex_nt_body2(const char* file_name,vec_Net_wiz_prior_p net_str_s,size_t i);
 void latex_tre_body(const char* file_name,string gt_str,string sp_str);
 void latex_tail(const char* file_name);
 

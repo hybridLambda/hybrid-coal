@@ -4,6 +4,14 @@
 #include<iomanip>
 
 
+#ifndef NDEBUG
+#define dout std::cout
+#else
+#pragma GCC diagnostic ignored "-Wunused-value"
+#define dout 0 && std::cout
+#endif
+
+
 // do not use string here!!!
 
 using namespace std;
@@ -19,27 +27,29 @@ class Node {
 		//vector<int> descndnt;
 		vector<int> des_num_descndnt_interior;
 		vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
-		vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
+		vector<Node*> child; /*!< \brief list of pointers to its child nodes */		
+		vector<Node*> descndnt;
 		vector <double> path_time;
+		
+		
+		size_t num_descndnt() const {return this->descndnt.size();}; /*!< \brief number of the tip nodes, that are descendant from this node */
+		size_t num_descndnt_interior() const {return this->descndnt_interior_node.size();}; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
+		size_t num_child() const {return this->child.size();}; /*!< \brief number of child \todo this can be replaced by child.size */
 
-		int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
-		int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
-		size_t num_child() const {return this->child.size()}; /*!< \brief number of child \todo this can be replaced by child.size */
 
+		//string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */		
+		//string label; /*!< \brief String label of a node, each node has unique label */
+		//string node_content; /*!< \brief node content, the subtree string at this node */
+		//string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
 
-		string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */		
-		string label; /*!< \brief String label of a node, each node has unique label */
-		string node_content; /*!< \brief node content, the subtree string at this node */
-		string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
+		//class Net * SubNetwork; /*!< \brief \todo pointer to the subtree of this node */
 
 // Getter and setter
-		
 		Node* parent1() const {return this->parent1_;} /*!< \brief pointer to its parent node. */
-		void set_partent1(Node* parent1){this->parent1_ = parent1;}
-		//class Net * SubNetwork; /*!< \brief \todo pointer to the subtree of this node */
+		void set_parent1(Node* parent1){this->parent1_ = parent1;}
 		
 		size_t e_num() const {return this->e_num_;}; /*!< \brief numbering the branch */
-		void set_e_num(size_t e_num){this->e_num = e_num;}
+		void set_e_num(size_t e_num){this->e_num_ = e_num;}
 		
 		int rank() const {return this->rank_;}; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
 		void set_rank(int rank){this->rank_ = rank;}
@@ -54,27 +64,28 @@ class Node {
 		void set_visited (bool yesorno){this->visited_ = yesorno;}
 		
 		bool descndnt_of_hybrid() const {return this->descndnt_of_hybrid_;}; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-		void set_descndnt_of_hybrid(bool yesorno){this->set_descndnt_of_hybrid = yesorno;}
+		void set_descndnt_of_hybrid(bool yesorno){this->descndnt_of_hybrid_ = yesorno;}
 		
 		bool tip() const {return this->tip_;}; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
 		void set_tip(bool yesorno){this->tip_ = yesorno;}
 		
 		/* These members apply to only hybrid nodes */
 		bool hybrid() const {return this->hybrid_;}; /*!< \brief Hybrid node only, indicator of a hybrid node */
-		void set_hybrid(bool yesorno){this->hybrid = yesorno;};
+		void set_hybrid(bool yesorno){this->hybrid_ = yesorno;};
 		
 		Node* parent2() const {return this->parent2_;} /*!< \brief pointer to its parent node. */
-		void set_partent2(Node* parent2){this->parent2_ = parent2;}
+		void set_parent2(Node* parent2){this->parent2_ = parent2;}
 
 		size_t e_num2() const { return this->e_num2_;}; /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
 		void set_e_num2(size_t e_num2){this->e_num2_ = e_num2;}
 		
 		
-		double brchlen2() const {return this->brchlen2_};/*!< \brief Hybrid node only, Branch length to the second parent*/
+		double brchlen2() const {return this->brchlen2_;};/*!< \brief Hybrid node only, Branch length to the second parent*/
 		void set_brchlen2(double bl){this->brchlen2_ = bl;};
 		//double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
 		
 		Node(); /*!< \brief Initialize Node class*/
+		~Node();
 		void init();
 		void print_net_Node();
 		void print_tree_Node();

@@ -57,9 +57,7 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 			}
 		}
 			
-		if (utility_debug_bool){
-			cout<<"Net::Net flag2"<<endl;
-		}
+			dout<<"Net::Net flag2"<<endl;
 		//vector <Node> Net_nodes;
 		int label_counter=brchlens.size();
 		for (int new_i_label=0;new_i_label<label_counter;new_i_label++){

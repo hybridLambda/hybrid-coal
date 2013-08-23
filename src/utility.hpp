@@ -37,6 +37,7 @@
 #include<valarray>
 //#include <gmp.h>
 #include"node.hpp"
+#include"net.hpp"
 using namespace std;
 
 #ifndef GLOBAL_H

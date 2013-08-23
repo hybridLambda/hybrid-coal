@@ -11,7 +11,7 @@ class Net{
 	public:
 		string net_str; /*!< \brief species network string \todo this is new!!!*/
 		
-		class Network_s SubNetworkS; /*!< \brief sub species networks \todo this is new!!!*/
+		//class Network_s SubNetworkS; /*!< \brief sub species networks \todo this is new!!!*/
 		int max_rank;
 		vector< valarray <int> > descndnt;
 		vector< valarray <int> > descndnt2;
