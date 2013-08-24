@@ -51,8 +51,6 @@ using namespace std;
 bool start_of_tax_name(string in_str,size_t i);
 
 void add_node(Node *parent_node, Node *child_node);
-void find_tip(Node *current);
-void find_hybrid_descndnt(Node *current);
 bool find_descndnt(Node* current, string taxname);
 bool find_descndnt2(Node* current, string taxname);
 void rewrite_node_content(vector <Node*> Net_ptr);
@@ -93,7 +91,6 @@ size_t Parenthesis_balance_index_forwards(string in_str,size_t i);
 //string extract_label(string in_str, size_t i);
 size_t end_of_label_or_bl(string in_str, size_t i);
 
-string write_para_into_tree(string sp_string, double para);
 
 
 string extract_label(string in_str, size_t i);
@@ -104,7 +101,7 @@ double extract_hybrid_para(string in_str);
 
 string read_input_line(char inchar[]);
 vector <string> read_input_lines(char inchar[]);
-string read_input_para(char inchar[],string in_str);
+//string read_input_para(char inchar[],string in_str);
 bool is_num(char inchar[]);
 string checking_labeled(string in_str);
 string label_interior_node(string in_str);

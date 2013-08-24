@@ -36,18 +36,9 @@ bool utility_debug_bool=false;
 
 
 
-void print_all_child(Node *parent /*! pointer to the parent node*/){
-    cout << parent->label << " has " << parent->num_child << " kids" << endl;
-    for (int i_num_child=0;i_num_child<=parent->num_child-1;i_num_child++){
-        cout<<parent->child[i_num_child]->label<<endl;
-    }
-}
 
 
-void print_parent(Node *child /*! pointer to the child node*/){
-	cout<<child->label<<" has parents "<<endl;
-	cout<<child->parent1->label<<" and "<<child->parent2->label <<endl;
-}
+
 
 /*! \brief Identify if its the start of the taxon name in a newick string, should be replaced by using (isalpha() || isdigit())  */
 bool start_of_tax_name(string in_str,size_t i){
@@ -120,16 +111,16 @@ void add_node(
 Node *parent_node /*! pointer to the parent node*/, 
 Node *child_node /*! pointer to the child node*/){
     parent_node->child.push_back(child_node);
-	if (child_node->parent1){
-		child_node->parent2=parent_node;
-		child_node->hybrid=true;
+	if (child_node->parent1()){
+		child_node->set_parent2(parent_node);
+		child_node->set_hybrid(true);
 	}
 	else {
-		child_node->parent1=parent_node;
+		child_node->set_parent1(parent_node);
 		//cout<<child_node->label<<" parent1 is "<<child_node->parent1->label<<endl;
 	}
 	//Node *kidspintr=parent_node->child[parent_node->num_child];
-	parent_node->num_child++;
+	//parent_node->num_child++;
 } 
 
 
@@ -140,103 +131,73 @@ Node *child_node /*! pointer to the child node*/){
  * Child node has lower rank than the parent node. Tip nodes have rank one, the root node has the highest rank
  */
 int ranking(Node *current){
-	int current_rank;
-	if (current->tip_bool){
-		current->rank=1;}
+	//int current_rank;
+	if (current->tip()){
+		current->set_rank(1);}
 	else
 	{
 		int child_max_rank=0;
-		for (int i_num_child=0;i_num_child<current->num_child;i_num_child++){
+		for (size_t i_num_child=0;i_num_child<current->num_child();i_num_child++){
 			int child_rank=ranking(current->child[i_num_child]);
 			child_max_rank=max(child_rank,child_max_rank);
 		}
-		current->rank=child_max_rank+1;
+		current->set_rank(child_max_rank+1);
 	}		
-	return current_rank=current->rank;
+	//return current_rank=current->rank;
+	return current->rank();
 }
 
 
-bool find_descndnt(Node* current, string taxname){
-	bool descndnt_found=false;
-	if (current->tip_bool){
+//bool find_descndnt(Node* current, string taxname){
+	//bool descndnt_found=false;
+	//if (current->tip()){
+		////if (current->label==taxname){
+			////cout<<current->name<<endl;
+			////cout<<taxname<<endl;
+		//if (current->name==taxname){
+			//descndnt_found=true;
+		//}
+		////else{
+			////descndnt_found=false;
+		////}
+	//}
+	//else {//int i;
+		//for (int i=0;i<current->num_child;i++){
+			//if (find_descndnt(current->child[i],taxname)){
+				//descndnt_found=true;
+				//break;
+			//}
+			////else descndnt_found=false;
+		//}
+	//}	
+	//return descndnt_found;
+//}
+
+//bool find_descndnt2(Node* current, string taxname){
+	//bool descndnt_found=false;
+	//if (current->tip_bool){
+		////if (current->label==taxname){
 		//if (current->label==taxname){
-			//cout<<current->name<<endl;
-			//cout<<taxname<<endl;
-		if (current->name==taxname){
-			descndnt_found=true;
-		}
+			//descndnt_found=true;
+		//}
 		//else{
 			//descndnt_found=false;
 		//}
-	}
-	else {//int i;
-		for (int i=0;i<current->num_child;i++){
-			if (find_descndnt(current->child[i],taxname)){
-				descndnt_found=true;
-				break;
-			}
-			//else descndnt_found=false;
-		}
-	}	
-	return descndnt_found;
-}
-
-bool find_descndnt2(Node* current, string taxname){
-	bool descndnt_found=false;
-	if (current->tip_bool){
-		//if (current->label==taxname){
-		if (current->label==taxname){
-			descndnt_found=true;
-		}
-		else{
-			descndnt_found=false;
-		}
-	}
-	else {//int i;
-		for (int i=0;i<current->num_child;i++){
-			if (find_descndnt2(current->child[i],taxname)){
-				descndnt_found=true;
-				break;
-			}
-			else descndnt_found=false;
-		}
-	}	
-	return descndnt_found;
-}
-
-
-
-/*! \brief label a node if its a tip node */
-void find_tip(Node *current /*! pointer to a node*/){
-	if (current->num_child==0){
-	//cout<<current->label<<" is a tip "<<endl;
-		current->tip_bool=true;
-	}
-	else {
-		for (int i_num_child=0;i_num_child < current->num_child;i_num_child++){
-			//if (current->hybrid || current->descndnt_of_hybrid){
-				//current->child[i_num_child]->descndnt_of_hybrid=true;
+	//}
+	//else {//int i;
+		//for (int i=0;i<current->num_child;i++){
+			//if (find_descndnt2(current->child[i],taxname)){
+				//descndnt_found=true;
+				//break;
 			//}
-			find_tip(current->child[i_num_child]);
-		}
-	}
-}
+			//else descndnt_found=false;
+		//}
+	//}	
+	//return descndnt_found;
+//}
 
 
-/*! \brief Label a node if its a descendant of a hybrid node */
-void find_hybrid_descndnt(Node *current/*! pointer to a node*/){
-	//if (current->num_child==0){
-		//current->tip_bool=false;}
-	//else {
-	if (!current->tip_bool){
-		for (int i_num_child=0;i_num_child<current->num_child;i_num_child++){
-			if (current->hybrid || current->descndnt_of_hybrid){
-				current->child[i_num_child]->descndnt_of_hybrid=true;
-			}
-			find_hybrid_descndnt(current->child[i_num_child]);
-		}
-	}
-}
+
 
 
 /*! \brief Label interior node if the interior nodes of the tree string are not labeled */
@@ -288,71 +249,71 @@ void appending_log_file(string log_file_input /*! Information added*/){
 }
 
 
-/*! \brief rewrite node content of nodes */
-void rewrite_node_content(vector <Node*> Net_ptr /*! vector of pointers pointing to nodes */){
-	int highest_i=0;
-	for (unsigned int i =0; i<Net_ptr.size();i++){
-		if (Net_ptr[i]->num_descndnt > Net_ptr[highest_i]->num_descndnt ){highest_i=i;}
-	}
-	
-	//for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
-		//Net_ptr[node_i]->print_net_Node();
-		//cout<<endl;
-	//}
-	
-	ranking(Net_ptr[highest_i]);
-	//cout<<Net_ptr[highest_i]->node_content<<endl;
-	//for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
-		//Net_ptr[node_i]->print_net_Node();
-		//cout<<endl;
-	//}
-	for (int rank_i=1;rank_i<=Net_ptr.back()->rank;rank_i++){
-		for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
-			if (Net_ptr[node_i]->rank==1){
-				Net_ptr[node_i]->node_content=Net_ptr[node_i]->label;
-			}
-			else{
-			if (Net_ptr[node_i]->rank==rank_i){
-				string new_node_content="(";
-				for (int child_i=0;child_i<Net_ptr[node_i]->num_child;child_i++){
-					ostringstream brchlen_str;
-					ostringstream brchlen_str2;
-					brchlen_str<<Net_ptr[node_i]->child[child_i]->brchlen1;
-					if (Net_ptr[node_i]->child[child_i]->node_content==Net_ptr[node_i]->child[child_i]->label){
-						new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str.str();}
-					else{
-						bool new_hybrid_node=false;
-						for (unsigned int node_ii=0;node_ii<node_i;node_ii++){
-							for (int node_ii_child_i=0;node_ii_child_i<Net_ptr[node_ii]->num_child;node_ii_child_i++){
-								if (Net_ptr[node_ii]->child[node_ii_child_i]->node_content==Net_ptr[node_i]->child[child_i]->node_content){
-									new_hybrid_node=true;
-									brchlen_str2<<Net_ptr[node_i]->child[child_i]->brchlen2;
-								break;}
-							}
-							//if (new_hybrid_node==1){break;}
-						}
-						if (new_hybrid_node){
-							new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str2.str();
-						}
-						else{
-							new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str.str();
-						}
-					}
-					//new_node_content=new_node_content+sp_nodes_ptr_rm1[node_i]->child[child_i]->node_content+sp_nodes_ptr_rm1[node_i]->child[child_i]->label+":"+brchlen_str.str();
-					if (child_i<Net_ptr[node_i]->num_child-1){
-						new_node_content=new_node_content+",";
-					}
-				}
-				new_node_content=new_node_content+")";
-				Net_ptr[node_i]->node_content=new_node_content;
-				}
-			}
-		}	
-	}
+///*! \brief rewrite node content of nodes */
+//void rewrite_node_content(vector <Node*> Net_ptr /*! vector of pointers pointing to nodes */){
+	//int highest_i=0;
 	//for (unsigned int i =0; i<Net_ptr.size();i++){
-		//cout<<Net_ptr[i]->label<<" "<<Net_ptr[i]->node_content<<endl;//<<"!!!!";
+		//if (Net_ptr[i]->num_descndnt > Net_ptr[highest_i]->num_descndnt ){highest_i=i;}
 	//}
-}
+	
+	////for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+		////Net_ptr[node_i]->print_net_Node();
+		////cout<<endl;
+	////}
+	
+	//ranking(Net_ptr[highest_i]);
+	////cout<<Net_ptr[highest_i]->node_content<<endl;
+	////for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+		////Net_ptr[node_i]->print_net_Node();
+		////cout<<endl;
+	////}
+	//for (int rank_i=1;rank_i<=Net_ptr.back()->rank;rank_i++){
+		//for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+			//if (Net_ptr[node_i]->rank==1){
+				//Net_ptr[node_i]->node_content=Net_ptr[node_i]->label;
+			//}
+			//else{
+			//if (Net_ptr[node_i]->rank==rank_i){
+				//string new_node_content="(";
+				//for (int child_i=0;child_i<Net_ptr[node_i]->num_child;child_i++){
+					//ostringstream brchlen_str;
+					//ostringstream brchlen_str2;
+					//brchlen_str<<Net_ptr[node_i]->child[child_i]->brchlen1;
+					//if (Net_ptr[node_i]->child[child_i]->node_content==Net_ptr[node_i]->child[child_i]->label){
+						//new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str.str();}
+					//else{
+						//bool new_hybrid_node=false;
+						//for (unsigned int node_ii=0;node_ii<node_i;node_ii++){
+							//for (int node_ii_child_i=0;node_ii_child_i<Net_ptr[node_ii]->num_child;node_ii_child_i++){
+								//if (Net_ptr[node_ii]->child[node_ii_child_i]->node_content==Net_ptr[node_i]->child[child_i]->node_content){
+									//new_hybrid_node=true;
+									//brchlen_str2<<Net_ptr[node_i]->child[child_i]->brchlen2;
+								//break;}
+							//}
+							////if (new_hybrid_node==1){break;}
+						//}
+						//if (new_hybrid_node){
+							//new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str2.str();
+						//}
+						//else{
+							//new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str.str();
+						//}
+					//}
+					////new_node_content=new_node_content+sp_nodes_ptr_rm1[node_i]->child[child_i]->node_content+sp_nodes_ptr_rm1[node_i]->child[child_i]->label+":"+brchlen_str.str();
+					//if (child_i<Net_ptr[node_i]->num_child-1){
+						//new_node_content=new_node_content+",";
+					//}
+				//}
+				//new_node_content=new_node_content+")";
+				//Net_ptr[node_i]->node_content=new_node_content;
+				//}
+			//}
+		//}	
+	//}
+	////for (unsigned int i =0; i<Net_ptr.size();i++){
+		////cout<<Net_ptr[i]->label<<" "<<Net_ptr[i]->node_content<<endl;//<<"!!!!";
+	////}
+//}
 
 /*! \brief Remove interior nodes label of a string */
 string remove_interior_label(string in_str/*!< input newick form string */){
@@ -389,18 +350,7 @@ string tree_topo(string in_str /*!< input newick form string */){
 	return remove_brchlen(remove_interior_label(in_str));
 }
 
-string construct_adding_new_Net_str(Net in_Net){
-	string out_str;
-	out_str=in_Net.Net_nodes.back().node_content;
-	out_str=out_str+in_Net.Net_nodes.back().label;
-	if (in_Net.Net_nodes.back().brchlen1!=0){
-		ostringstream brchlen_str;
-		brchlen_str<<in_Net.Net_nodes.back().brchlen1;
-		out_str=out_str+":"+brchlen_str.str();
-	}
-	out_str.push_back(';');
-	return out_str;
-}
+
 
 
 
@@ -664,51 +614,23 @@ bool is_num(char inchar[]){
 	return is_num_return;
 }
 
-string read_input_para(char inchar[],string in_str){
+//string read_input_para(char inchar[],string in_str){
 	
-	string out_str;
-	if (is_num(inchar)){
-		istringstream para_istrm(inchar);
-		double para;
-		para_istrm>>para;
-		out_str=write_para_into_tree(in_str, para);
-	}
-	else{
-		out_str=read_input_line(inchar);
-	}
-	return out_str;
-}
+	//string out_str;
+	//if (is_num(inchar)){
+		//istringstream para_istrm(inchar);
+		//double para;
+		//para_istrm>>para;
+		//out_str=write_para_into_tree(in_str, para);
+	//}
+	//else{
+		//out_str=read_input_line(inchar);
+	//}
+	//return out_str;
+//}
 		
 		
-/*! \brief Write a fixed parameter into a externed newick formatted network string*/
-string write_para_into_tree(string in_str /*! Externed newick formatted network string*/, 
-double para /*! Coalescent parameter or fixed population sizes */){
-	if (in_str.size()==0){
-		cout<<"Define input tree (network) first!"<<endl;
-		exit(1);;
-	}
-	Net para_Net(in_str);
-	vector <Node*> para_Net_node_ptr;
-	if (utility_debug_bool){
-		cout<<"write_para_into_tree flag1"<<endl;
-	}
-	for (unsigned int node_i=0;node_i<para_Net.Net_nodes.size();node_i++){
-		Node* new_node_ptr=NULL;
-        para_Net_node_ptr.push_back(new_node_ptr);
-        para_Net_node_ptr[node_i]=&para_Net.Net_nodes[node_i];
-		para_Net_node_ptr[node_i]->brchlen1=para;
-		if (para_Net.Net_nodes[node_i].hybrid){
-			para_Net_node_ptr[node_i]->brchlen2=para;
-		}
-	}
-	if (utility_debug_bool){
-		cout<<"write_para_into_tree flag2"<<para<<endl;
-	}
-	para_Net_node_ptr.back()->brchlen1=para;
-	rewrite_node_content(para_Net_node_ptr);
-	string para_string=construct_adding_new_Net_str(para_Net);
-	return para_string;	
-}
+
 		
 		
 string rewrite_net_str(string net_str, vector <string> tax_name, vector <string> tip_name){
@@ -764,19 +686,19 @@ void check_gt_str_and_sign(string gt_str){
 	
 }
 
-void check_sp_str_dash_sign(string sp_str){
-	Net sp_net(sp_str);
-	for (size_t i=0;i<sp_net.Net_nodes.size();i++){
-		if (sp_net.Net_nodes[i].tip_bool){
-			size_t found=sp_net.Net_nodes[i].label.find('_');
-			if (found!=string::npos){
-				string sp_log="Error:  "+sp_str+" can not be a species string";
-				appending_log_file(sp_log);
-				my_exit();
-				exit(1);				
-			}
-		}
-	}
+//void check_sp_str_dash_sign(string sp_str){
+	//Net sp_net(sp_str);
+	//for (size_t i=0;i<sp_net.Net_nodes.size();i++){
+		//if (sp_net.Net_nodes[i].tip_bool){
+			//size_t found=sp_net.Net_nodes[i].label.find('_');
+			//if (found!=string::npos){
+				//string sp_log="Error:  "+sp_str+" can not be a species string";
+				//appending_log_file(sp_log);
+				//my_exit();
+				//exit(1);				
+			//}
+		//}
+	//}
 
 	
-}
+//}

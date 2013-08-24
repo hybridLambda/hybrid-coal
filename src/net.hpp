@@ -10,10 +10,12 @@ class Net{
 	private:
 	//string checking_labeled(string in_str);
 	//string label_interior_node(string in_str);
-	int enumerate_internal_branch(Node *current,int e_num_old);
-	bool is_net_func(); /*!< \brief To determin if a Net is network or not. \return is_net */
-	void checking_Parenthesis(string in_str);
-
+		//int enumerate_internal_branch(Node *current,int e_num_old);
+		bool is_net_func(); /*!< \brief To determin if a Net is network or not. \return is_net */
+		void checking_Parenthesis(string in_str);
+		void create_node_list();
+		void merge_repeated_nodes_as_one();
+	
 	public:
 		string net_str; /*!< \brief species network string \todo this is new!!!*/
 		
@@ -49,5 +51,9 @@ class Net{
 		
 		Net(string Net_str);
 };
+
+
+
+//string write_para_into_tree(string sp_string, double para);
 
 #endif

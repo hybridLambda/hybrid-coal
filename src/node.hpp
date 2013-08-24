@@ -2,7 +2,7 @@
 //#include<string>
 #include<iostream>
 #include<iomanip>
-
+#include<cassert>
 
 #ifndef NDEBUG
 #define dout std::cout
@@ -40,11 +40,7 @@ class Node {
 		size_t num_child() const {return this->child.size();}; /*!< \brief number of child \todo this can be replaced by child.size */
 
 
-		//string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */		
-		//string label; /*!< \brief String label of a node, each node has unique label */
-		//string node_content; /*!< \brief node content, the subtree string at this node */
-		//string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
-
+		
 		//class Net * SubNetwork; /*!< \brief \todo pointer to the subtree of this node */
 
 // Getter and setter
@@ -54,6 +50,7 @@ class Node {
 		size_t e_num() const {return this->e_num_;}; /*!< \brief numbering the branch */
 		void set_e_num(size_t e_num){this->e_num_ = e_num;}
 		
+		int ranking();
 		int rank() const {return this->rank_;}; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
 		void set_rank(int rank){this->rank_ = rank;}
 		 
@@ -87,11 +84,43 @@ class Node {
 		void set_brchlen2(double bl){this->brchlen2_ = bl;};
 		//double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
 		
+		size_t nodeName_start() const {return this->nodeName_start_;};
+		void set_nodeName_start(size_t index){this->nodeName_start_ = index;};
+		
+		size_t nodeName_end() const {return this->nodeName_end_;};
+		void set_nodeName_end(size_t index){this->nodeName_end_ = index;};
+		
+		size_t node_content_start() const {return this->node_content_start_;};
+		void set_node_content_start(size_t index){this->node_content_start_ = index;};
+		
+		size_t node_content_end() const {return this->node_content_end_;};
+		void set_node_content_end(size_t index){this->node_content_end_ = index;};
+		
+		void add_to_parent(Node* parent);
+		
+		
+		void init(
+			size_t nodeName_start = 0,
+			size_t nodeName_end = 0, 
+			size_t node_content_start = 0, 
+			size_t node_content_end = 0, 
+			double bl1=0.0,
+			double bl2=0.0);
+			
 		Node(); /*!< \brief Initialize Node class*/
+		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end);
+		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end, double bl1);
+		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end, double bl1, double bl2);
+		
 		~Node();
-		void init();
-		void print_net_Node();
-		void print_tree_Node();
+		
+		
+		size_t enumerate_internal_branch(size_t e_num_old);  /*!< enumerator which is about to be updated \todo change e_num_old to int* type */ 
+		void print_all_child();
+		void print_parent();
+		
+		bool print_net_Node(const char* net_str) const; 
+		bool print_tree_Node(const char* tree_str ) const;
 		void clear();
 	
 	private:
@@ -120,7 +149,23 @@ class Node {
 		size_t nodeName_start_;
 		size_t nodeName_end_;
 		
+		size_t node_content_start_;
+		size_t node_content_end_;
+		
+		//size_t name_;
+		
+		//string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */		
+		//string label; /*!< \brief String label of a node, each node has unique label */
+		//string node_content; /*!< \brief node content, the subtree string at this node */
+		//string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
+
+		
 };
+
+
+
+void find_hybrid_descndnt(Node *current);
+void find_tip(Node *current);
 
 
 #endif
