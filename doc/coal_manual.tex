@@ -52,14 +52,15 @@ Since the hybrid node has two parent nodes, the branch length needs to be specif
 
 \subsection{Method}
 The coalescent model of \citet{Degnan2005} is extended to obtain the distribution of gene trees ($T$) in a given network ($W$). The network $W$ is initially reduced to a set of simpler networks ($SG(W)$) in a single step of the reduction process. By standard probability theory, we have the following:
-\begin{equation*}\PP(T|W)=\sum_{W^*\in SG(W)}\PP(T|W^*)\omega(W^*|T, W).
+\begin{equation*}%\PP(T|W)=\sum_{W^*\in SG(W)}\PP(T|W^*)\omega(W^*|T, W).
+P(T|W)=\sum_{w^*\in SG(W)}P(T|W^*=w^*)P(W^*=w^*|W)
 \label{coal_man:eqn:recursion}\end{equation*}
 % $\quad\text {where }\omega(N^*|T_g=\tau, N)=\begin{cases}
 % \omega_s, & \text{Case 1};\\
 % \omega_h, & \text{Case 2}.
 %  \end{cases}$
 
-When each network $W^*$ is obtained from $W$ by removing an edge or a node, we will apply the recursion to reduce the networks on $N^*$ until all the simpler network structures are tree-like. The problem of obtaining gene tree probabilities from species trees has already been solved by \cite{Degnan2005}. The approach we have outlined will therefore reduce the probability of a gene tree, given a species network, into a linear combination of gene tree probabilities, given species trees.
+When each network $w^*$ is obtained from $W$ by removing an edge or a node, we will apply the recursion to reduce the networks on $W^*$ until all the simpler network structures are tree-like. The problem of obtaining gene tree probabilities from species trees has already been solved by \cite{Degnan2005}. The approach we have outlined will therefore reduce the probability of a gene tree, given a species network, into a linear combination of gene tree probabilities, given species trees.
 
 
 \section{Commands:}

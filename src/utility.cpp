@@ -59,24 +59,6 @@ bool start_of_tax_name(string in_str,size_t i){
 	return 	start_bool;
 }
 
-/*! \brief Checking Parenthesis of a (extended) Newick string */
-void checking_Parenthesis(string in_str){
-	int num_b=0;
-	for (size_t i=0;i<in_str.size();i++){
-		if (in_str[i]=='('){
-			num_b++;
-		}
-		if (in_str[i]==')'){
-			num_b--;
-		}
-	}
-	if (num_b!=0){
-		cout<<"Error:"<<endl;
-		cout<<in_str<<endl;
-		cout<<"Parenthesis not balanced!"<<endl;
-		exit (1);
-	}
-}
 
 size_t Parenthesis_balance_index_backwards(string in_str,size_t i){
 	size_t j=i;

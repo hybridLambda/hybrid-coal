@@ -2,14 +2,12 @@
 
 /*! \brief Construct Net object from a (extended) Newick string */
 Net::Net(string in_str /*! input (extended) newick form string */){
-	if (in_str.size()>0){
+	//if (in_str.size()>0){
 
 		checking_Parenthesis(in_str);
 		net_str=checking_labeled(in_str);
-	
-		if (utility_debug_bool){
-			cout<<"Net::Net BEGIN"<<endl;
-		}
+		dout<<"Build Net from string: "<<net_str<<endl;
+
 
 		int net_str_len=net_str.length();
 		vector<string> labels;
@@ -24,19 +22,25 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 				//if (isalpha(net_str[i_str_len])){
 				if ( start_of_tax_name(net_str,i_str_len)){
 				//if (isalpha(net_str[i_str_len]) || isdigit(net_str[i_str_len])){	
-					size_t str_start_index=i_str_len;
-					string label=extract_label(net_str,i_str_len);
+					size_t str_start_index = i_str_len;
+					size_t str_end_index = end_of_label_or_bl(net_str, str_start_index);
+
+					//string label=extract_label(net_str,i_str_len);
 					//cout<<label<<endl;
-					labels.push_back(label);
+					//labels.push_back(label);
 					//int str_end_index=label.size()+i_str_len-1;
-					string node_content;
+					//string node_content;
+					size_t node_content_start_idx;
+					size_t node_content_end_idx;
 					if (net_str[str_start_index-1]==')'){
-						size_t rev_dummy_i=Parenthesis_balance_index_backwards(net_str,str_start_index-1);
-						size_t substr_len=str_start_index-rev_dummy_i;
-						node_content=net_str.substr(rev_dummy_i,substr_len);			
+						node_content_start_idx=Parenthesis_balance_index_backwards(net_str,str_start_index-1);
+						node_content_end_idx=
+						//size_t substr_len=str_start_index-rev_dummy_i;
+						//node_content=net_str.substr(rev_dummy_i,substr_len);			
 					}
 					else {
-						node_content=label;
+						node_content_end_idx
+						//node_content=label;
 					}
 					i_str_len=label.size()+i_str_len;
 					//cout<<node_content<<endl;
@@ -50,6 +54,10 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 					}
 					found_bl=net_str.find(":",found_bl+1);
 					brchlens.push_back(brchlen);
+					
+					Node * node_ptr = new Node();
+					
+					
 				}
 				else {
 					i_str_len++;
@@ -132,13 +140,13 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 		
 		
 		
-		vector <Node*> Net_nodes_ptr;
-		for (unsigned int i=0;i<Net_nodes.size();i++){
-			Net_nodes[i].node_index=i;
-			Node* new_node_ptr=NULL;
-			Net_nodes_ptr.push_back(new_node_ptr);
-			Net_nodes_ptr[i]=&Net_nodes[i];
-		}
+		//vector <Node*> Net_nodes_ptr;
+		//for (unsigned int i=0;i<Net_nodes.size();i++){
+			//Net_nodes[i].node_index=i;
+			//Node* new_node_ptr=NULL;
+			//Net_nodes_ptr.push_back(new_node_ptr);
+			//Net_nodes_ptr[i]=&Net_nodes[i];
+		//}
 		
 		
 		for (unsigned int i=0;i<Net_nodes.size();i++){
@@ -362,18 +370,25 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 		//is_ultrametric=true;
 		//is_ultrametric=is_ultrametric_func();
 
-	}
-	else{
-		descndnt.clear();
-		tax_name.clear();
-		Net_nodes.clear();
-	}
+	//}
+	//else{
+		//descndnt.clear();
+		//tax_name.clear();
+		//Net_nodes.clear();
+	//}
 		
-	if (utility_debug_bool){
-		cout<<"Net::Net END"<<endl;
-	}
+	dout<<"Net of "<<net_str <<" is built"<<endl;
+
 }
 
+
+void Net::create_node_list(){
+	
+}
+
+void Net::merge_repeated_nodes_as_one(){
+	
+}
 
 /*! \brief free the meomory */
 void Net::clear(){
@@ -549,3 +564,21 @@ bool Net::is_ultrametric_func(){
 	return is_ultrametric_return;
 }
 
+/*! \brief Checking Parenthesis of a (extended) Newick string */
+void Net::checking_Parenthesis(string in_str){
+	int num_b=0;
+	for (size_t i=0;i<in_str.size();i++){
+		if (in_str[i]=='('){
+			num_b++;
+		}
+		if (in_str[i]==')'){
+			num_b--;
+		}
+	}
+	if (num_b!=0){
+		cout<<"Error:"<<endl;
+		cout<<in_str<<endl;
+		cout<<"Parenthesis not balanced!"<<endl;
+		exit (1);
+	}
+}

@@ -28,11 +28,14 @@ class Node {
 		vector<int> des_num_descndnt_interior;
 		vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
 		vector<Node*> child; /*!< \brief list of pointers to its child nodes */		
-		vector<Node*> descndnt;
+		//vector<Node*> descndnt;
 		vector <double> path_time;
+//valarray <int>	descndnt;
+		
+		size_t num_descndnt() const {return this->num_descndnt_;}; /*!< \brief number of the tip nodes, that are descendant from this node */
+		void set_num_descndnt(size_t num){this->num_descndnt_ = num;};
 		
 		
-		size_t num_descndnt() const {return this->descndnt.size();}; /*!< \brief number of the tip nodes, that are descendant from this node */
 		size_t num_descndnt_interior() const {return this->descndnt_interior_node.size();}; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
 		size_t num_child() const {return this->child.size();}; /*!< \brief number of child \todo this can be replaced by child.size */
 
@@ -92,6 +95,8 @@ class Node {
 		void clear();
 	
 	private:
+		size_t num_descndnt_;
+	
 		Node* parent1_; /*!< \brief pointer to its parent node. */
 		Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
 		
@@ -112,7 +117,8 @@ class Node {
 		bool tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
 		bool hybrid_; /*!< \brief Hybrid node only, indicator of a hybrid node */
 
-
+		size_t nodeName_start_;
+		size_t nodeName_end_;
 		
 };
 

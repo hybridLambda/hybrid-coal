@@ -37,7 +37,7 @@
 #include<valarray>
 //#include <gmp.h>
 #include"node.hpp"
-#include"net.hpp"
+//#include"net.hpp"
 using namespace std;
 
 #ifndef GLOBAL_H
@@ -56,7 +56,7 @@ void find_hybrid_descndnt(Node *current);
 bool find_descndnt(Node* current, string taxname);
 bool find_descndnt2(Node* current, string taxname);
 void rewrite_node_content(vector <Node*> Net_ptr);
-string construct_adding_new_Net_str(Net old_Net);
+//string construct_adding_new_Net_str(Net old_Net);
 int ranking(Node *current);
 //vector <string> all_n_tax_gene_tree(unsigned int tax_num);
 double factorial(double a);	
@@ -89,9 +89,8 @@ int my_exit();
 
 size_t Parenthesis_balance_index_backwards(string in_str,size_t i);
 size_t Parenthesis_balance_index_forwards(string in_str,size_t i);
-void checking_Parenthesis(string in_str);
 
-string extract_label(string in_str, size_t i);
+//string extract_label(string in_str, size_t i);
 size_t end_of_label_or_bl(string in_str, size_t i);
 
 string write_para_into_tree(string sp_string, double para);

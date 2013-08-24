@@ -2,7 +2,8 @@ bin_PROGRAMS = test_hybrid_coal
 PROG = TEST_HYBRID_COAL
 test_hybrid_coal_SOURCES = node.cpp node.hpp \
 newmain.cpp  \
-net.cpp net.hpp
+net.cpp net.hpp \
+utility.cpp  utility.hpp
 
 test_hybrid_coal_CXXFLAGS= -g -O3 -Wall  #options for showing debug messages
 #test_hybrid_coal_CXXFLAGS= -O3 -Wall -DNDEBUG   #options for not showing debug messages

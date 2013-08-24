@@ -3,7 +3,6 @@
 #include"utility.hpp"
 
 int main(int argc, char *argv[]){
-for (int argc_i=0;argc_i<argc;argc_i++){
 	bool main_debug_bool=false; 	
 	bool export_debug_bool=false;
 	bool coal_debug_bool=false;
@@ -17,8 +16,8 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 	bool pdf_bool=false;	
 	string latex_F_name="latex_prob.tex";
 	
-	maple_bool=false;
-	string maple_F_name="maple_prob.mw";
+	//maple_bool=false;
+	//string maple_F_name="maple_prob.mw";
 	
 	bool print_gene_topo_bool=false;
 	string gtopo_F_name="GENE_topo";
@@ -33,7 +32,7 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		
 	bool list_sub_network_bool=false;
 
-	int plot_option;//=0;
+	//int plot_option;//=0;
 	bool plot_label=false;
 	bool plot_branch=false;
 	bool plot_bool=false;
@@ -42,6 +41,8 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 	string dot_fig_name="figure.dot";
 	bool out_bool=false;
 	string out_file="out_coal";
+for (int argc_i=0;argc_i<argc;argc_i++){
+	
 		string argv_i(argv[argc_i]);
 		
 		if (argv_i=="-gt"){
@@ -60,14 +61,14 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			appending_log_file(sp_log);
 
 		}
-		if (argv_i=="-latex"){
-			latex_bool=true;			
-		}
+		//if (argv_i=="-latex"){
+			//latex_bool=true;			
+		//}
 		
-		if (argv_i=="-latexF"){
-			latex_bool=true;
-			latex_F_name=Fname_ext(argv[argc_i+1],".tex");
-		}
+		//if (argv_i=="-latexF"){
+			//latex_bool=true;
+			//latex_F_name=Fname_ext(argv[argc_i+1],".tex");
+		//}
 		if (argv_i=="-out"){
 			out_bool=true;
 			out_file=argv[argc_i+1];
@@ -80,13 +81,13 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		//if (argv_i=="-history"){
 			//coal_history=true;
 		//}
-		if (argv_i=="-maple"){
-			maple_bool=true;
-		}
-		if (argv_i=="-mapleF"){
-			maple_bool=true;
-			maple_F_name=Fname_ext(argv[argc_i+1],".mw");
-		}
+		//if (argv_i=="-maple"){
+			//maple_bool=true;
+		//}
+		//if (argv_i=="-mapleF"){
+			//maple_bool=true;
+			//maple_F_name=Fname_ext(argv[argc_i+1],".mw");
+		//}
 		
 		if (argv_i=="-h" || argv_i=="-help" ){
 			help=true;
@@ -179,33 +180,33 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		}
 		//plot_option=set_plot_option(plot_label,plot_branch);
 
-		if (plot_bool){
-			plot_in_latex_file(tex_fig_name.c_str(), net_dummy,plot_option);	
-		}
+		//if (plot_bool){
+			//plot_in_latex_file(tex_fig_name.c_str(), net_dummy,plot_option);	
+		//}
 		
-		if (dot_bool){
-			plot_in_dot(dot_fig_name.c_str(), net_dummy,plot_option);			
-		}
+		//if (dot_bool){
+			//plot_in_dot(dot_fig_name.c_str(), net_dummy,plot_option);			
+		//}
 			
-		if (all_gt_tree_bool){
-			gt_tree_str_s=all_n_tax_gene_tree(net_dummy.tip_name);
-			if (print_gene_topo_bool){
-				print_all_gt_topo(gtopo_F_name.c_str(),gt_tree_str_s);
-			}
-		}
+		//if (all_gt_tree_bool){
+			//gt_tree_str_s=all_n_tax_gene_tree(net_dummy.tip_name);
+			//if (print_gene_topo_bool){
+				//print_all_gt_topo(gtopo_F_name.c_str(),gt_tree_str_s);
+			//}
+		//}
 
-		if (list_sub_network_bool && gt_tree_str_s.size()==1){
-			list_sub(net_str,gt_tree_str_s[0]);
-		}
+		//if (list_sub_network_bool && gt_tree_str_s.size()==1){
+			//list_sub(net_str,gt_tree_str_s[0]);
+		//}
 
-		if (list_sub_network_bool && all_gt_tree_bool){
-			string 	empty_str="";
-			list_sub(net_str,empty_str);
-		}
+		//if (list_sub_network_bool && all_gt_tree_bool){
+			//string 	empty_str="";
+			//list_sub(net_str,empty_str);
+		//}
 				
-		if (print_tree || plot_bool || dot_bool || print_gene_topo_bool || list_sub_network_bool && gt_tree_str_s.size()>1){
-			//return 0;
-			return my_exit();
-		}		
+		//if (print_tree || plot_bool || dot_bool || print_gene_topo_bool || list_sub_network_bool && gt_tree_str_s.size()>1){
+			////return 0;
+			//return my_exit();
+		//}		
 
 }
