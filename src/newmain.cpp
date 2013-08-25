@@ -1,13 +1,16 @@
-#include"net.hpp"
-#include"node.hpp"
-#include"utility.hpp"
+//#include"net.hpp"
+//#include"node.hpp"
+//#include"utility.hpp"
+#include"export.hpp"
+#include"all_gene_topo.hpp"
+
 
 int main(int argc, char *argv[]){
-	bool main_debug_bool=false; 	
-	bool export_debug_bool=false;
-	bool coal_debug_bool=false;
-	bool utility_debug_bool=false;
-	bool rm_debug_bool=false;
+	//bool main_debug_bool=false; 	
+	//bool export_debug_bool=false;
+	//bool coal_debug_bool=false;
+	//bool utility_debug_bool=false;
+	//bool rm_debug_bool=false;
 	
 	bool acc_bool=false;
 	
@@ -32,7 +35,7 @@ int main(int argc, char *argv[]){
 		
 	bool list_sub_network_bool=false;
 
-	//int plot_option;//=0;
+	int plot_option;//=0;
 	bool plot_label=false;
 	bool plot_branch=false;
 	bool plot_bool=false;
@@ -96,30 +99,30 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		//if (argv_i=="-debug"){
 			//debug_bool=true;
 		//}
-		if (argv_i=="-debug"){
-			//samples_bool=true;
-			for (int argc_j=argc_i+1;argc_j<argc;argc_j++){
-				string s(argv[argc_j]);
-				if (s[0]=='-'){
-					break;
-				}
-				if (s=="coal"){
-					coal_debug_bool=true;
-				}
-				if (s=="utility"){
-					utility_debug_bool=true;
-				}
-				if (s=="rm"){
-					rm_debug_bool=true;
-				}
-				if (s=="export"){
-					export_debug_bool=true;
-				}
-				if (s=="main"){
-					main_debug_bool=true;
-				}
-			}
-		}
+		//if (argv_i=="-debug"){
+			////samples_bool=true;
+			//for (int argc_j=argc_i+1;argc_j<argc;argc_j++){
+				//string s(argv[argc_j]);
+				//if (s[0]=='-'){
+					//break;
+				//}
+				//if (s=="coal"){
+					//coal_debug_bool=true;
+				//}
+				//if (s=="utility"){
+					//utility_debug_bool=true;
+				//}
+				//if (s=="rm"){
+					//rm_debug_bool=true;
+				//}
+				//if (s=="export"){
+					//export_debug_bool=true;
+				//}
+				//if (s=="main"){
+					//main_debug_bool=true;
+				//}
+			//}
+		//}
 		
 		if (argv_i=="-symb"){
 			symb_bool=true;
@@ -178,35 +181,36 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			net_dummy->print_all_node();
 			appending_log_file("Tree printed");
 		}
-		//plot_option=set_plot_option(plot_label,plot_branch);
+		plot_option=set_plot_option(plot_label,plot_branch);
 
-		//if (plot_bool){
-			//plot_in_latex_file(tex_fig_name.c_str(), net_dummy,plot_option);	
-		//}
+		if (plot_bool){
+			plot_in_latex_file(tex_fig_name.c_str(), net_dummy,plot_option);	
+		}
 		
-		//if (dot_bool){
-			//plot_in_dot(dot_fig_name.c_str(), net_dummy,plot_option);			
-		//}
+		if (dot_bool){
+			plot_in_dot(dot_fig_name.c_str(), net_dummy,plot_option);			
+		}
 			
-		//if (all_gt_tree_bool){
-			//gt_tree_str_s=all_n_tax_gene_tree(net_dummy.tip_name);
-			//if (print_gene_topo_bool){
-				//print_all_gt_topo(gtopo_F_name.c_str(),gt_tree_str_s);
-			//}
-		//}
+		if (all_gt_tree_bool){
+			vector<string> tip_names = net_dummy->extract_tip_names();
+			gt_tree_str_s=all_n_tax_gene_tree(tip_names);
+			if (print_gene_topo_bool){
+				print_all_gt_topo(gtopo_F_name.c_str(),gt_tree_str_s);
+			}
+		}
 
-		//if (list_sub_network_bool && gt_tree_str_s.size()==1){
-			//list_sub(net_str,gt_tree_str_s[0]);
-		//}
+		if (list_sub_network_bool && gt_tree_str_s.size()==1){
+			list_sub(net_str,gt_tree_str_s[0]);
+		}
 
-		//if (list_sub_network_bool && all_gt_tree_bool){
-			//string 	empty_str="";
-			//list_sub(net_str,empty_str);
-		//}
+		if (list_sub_network_bool && all_gt_tree_bool){
+			string 	empty_str="";
+			list_sub(net_str,empty_str);
+		}
 				
-		//if (print_tree || plot_bool || dot_bool || print_gene_topo_bool || list_sub_network_bool && gt_tree_str_s.size()>1){
-			////return 0;
-			//return my_exit();
-		//}		
+		if (print_tree || plot_bool || dot_bool || print_gene_topo_bool || list_sub_network_bool && gt_tree_str_s.size()>1){
+			//return 0;
+			return my_exit();
+		}		
 
 }

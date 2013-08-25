@@ -52,7 +52,7 @@ void print_all_gt_topo(const char* file_name,vector <string> gt_tree_str_s){
 /*! \brief Core function of drawing a network in .tex files. 
  */
 void plot_in_latex(const char* file_name /*! Name for the figure file */ , 
-	Net net_dummy,
+	Net* net_dummy,
 // string net_str /*! Input network written in extended newick form */,
 	int plot_option /*! '0' -- do not label the branches; '1' -- enumerate the branches by  postorder tree traversal; '2' -- label the branch lengths of the network*/
 	){
@@ -62,44 +62,50 @@ void plot_in_latex(const char* file_name /*! Name for the figure file */ ,
 	latex_file <<"\\begin{center}\n";	
 	latex_file <<"\\begin{tikzpicture}[thick]\n";
 	valarray <int>  x_node=det_x_node (net_dummy);
-	for (unsigned int node_i=0;node_i<net_dummy.Net_nodes.size();node_i++){
-		string sp_node_label=net_dummy.Net_nodes[node_i].label;
+	for (size_t node_i=0;node_i<net_dummy->Net_nodes.size();node_i++){
+		Node * current_node =net_dummy->Net_nodes[node_i];
+		string sp_node_label=net_dummy->net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
 		sp_node_label=rm_and_hash_sign(sp_node_label);
-		if (net_dummy.Net_nodes[node_i].tip_bool){
-			latex_file<<"\\node at ("<<x_node[node_i]<<"\\du,"<<net_dummy.Net_nodes[node_i].rank<<"\\du) [circle,draw] ("<<sp_node_label <<") {$"<<sp_node_label <<"$};\n";
+		if (current_node->tip()){
+			latex_file<<"\\node at ("<<x_node[node_i]<<"\\du,"<<current_node->rank()<<"\\du) [circle,draw] ("<<sp_node_label <<") {$"<<sp_node_label <<"$};\n";
 		//latex_file<<"\\node at ("<<x_node[node_i]<<"\\du,"<<y_node[node_i]<<"\\du) [circle,draw] ("<<sp_node_label <<") {$"<<sp_node_label <<"$};\n";
 		}
 		else{
-			latex_file<<"\\node at ("<<x_node[node_i]<<"\\du,"<<net_dummy.Net_nodes[node_i].rank<<"\\du) [circle,fill=orange,draw] ("<<sp_node_label <<") {$"<<sp_node_label <<"$};\n";
+			latex_file<<"\\node at ("<<x_node[node_i]<<"\\du,"<<current_node->rank()<<"\\du) [circle,fill=orange,draw] ("<<sp_node_label <<") {$"<<sp_node_label <<"$};\n";
 		}
 	}
 
-	for (unsigned int node_i=0;node_i<net_dummy.Net_nodes.size()-1;node_i++){
-		string sp_node_label=net_dummy.Net_nodes[node_i].label;
+	for (size_t node_i=0;node_i<net_dummy->Net_nodes.size()-1;node_i++){
+		Node * current_node =net_dummy->Net_nodes[node_i];
+		string sp_node_label=net_dummy->net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
+		//string sp_node_label=net_dummy->Net_nodes[node_i].label;
 		sp_node_label=rm_and_hash_sign(sp_node_label);
-		string sp_node_parent1_label=net_dummy.Net_nodes[node_i].parent1->label;
+		Node * parent1 = current_node->parent1();
+		string sp_node_parent1_label=net_dummy->net_str.substr(parent1->nodeName_start(), parent1->nodeName_length());
 		sp_node_parent1_label=rm_and_hash_sign(sp_node_parent1_label);
-		if (!net_dummy.Net_nodes[node_i].tip_bool){
+		if (!net_dummy->Net_nodes[node_i]->tip()){
 			if (plot_option==1){
-				latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].e_num <<"};\n";
+				latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< current_node->e_num() <<"};\n";
 			}
 			else{
 				if (plot_option==2){
-					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].brchlen1 <<"};\n";
+					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< current_node->brchlen1() <<"};\n";
 				}
 				else{
 					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<");\n";	
 				}	
 			}
-			if (net_dummy.Net_nodes[node_i].parent2){
-				string sp_node_parent2_label=net_dummy.Net_nodes[node_i].parent2->label;	
+			if (current_node->parent2()){
+				Node * parent2 = current_node->parent2();
+				string sp_node_parent2_label=net_dummy->net_str.substr(parent2->nodeName_start(), parent2->nodeName_length());
+				//string sp_node_parent2_label=net_dummy->Net_nodes[node_i].parent2->label;	
 				sp_node_parent2_label=rm_and_hash_sign(sp_node_parent2_label);
 				if (plot_option==1){
-					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].e_num2 <<"};\n";
+					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< current_node->e_num2() <<"};\n";
 				}
 				else{
 					if (plot_option==2){
-						latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].brchlen2 <<"};\n";
+						latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< current_node->brchlen2() <<"};\n";
 					}
 					else{
 						latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<");\n";
@@ -109,16 +115,18 @@ void plot_in_latex(const char* file_name /*! Name for the figure file */ ,
 		}
 		else{
 			if (plot_option==2){
-				latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].brchlen1 <<"};\n";
+				latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<") node [midway,left]{"<< current_node->brchlen1() <<"};\n";
 			}
 			else{
 				latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent1_label<<");\n";	
 			}	
-			if (net_dummy.Net_nodes[node_i].parent2){
-				string sp_node_parent2_label=net_dummy.Net_nodes[node_i].parent2->label;
+			if (current_node->parent2()){
+				Node * parent2 = current_node->parent2();
+				string sp_node_parent2_label=net_dummy->net_str.substr(parent2->nodeName_start(), parent2->nodeName_length());
+				//string sp_node_parent2_label=net_dummy->Net_nodes[node_i].parent2->label;
 				sp_node_parent2_label=rm_and_hash_sign(sp_node_parent2_label);
 				if (plot_option==2){
-					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< net_dummy.Net_nodes[node_i].brchlen2 <<"};\n";
+					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<") node [midway,left]{"<< current_node->brchlen2() <<"};\n";
 				}
 				else{
 					latex_file<<"\\draw ("<<sp_node_label<<")-- ("<<sp_node_parent2_label<<");\n";
@@ -135,7 +143,7 @@ void plot_in_latex(const char* file_name /*! Name for the figure file */ ,
 /*! \brief Produce a dot file, which is used to draw the network, and compile the dot file to a pdf file.
  */
 void plot_in_dot(const char* file_name /*! Name for the figure file */,
-	Net net_dummy,
+	Net* net_dummy,
 // string net_str /*! Input network written in extended newick form */,
 	int plot_option /*! '0' -- do not label the branches; '1' -- enumerate the branches by  postorder tree traversal; '2' -- label the branch lengths of the network*/){
 	string file_name_no_dot=Fname_no_ext(file_name,".dot");
@@ -147,35 +155,41 @@ void plot_in_dot(const char* file_name /*! Name for the figure file */,
 	dot_file <<"graph G {\n rankdir=BT; ratio=compress;\n";//page="14,14"; determines the size of the ps output
 	//valarray <int>  x_node=det_x_node (net_dummy);
 
-	for (unsigned int node_i=0;node_i<net_dummy.Net_nodes.size()-1;node_i++){
-		string sp_node_label=net_dummy.Net_nodes[node_i].label;
+	for (size_t node_i=0;node_i<net_dummy->Net_nodes.size()-1;node_i++){
+		Node * current_node =net_dummy->Net_nodes[node_i];
+		string sp_node_label=net_dummy->net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
+		//string sp_node_label=net_dummy->Net_nodes[node_i].label;
 		sp_node_label=rm_and_hash_sign(sp_node_label);
-		string sp_node_parent1_label=net_dummy.Net_nodes[node_i].parent1->label;
+		//string sp_node_parent1_label=net_dummy->Net_nodes[node_i].parent1->label;
+		Node * parent1 = current_node->parent1();
+		string sp_node_parent1_label=net_dummy->net_str.substr(parent1->nodeName_start(), parent1->nodeName_length());
 		sp_node_parent1_label=rm_and_hash_sign(sp_node_parent1_label);
-		if (!net_dummy.Net_nodes[node_i].tip_bool){		
+		if (!current_node->tip()){		
 			if (plot_option==1){
-				dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< net_dummy.Net_nodes[node_i].e_num <<"\"];\n";
+				dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< current_node->e_num() <<"\"];\n";
 			}
 			else{
 				if (plot_option==2){
-					dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< net_dummy.Net_nodes[node_i].brchlen1 <<"\"];\n";	
+					dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< current_node->brchlen1() <<"\"];\n";	
 				}
 				else{
 					dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<";\n";//
 				}	
 			}
-			if (net_dummy.Net_nodes[node_i].parent2){
-				string sp_node_parent2_label=net_dummy.Net_nodes[node_i].parent2->label;
+			if (current_node->parent2()){
+				Node * parent2 = current_node->parent2();
+				string sp_node_parent2_label=net_dummy->net_str.substr(parent2->nodeName_start(), parent2->nodeName_length());
+				//string sp_node_parent2_label=net_dummy->Net_nodes[node_i].parent2->label;
 				sp_node_parent2_label=rm_and_hash_sign(sp_node_parent2_label);
 				if (plot_option==1){
-					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< net_dummy.Net_nodes[node_i].e_num2 <<"\"];\n";
+					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< current_node->e_num2() <<"\"];\n";
 				}
 				else{
 					if (plot_option==2){
-						dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< net_dummy.Net_nodes[node_i].brchlen2 <<"\"];\n";	
+						dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< current_node->brchlen2() <<"\"];\n";	
 					}
 					else{
-						dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<";\n";//<<"[label=\""<< net_dummy.Net_nodes[node_i].e_num2 <<"\"];\n";
+						dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<";\n";//<<"[label=\""<< net_dummy->Net_nodes[node_i].e_num2 <<"\"];\n";
 					}	
 				}	
 				
@@ -183,33 +197,38 @@ void plot_in_dot(const char* file_name /*! Name for the figure file */,
 		}
 		else{
 			if (plot_option==2){
-				dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< net_dummy.Net_nodes[node_i].brchlen1 <<"\"];\n";	
+				dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<"[label=\""<< current_node->brchlen1() <<"\"];\n";	
 			}
 			else{
 				dot_file<<sp_node_label<<" -- "<<sp_node_parent1_label<<";\n";//
 			}	
 			
-			if (net_dummy.Net_nodes[node_i].parent2){
-				string sp_node_parent2_label=net_dummy.Net_nodes[node_i].parent2->label;
+			if (current_node->parent2()){
+				Node * parent2 = current_node->parent2();
+				string sp_node_parent2_label=net_dummy->net_str.substr(parent2->nodeName_start(), parent2->nodeName_length());
+				//string sp_node_parent2_label=net_dummy->Net_nodes[node_i].parent2->label;
 				sp_node_parent2_label=rm_and_hash_sign(sp_node_parent2_label);					
 				if (plot_option==2){
-					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< net_dummy.Net_nodes[node_i].brchlen2 <<"\"];\n";	
+					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<"[label=\""<< current_node->brchlen2() <<"\"];\n";	
 				}
 				else{
-					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<";\n";//<<"[label=\""<< net_dummy.Net_nodes[node_i].e_num2 <<"\"];\n";
+					dot_file<<sp_node_label<<" -- "<<sp_node_parent2_label<<";\n";//<<"[label=\""<< net_dummy->Net_nodes[node_i].e_num2 <<"\"];\n";
 				}
 			}
 		}
 	}
 	//cout<<"hea"<<endl;
-	//if (net_dummy.is_ultrametric_func()){
-		for (int rank_i=net_dummy.Net_nodes.back().rank;rank_i>0;rank_i--){
+	//if (net_dummy->is_ultrametric_func()){
+		for (int rank_i=net_dummy->Net_nodes.back()->rank();rank_i>0;rank_i--){
 			dot_file<<"{ rank=same; ";
 			vector <int> x_node_dummy;
-			vector <unsigned int> x_node_dummy_index;
-			for (unsigned int node_i=0;node_i<net_dummy.Net_nodes.size();node_i++){
-				if (net_dummy.Net_nodes[node_i].rank==rank_i){
-					string sp_node_label=net_dummy.Net_nodes[node_i].label;
+			vector <size_t> x_node_dummy_index;
+			for (size_t node_i=0;node_i<net_dummy->Net_nodes.size();node_i++){
+				Node * current_node =net_dummy->Net_nodes[node_i];
+				if (current_node->rank()==rank_i){
+					
+					string sp_node_label=net_dummy->net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
+					//string sp_node_label=net_dummy->Net_nodes[node_i].label;
 					sp_node_label=rm_and_hash_sign(sp_node_label);
 					dot_file<<sp_node_label<<" ";
 				}	
@@ -260,7 +279,7 @@ string Fname_no_ext(const char* file_name,const char* ext){
 /*! \brief Produce a tex file, which is used to draw the network 
  */
 void plot_in_latex_file(const char* file_name /*! Name for the figure file */ , 
-	Net net_dummy,
+	Net* net_dummy,
 // string net_str /*! Input network written in extended newick form */,
 	int plot_option /*! '0' -- do not label the branches; '1' -- enumerate the branches by  postorder tree traversal; '2' -- label the branch lengths of the network*/ 
 	){
@@ -302,22 +321,22 @@ void latex_nt_body1(const char* file_name,size_t topo_idx,string gt_topo){
 	}
 }
 
-void latex_nt_body2(const char* file_name,vec_Net_wiz_prior_p net_str_s,size_t i){
-	ofstream latex_file;
-	latex_file.open (file_name, ios::out | ios::app | ios::binary);
+//void latex_nt_body2(const char* file_name,vec_Net_wiz_prior_p net_str_s,size_t i){
+	//ofstream latex_file;
+	//latex_file.open (file_name, ios::out | ios::app | ios::binary);
 	
-	latex_file<<"\\begin{verbatim}ST: "<<tree_topo(net_str_s.Net_vec[i].s_net_string)<<"\\end{verbatim} "<<endl;
-	latex_file<<"$"<<net_str_s.Net_vec[i].omega_string<<"$\\\\"<<endl;
-	latex_file<<"$\\omega="<<net_str_s.Net_vec[i].omega<<"$\\\\"<<endl;
-	latex_file.close();
-	//plot_enum_in_latex("latex_prob.tex",net_str_s.Net_vec[i]);
-	plot_in_latex(file_name, net_str_s.Net_vec[i].s_net_string_enum,2);		
-	//plot_in_latex("latex_prob.tex", net_str_s.Net_vec[i].s_net_string,1);		
+	//latex_file<<"\\begin{verbatim}ST: "<<tree_topo(net_str_s.Net_vec[i].s_net_string)<<"\\end{verbatim} "<<endl;
+	//latex_file<<"$"<<net_str_s.Net_vec[i].omega_string<<"$\\\\"<<endl;
+	//latex_file<<"$\\omega="<<net_str_s.Net_vec[i].omega<<"$\\\\"<<endl;
+	//latex_file.close();
+	//////plot_enum_in_latex("latex_prob.tex",net_str_s.Net_vec[i]);
+	//plot_in_latex(file_name, net_str_s.Net_vec[i].s_net_string_enum,2);		
+	//////plot_in_latex("latex_prob.tex", net_str_s.Net_vec[i].s_net_string,1);		
 
-	if (export_debug_bool){
-		cout<<"latex_nt_body2 END"<<endl;
-	}
-}
+	//if (export_debug_bool){
+		//cout<<"latex_nt_body2 END"<<endl;
+	//}
+//}
 
 void latex_tre_body(const char* file_name,string gt_str,string sp_str){
 	ofstream latex_file;
@@ -346,53 +365,53 @@ void latex_tail(const char* file_name){
 
 
 void list_sub_tree(string in_str,string gt_str){
-	check_and_remove("sub_trees");
-	ofstream sub_trees_file;
-	sub_trees_file.open("sub_trees", ios::out | ios::app | ios::binary);
-	//string empty_str="";
-	//vec_Net_wiz_prior_p net_str_s=simplify_Networks(in_str,empty_str);
-	vec_Net_wiz_prior_p net_str_s=simplify_Networks(in_str,gt_str);
+	//check_and_remove("sub_trees");
+	//ofstream sub_trees_file;
+	//sub_trees_file.open("sub_trees", ios::out | ios::app | ios::binary);
+	//////string empty_str="";
+	//////vec_Net_wiz_prior_p net_str_s=simplify_Networks(in_str,empty_str);
+	//vec_Net_wiz_prior_p net_str_s=simplify_Networks(in_str,gt_str);
 	
-	for (size_t i=0;i<net_str_s.Net_vec.size();i++){
-		sub_trees_file<<net_str_s.Net_vec[i].s_net_string<<"\t"<<net_str_s.Net_vec[i].omega <<endl;
+	//for (size_t i=0;i<net_str_s.Net_vec.size();i++){
+		//sub_trees_file<<net_str_s.Net_vec[i].s_net_string<<"\t"<<net_str_s.Net_vec[i].omega <<endl;
 		
-	}
-	//sub_trees_file<<net_str_s.Net_vec.size()<<" "<<" "<<endl;
-	sub_trees_file.close();
-	appending_log_file("Simplified species tree are listed in: sub_trees");
+	//}
+	//////sub_trees_file<<net_str_s.Net_vec.size()<<" "<<" "<<endl;
+	//sub_trees_file.close();
+	//appending_log_file("Simplified species tree are listed in: sub_trees");
 	
 }
 
 
 
 void list_sub_net(string in_str,string gt_str){
-	check_and_remove("sub_networks");
-	check_and_remove("reverse_sub_net");
-	//string 	empty_str="";
-	//simplify_Networks_maple_block("reverse_sub_net",in_str, empty_str,1);
-	simplify_Networks_maple_block("reverse_sub_net",in_str, gt_str,1);
+	//check_and_remove("sub_networks");
+	//check_and_remove("reverse_sub_net");
+	////string 	empty_str="";
+	////simplify_Networks_maple_block("reverse_sub_net",in_str, empty_str,1);
+	//simplify_Networks_maple_block("reverse_sub_net",in_str, gt_str,1);
 
-	ifstream maple_file;
-	maple_file.open("reverse_sub_net");
-	ofstream sub_network_file;
-	sub_network_file.open("sub_networks", ios::out | ios::app | ios::binary);
-	string maple_file_content;
-	getline (maple_file,maple_file_content);
-	int count_subnetwork=0;
-	while (maple_file_content.size()>0){   
-		//getline (gt_tree_file,gt_tree_str);
-		if (maple_file_content.find(";#s[")!=string::npos){
-			count_subnetwork++;
-			sub_network_file<<maple_file_content.substr(maple_file_content.find("]=")+2,maple_file_content.size())<<endl;
-		}
-		//gt_tree_str_s.push_back(gt_tree_str);
-		getline (maple_file,maple_file_content);
-	}
-	maple_file.close();
-	check_and_remove("reverse_sub_net");		
-	sub_network_file<<count_subnetwork<<endl;
-	sub_network_file.close();
-	appending_log_file("Simplified species tree are listed in: sub_networks");	
+	//ifstream maple_file;
+	//maple_file.open("reverse_sub_net");
+	//ofstream sub_network_file;
+	//sub_network_file.open("sub_networks", ios::out | ios::app | ios::binary);
+	//string maple_file_content;
+	//getline (maple_file,maple_file_content);
+	//int count_subnetwork=0;
+	//while (maple_file_content.size()>0){   
+		////getline (gt_tree_file,gt_tree_str);
+		//if (maple_file_content.find(";#s[")!=string::npos){
+			//count_subnetwork++;
+			//sub_network_file<<maple_file_content.substr(maple_file_content.find("]=")+2,maple_file_content.size())<<endl;
+		//}
+		////gt_tree_str_s.push_back(gt_tree_str);
+		//getline (maple_file,maple_file_content);
+	//}
+	//maple_file.close();
+	//check_and_remove("reverse_sub_net");		
+	//sub_network_file<<count_subnetwork<<endl;
+	//sub_network_file.close();
+	//appending_log_file("Simplified species tree are listed in: sub_networks");	
 }
 
 
@@ -403,22 +422,22 @@ void list_sub(string in_str,string gt_str){
 }
 
 
-void produce_maple(const char* file_name, string in_str, bool symb_bool, vector <string> gt_tree_str_s){
-	if (export_debug_bool){
-		cout<<"produce_maple START"<<endl;
-	}
-	maple_head(file_name,in_str,symb_bool);
+//void produce_maple(const char* file_name, string in_str, bool symb_bool, vector <string> gt_tree_str_s){
+	//if (export_debug_bool){
+		//cout<<"produce_maple START"<<endl;
+	//}
+	//maple_head(file_name,in_str,symb_bool);
 	
-	for (size_t i=0;i<gt_tree_str_s.size();i++){
-		//vector <string> maple_block=simplify_Networks_maple_block(old_net_string, gt_tree_str_s[i],i);
-		simplify_Networks_maple_block(file_name,in_str, gt_tree_str_s[i],i);
-		//for (unsigned int maple_block_i=0;maple_block_i<maple_block.size();maple_block_i++){
-			//maple_file_rv_vec.push_back(maple_block[maple_block_i]);
+	//for (size_t i=0;i<gt_tree_str_s.size();i++){
+		////vector <string> maple_block=simplify_Networks_maple_block(old_net_string, gt_tree_str_s[i],i);
+		//simplify_Networks_maple_block(file_name,in_str, gt_tree_str_s[i],i);
+		////for (size_t maple_block_i=0;maple_block_i<maple_block.size();maple_block_i++){
+			////maple_file_rv_vec.push_back(maple_block[maple_block_i]);
 			
-		//}
-	}			
-	maple_tail(file_name,gt_tree_str_s.size()-1);
-}
+		////}
+	//}			
+	//maple_tail(file_name,gt_tree_str_s.size()-1);
+//}
 
 void maple_head(const char* file_name, string in_str,bool symb_bool){
 	check_and_remove(file_name);
@@ -435,27 +454,27 @@ void maple_head(const char* file_name, string in_str,bool symb_bool){
 }
 
 void symb_maple(const char* file_name,string in_str){
-	Net net_dummy(in_str);
-	ofstream maple_file;
-	maple_file.open(file_name, ios::out | ios::app | ios::binary);	
-	maple_file<<"unprotect(gamma); "<<endl;
+	//Net * net_dummy = new Net(in_str);
+	//ofstream maple_file;
+	//maple_file.open(file_name, ios::out | ios::app | ios::binary);	
+	//maple_file<<"unprotect(gamma); "<<endl;
 	
-	for (unsigned int i=0;i<net_dummy.Net_nodes.size()-1;i++){
-		if (!net_dummy.Net_nodes[i].tip_bool){
-			maple_file<<"lambda["<<net_dummy.Net_nodes[i].e_num<<"]:="<<net_dummy.Net_nodes[i].brchlen1<<";"<<endl;
-			if (net_dummy.Net_nodes[i].hybrid){
-				maple_file<<"lambda["<<net_dummy.Net_nodes[i].e_num2<<"]:="<<net_dummy.Net_nodes[i].brchlen2<<";"<<endl;		
-				size_t new_node_name_i=net_dummy.Net_nodes[i].label.find("#");
-				//for (new_node_name_i=0;new_node_name_i<net_dummy.Net_nodes[i].label.size();new_node_name_i++){
-					//if (net_dummy.Net_nodes[i].label[new_node_name_i]=='#'){
-						//break;
-					//}
-				//}
-				maple_file<<"gamma["<<net_dummy.Net_nodes[i].label.substr(1,new_node_name_i-1) <<"]:="<<net_dummy.Net_nodes[i].label.substr(new_node_name_i+1,net_dummy.Net_nodes[i].label.size()-1) <<";"<<endl;		
-			}
-		}
-	}	
-	maple_file.close();	
+	//for (size_t i=0;i<net_dummy->Net_nodes.size()-1;i++){
+		//if (!net_dummy->Net_nodes[i]->tip()){
+			//maple_file<<"lambda["<<net_dummy->Net_nodes[i].e_num<<"]:="<<net_dummy->Net_nodes[i].brchlen1<<";"<<endl;
+			//if (net_dummy->Net_nodes[i].hybrid){
+				//maple_file<<"lambda["<<net_dummy->Net_nodes[i].e_num2<<"]:="<<net_dummy->Net_nodes[i].brchlen2<<";"<<endl;		
+				//size_t new_node_name_i=net_dummy->Net_nodes[i].label.find("#");
+				////for (new_node_name_i=0;new_node_name_i<net_dummy->Net_nodes[i].label.size();new_node_name_i++){
+					////if (net_dummy->Net_nodes[i].label[new_node_name_i]=='#'){
+						////break;
+					////}
+				////}
+				//maple_file<<"gamma["<<net_dummy->Net_nodes[i].label.substr(1,new_node_name_i-1) <<"]:="<<net_dummy->Net_nodes[i].label.substr(new_node_name_i+1,net_dummy->Net_nodes[i].label.size()-1) <<";"<<endl;		
+			//}
+		//}
+	//}	
+	//maple_file.close();	
 }
 
 
@@ -536,19 +555,20 @@ int set_plot_option(bool plot_label,bool plot_branch){
 
 /*! \brief When drawing network in .tex files, detemine the x coordinates of nodes \todo improve this!
  */
-valarray <int>  det_x_node (Net net_dummy){
-	valarray <int>  x_node (net_dummy.Net_nodes.size());
+valarray <int>  det_x_node (Net* net_dummy){
+	valarray <int>  x_node (net_dummy->Net_nodes.size());
 	x_node[x_node.size()-1]=0;
 	
-	//valarray <int>  y_node (net_dummy.Net_nodes.size());
-	//y_node[x_node.size()-1]=net_dummy.Net_nodes.back().e_num;
+	//valarray <int>  y_node (net_dummy->Net_nodes.size());
+	//y_node[x_node.size()-1]=net_dummy->Net_nodes.back().e_num;
 	
-	for (int rank_i=net_dummy.Net_nodes.back().rank;rank_i>0;rank_i--){
+	for (int rank_i=net_dummy->Net_nodes.back()->rank();rank_i>0;rank_i--){
 		vector <int> x_node_dummy;
-		vector <unsigned int> x_node_dummy_index;
-		for (unsigned int node_i=0;node_i<net_dummy.Net_nodes.size();node_i++){
-			if (net_dummy.Net_nodes[node_i].rank==rank_i){
-				unsigned int n_child=net_dummy.Net_nodes[node_i].child.size();
+		vector <size_t> x_node_dummy_index;
+		for (size_t node_i=0;node_i<net_dummy->Net_nodes.size();node_i++){
+			Node * current_node = net_dummy->Net_nodes[node_i];
+			if (current_node->rank()==rank_i){
+				size_t n_child=current_node->child.size();
 				int parent_x=x_node[node_i];
 				//int parent_y=y_node[node_i];
 				int start_child_x=parent_x-floor(n_child/2);
@@ -558,9 +578,9 @@ valarray <int>  det_x_node (Net net_dummy){
 					odd_num_child=true;
 				}
 				if (odd_num_child){
-					for (unsigned int child_i=0;child_i<n_child;child_i++){
-						for (unsigned int node_j=0;node_j<net_dummy.Net_nodes.size();node_j++){
-							if (net_dummy.Net_nodes[node_j].label==net_dummy.Net_nodes[node_i].child[child_i]->label){			
+					for (size_t child_i=0;child_i<n_child;child_i++){
+						for (size_t node_j=0;node_j<net_dummy->Net_nodes.size();node_j++){
+							if (net_dummy->Net_nodes[node_j]==current_node->child[child_i]){			
 								//int child_y=y_node[node_j];
 								if (start_child_x==parent_x){
 									x_node[node_j]=parent_x;
@@ -578,9 +598,9 @@ valarray <int>  det_x_node (Net net_dummy){
 					}
 				}
 				else{
-					for (unsigned int child_i=0;child_i<n_child;child_i++){
-						for (unsigned int node_j=0;node_j<net_dummy.Net_nodes.size();node_j++){
-							if (net_dummy.Net_nodes[node_j].label==net_dummy.Net_nodes[node_i].child[child_i]->label){
+					for (size_t child_i=0;child_i<n_child;child_i++){
+						for (size_t node_j=0;node_j<net_dummy->Net_nodes.size();node_j++){
+							if (net_dummy->Net_nodes[node_j] == current_node->child[child_i]){
 								if (start_child_x==parent_x){										
 									start_child_x++;
 								}
@@ -600,9 +620,9 @@ valarray <int>  det_x_node (Net net_dummy){
 		if (x_node_dummy.size()>1){
 			bool need_to_shift=true;
 			while (need_to_shift){
-				for (unsigned int x_node_dummy_i=0;x_node_dummy_i<x_node_dummy.size();x_node_dummy_i++){
+				for (size_t x_node_dummy_i=0;x_node_dummy_i<x_node_dummy.size();x_node_dummy_i++){
 					int current_x_node_dummy=x_node_dummy[x_node_dummy_i];
-					for (unsigned int x_node_dummy_j=x_node_dummy_i+1;x_node_dummy_j<x_node_dummy.size();x_node_dummy_j++){
+					for (size_t x_node_dummy_j=x_node_dummy_i+1;x_node_dummy_j<x_node_dummy.size();x_node_dummy_j++){
 						if (current_x_node_dummy==x_node_dummy[x_node_dummy_j]){
 							if (x_node_dummy[x_node_dummy_j]>0){
 								x_node_dummy[x_node_dummy_j]++;
@@ -616,9 +636,9 @@ valarray <int>  det_x_node (Net net_dummy){
 					}
 				}
 				need_to_shift=false;
-				for (unsigned int x_node_dummy_i=0;x_node_dummy_i<x_node_dummy.size();x_node_dummy_i++){
+				for (size_t x_node_dummy_i=0;x_node_dummy_i<x_node_dummy.size();x_node_dummy_i++){
 					int current_x_node_dummy=x_node_dummy[x_node_dummy_i];
-					for (unsigned int x_node_dummy_j=x_node_dummy_i+1;x_node_dummy_j<x_node_dummy.size();x_node_dummy_j++){
+					for (size_t x_node_dummy_j=x_node_dummy_i+1;x_node_dummy_j<x_node_dummy.size();x_node_dummy_j++){
 						if (current_x_node_dummy==x_node_dummy[x_node_dummy_j]){
 							need_to_shift=true;
 							break;

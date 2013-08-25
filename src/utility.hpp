@@ -36,7 +36,7 @@
 #include<iomanip>
 #include<valarray>
 //#include <gmp.h>
-#include"node.hpp"
+//#include"node.hpp"
 //#include"net.hpp"
 using namespace std;
 
@@ -50,12 +50,12 @@ using namespace std;
 
 bool start_of_tax_name(string in_str,size_t i);
 
-void add_node(Node *parent_node, Node *child_node);
-bool find_descndnt(Node* current, string taxname);
-bool find_descndnt2(Node* current, string taxname);
-void rewrite_node_content(vector <Node*> Net_ptr);
+//void add_node(Node *parent_node, Node *child_node);
+//bool find_descndnt(Node* current, string taxname);
+//bool find_descndnt2(Node* current, string taxname);
+//void rewrite_node_content(vector <Node*> Net_ptr);
 //string construct_adding_new_Net_str(Net old_Net);
-int ranking(Node *current);
+//int ranking(Node *current);
 //vector <string> all_n_tax_gene_tree(unsigned int tax_num);
 double factorial(double a);	
 double n_permu_a(double n, double a);

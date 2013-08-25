@@ -18,6 +18,7 @@ class Net{
 		void linking_nodes();
 		bool is_net_;
 		int max_rank_;
+		void find_tips();
 		
 	public:
 	
@@ -28,8 +29,12 @@ class Net{
 		
 		//vector< valarray <int> > descndnt;
 		//vector< valarray <int> > descndnt2;
-		vector<string> tax_name;
-		vector<string> tip_name;
+		//vector<string> tax_name;
+		//vector<string> tip_name;
+		
+		vector<string> extract_tip_names();
+		//vector<string> extract_tax_names();
+		
 		//vector <Node*> Net_nodes_ptr; /*!< \brief pointers to the nodes of Net \todo use this instead of Net_nodes */
 		vector <Node*> Net_nodes;  /*!< \brief vector of nodes */
 		
@@ -42,7 +47,8 @@ class Net{
 		//bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
 		void clear(); 
 		bool print_all_node();
-		bool is_ultrametric_func(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
+		//void extract_tip_names();
+		//bool is_ultrametric_func(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
 	
 		//Net (){
 			//string net_str;

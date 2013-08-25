@@ -29,7 +29,7 @@ class Node {
 		vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
 		vector<Node*> child; /*!< \brief list of pointers to its child nodes */		
 		//vector<Node*> descndnt;
-		vector <double> path_time;
+		//vector <double> path_time;
 //valarray <int>	descndnt;
 		
 		size_t num_descndnt() const {return this->num_descndnt_;}; /*!< \brief number of the tip nodes, that are descendant from this node */
@@ -54,8 +54,8 @@ class Node {
 		int rank() const {return this->rank_;}; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
 		void set_rank(int rank){this->rank_ = rank;}
 		 
-		double height() const {return this->height_;}
-		void set_height(double height){this->height_ = height;}
+		//double height() const {return this->height_;}
+		//void set_height(double height){this->height_ = height;}
 		
 		double brchlen1() const {return this->brchlen1_;}; /*!< \brief Branch length */
 		void set_brchlen1(double bl){this->brchlen1_ = bl;}
@@ -90,7 +90,7 @@ class Node {
 		size_t nodeName_end() const {return this->nodeName_end_;};
 		void set_nodeName_end(size_t index){this->nodeName_end_ = index;};
 		
-		size_t nodeName_length(){return this->nodeName_end_-this->nodeName_start_+1;};
+		size_t nodeName_length(){return this->nodeName_end_ - this->nodeName_start_ + 1;};
 		
 		size_t node_content_start() const {return this->node_content_start_;};
 		void set_node_content_start(size_t index){this->node_content_start_ = index;};
@@ -98,8 +98,10 @@ class Node {
 		size_t node_content_end() const {return this->node_content_end_;};
 		void set_node_content_end(size_t index){this->node_content_end_ = index;};
 		
-		void add_to_parent(Node* parent);
+		size_t node_content_length(){return this->node_content_end_ - node_content_start_ + 1;}	
 		
+		void add_to_parent(Node* parent);
+		void find_hybrid_descndnt();
 		
 		void init(
 			size_t nodeName_start = 0,
@@ -138,7 +140,7 @@ class Node {
 		
 		size_t node_index_; /*!< \brief node index in the array, \todo use this more often!!!*/
 
-		double height_; /*!< \brief distance to the bottom of the tree */
+		//double height_; /*!< \brief distance to the bottom of the tree */
 
 		double brchlen1_; /*!< \brief Branch length */
 		double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
@@ -166,8 +168,8 @@ class Node {
 
 
 
-void find_hybrid_descndnt(Node *current);
-void find_tip(Node *current);
+//void find_hybrid_descndnt(Node *current);
+//void find_tip(Node *current);
 
 
 #endif

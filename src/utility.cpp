@@ -106,46 +106,8 @@ string checking_labeled(string in_str){
 	return out_str;
 }
 
-/*! \brief Add child node to parent node */
-void add_node(
-Node *parent_node /*! pointer to the parent node*/, 
-Node *child_node /*! pointer to the child node*/){
-    parent_node->child.push_back(child_node);
-	if (child_node->parent1()){
-		child_node->set_parent2(parent_node);
-		child_node->set_hybrid(true);
-	}
-	else {
-		child_node->set_parent1(parent_node);
-		//cout<<child_node->label<<" parent1 is "<<child_node->parent1->label<<endl;
-	}
-	//Node *kidspintr=parent_node->child[parent_node->num_child];
-	//parent_node->num_child++;
-} 
 
 
-
-
-/*! \brief Rank network node from the bottom.
- * 
- * Child node has lower rank than the parent node. Tip nodes have rank one, the root node has the highest rank
- */
-int ranking(Node *current){
-	//int current_rank;
-	if (current->tip()){
-		current->set_rank(1);}
-	else
-	{
-		int child_max_rank=0;
-		for (size_t i_num_child=0;i_num_child<current->num_child();i_num_child++){
-			int child_rank=ranking(current->child[i_num_child]);
-			child_max_rank=max(child_rank,child_max_rank);
-		}
-		current->set_rank(child_max_rank+1);
-	}		
-	//return current_rank=current->rank;
-	return current->rank();
-}
 
 
 //bool find_descndnt(Node* current, string taxname){

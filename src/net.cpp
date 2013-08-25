@@ -14,39 +14,28 @@ Net::Net(){
 Net::Net(string in_str /*! input (extended) newick form string */){
 	this->init();
 	//if (in_str.size()>0){
-
 		checking_Parenthesis(in_str);
 		net_str=checking_labeled(in_str);
 		dout<<"Build Net from string: "<<net_str<<endl;
-
-		this->create_node_list();
-		
-			dout<<"Net::Net flag2"<<endl;
+		dout<<"Extract nodes from net string"<<endl;
+		this->create_node_list();	
+		dout<<"Merge hybrid nodes:"<<endl;
 		this->merge_repeated_nodes_as_one();
-		dout<<"Net::Net flag3"<<endl;
-		//vector <Node> Net_nodes;
-		//int label_counter=brchlens.size();
-		//for (int new_i_label=0;new_i_label<label_counter;new_i_label++){
-			//Node empty_node;
-			////empty_node.pAC=0.0;
-			//Net_nodes.push_back(empty_node);
-			//Net_nodes[new_i_label].label=labels[new_i_label];
-			//Net_nodes[new_i_label].node_content=node_contents[new_i_label];
-			////cout<<Net_nodes[new_i_label].label<<" "<<Net_nodes[new_i_label].node_content<<endl;
-			//string s(brchlens[new_i_label]);
-			//istringstream istr(s);
-			//istr>>Net_nodes[new_i_label].brchlen1;
-		//}
-		//int repeated_num_node=0;
-
-		
-		
+		dout<<"Linking nodes:"<<endl;
+		this->linking_nodes();
+		this->Net_nodes.back()->find_hybrid_descndnt();
+		this->set_max_rank(Net_nodes.back()->ranking());
 		this->is_net_func();
 		assert(print_all_node());
 	dout<<"Net of "<<net_str <<" is built"<<endl;
 
 }
 
+void Net::find_tips(){
+	for (size_t i = 0; i < Net_nodes.size(); i++){
+		if (Net_nodes[i]->num_child() == 0){Net_nodes[i]->set_tip(true);}
+	}
+}
 
 void Net::create_node_list(){
 	for (size_t i_str_len=1;i_str_len<net_str.size();){
@@ -68,8 +57,8 @@ void Net::create_node_list(){
 					//node_content=net_str.substr(rev_dummy_i,substr_len);			
 				}
 				else {
-					node_content_start_idx = node_content_start_idx;
-					node_content_end_idx = node_content_end_idx;
+					node_content_start_idx = nodename_start_index;
+					node_content_end_idx = nodename_end_index;
 				}
 				i_str_len = nodename_end_index + 1;
 				//i_str_len=label.size()+i_str_len;
@@ -97,24 +86,24 @@ void Net::create_node_list(){
 					node_ptr= new Node(nodename_start_index,nodename_end_index, node_content_start_idx, node_content_end_idx);
 					}
 				this->Net_nodes.push_back(node_ptr);
-				assert(Net_nodes.back()->print_tree_Node(net_str.c_str()));
-				dout<<endl;
 			}
 			else {
 				i_str_len++;
 			}
 		}
 	}
+	assert(this->print_all_node());
 }
 
 void Net::merge_repeated_nodes_as_one(){
 		for (size_t i=1;i<Net_nodes.size()-1;i++){
 			size_t j;
-			dout<<net_str.substr(Net_nodes[i]->nodeName_start(),Net_nodes[i]->nodeName_length())<<endl;
+			//dout<<net_str.substr(Net_nodes[i]->nodeName_start(),Net_nodes[i]->nodeName_length())<<endl;
 			for ( j=i+1;j<Net_nodes.size()-1;j++){
-			dout<<"    "<<net_str.substr(Net_nodes[j]->nodeName_start(),Net_nodes[j]->nodeName_length())<<endl;
+			//dout<<"    "<<net_str.substr(Net_nodes[j]->nodeName_start(),Net_nodes[j]->nodeName_length())<<endl;
 			if (net_str.substr(Net_nodes[j]->nodeName_start(),Net_nodes[j]->nodeName_length()) == net_str.substr(Net_nodes[i]->nodeName_start(),Net_nodes[i]->nodeName_length())){
-					cout<<"reapeated"<<endl;
+					//cout<<"reapeated"<<endl;
+					dout<<net_str.substr(Net_nodes[j]->nodeName_start(),Net_nodes[j]->nodeName_length())<<endl;
 					if (net_str[Net_nodes[j]->node_content_start()]=='('){
 						Net_nodes[i]->set_node_content_start(Net_nodes[j]->node_content_start());
 						Net_nodes[i]->set_node_content_end(Net_nodes[j]->node_content_end());
@@ -136,7 +125,7 @@ void Net::merge_repeated_nodes_as_one(){
 
 /*! \brief free the meomory */
 void Net::clear(){
-	tax_name.clear();
+	//tax_name.clear();
 	Net_nodes.clear();
 };
 
@@ -157,7 +146,7 @@ void Net::is_net_func(){
 bool Net::print_all_node(){
 	//bool debug_switch=false;
 	if ( this->is_net() ){
-		dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
+		dout<<"           label  hybrid hyb_des tpNode parent1  brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
 		
 		for (size_t i=0;i<Net_nodes.size();i++){
 			//for (unsigned int j=0;j<descndnt[i].size();j++){
@@ -173,7 +162,7 @@ bool Net::print_all_node(){
 		}	
 	}
 	else{
-		dout<<"            label non-tp   parent        height brchln #child #dsndnt #id rank e_num   Clade "<<endl;
+		dout<<"label            tpNode   parent        brchln #child #dsndnt #id rank e_num   Clade "<<endl;
 		for (size_t i=0;i<Net_nodes.size();i++){
 			//for (unsigned int j=0;j<descndnt[i].size();j++){
 				//cout<<descndnt[i][j];
@@ -191,85 +180,43 @@ bool Net::print_all_node(){
 }
 
 
-
-
-
-
-//this is not used!!!
-bool Net::is_ultrametric_func(){
-	bool is_ultrametric_return=true;
-	vector <int> remaining_node(Net_nodes.size(),0);
-	for (unsigned int node_i=0;node_i<Net_nodes.size();node_i++){
-		remaining_node[node_i]=node_i;
+vector<string> extract_tax_names(vector<string> tip_name){
 	
-	}
-	//cout<<remaining_node.size()<<endl;
-	//for (int rank_i=1;rank_i<=max_rank;rank_i++){
-		//for (unsigned int node_i=0;node_i<Net_nodes.size();node_i++){
-	int rank_i=1;
-	unsigned int remaining_node_i=0;	
-	while (remaining_node.size()>0){
-		//remaining_node_i=0;
-		int node_i=remaining_node[remaining_node_i];
-		//cout<<remaining_node[remaining_node_i]<<endl;
-		//rank_i=1;
-		if (Net_nodes[node_i]->rank()==rank_i){
-			if (rank_i==1){
-				Net_nodes[node_i]->path_time.push_back(0.0);
-			}
-			else{
-				for (size_t child_i = 0; child_i<Net_nodes[node_i]->num_child(); child_i++){
-					double current_child_time;
-					//if ((Net_nodes[node_i]->child[child_i]->parent1()->nodeName_start() == Net_nodes[node_i]->nodeName_start()) && (Net_nodes[node_i]->child[child_i]->parent1()->nodeName_end() == Net_nodes[node_i]->nodeName_end())){
-					if (Net_nodes[node_i]->child[child_i]->parent1() == Net_nodes[node_i]){	
-						current_child_time=Net_nodes[node_i]->child[child_i]->brchlen1();
-					}
-					else{
-						//if (Net_nodes[node_i].child[child_i]->parent2->label==Net_nodes[node_i].label){
-							current_child_time=Net_nodes[node_i]->child[child_i]->brchlen2();
-						//}
-						//else{
-							//cout<<"warning!!!!! check code again"<<endl;
-						//}
-							
-					}
-					for (unsigned int child_i_time_i=0;child_i_time_i<Net_nodes[node_i]->child[child_i]->path_time.size();child_i_time_i++){
-						Net_nodes[node_i]->path_time.push_back(current_child_time+Net_nodes[node_i]->child[child_i]->path_time[child_i_time_i]);
-					}
-				}
-			}
+	
+}
+
+
+vector<string> Net::extract_tip_names(){
+	vector <string> tip_name;
+	for (size_t i=0;i<Net_nodes.size();i++){
+		Node * current_node = Net_nodes[i];
+		if(current_node->tip()){
 			
-			remaining_node.erase(remaining_node.begin()+remaining_node_i);
-			//cout<<rank_i<<" "<<Net_nodes[node_i].label<<" "<<Net_nodes[node_i].path_time.size()<<endl;
-		}
-		else{
-			remaining_node_i++;
-		}
-		//
-		if (remaining_node_i==remaining_node.size()-1){
-			rank_i++;
-			remaining_node_i=0;
+			//if (Net_nodes[i].label.find("_")>0){
+				////Net_nodes[i].name=Net_nodes[i].label.substr(0,Net_nodes[i].label.find("_"));
+				//bool new_tax_bool=true;
+				//for (size_t tax_i=0;tax_i<tax_name.size();tax_i++){
+					//if (tax_name[tax_i]==Net_nodes[i].name){
+						//new_tax_bool=false;
+						//break;
+					//}
+				//}
+				////if (new_tax_bool){
+					////tax_name.push_back(Net_nodes[i].name);
+				////}
+			//}
+			////else{
+				////tax_name.push_back(Net_nodes[i].label);
+			////}
+			string tipname=net_str.substr(current_node->nodeName_start(), current_node->nodeName_length()+1);
+			tip_name.push_back(tipname);
 		}
 	}
-	//}
-	for (unsigned int node_i=0;node_i<Net_nodes.size();node_i++){
-		//bool node_i_path_time_eq=true;
-		//cout<<Net_nodes[node_i].label<<"  ";
-		for (unsigned int path_time_i=0;path_time_i<Net_nodes[node_i]->path_time.size();path_time_i++){
-			if (pow((Net_nodes[node_i]->path_time[path_time_i]-Net_nodes[node_i]->path_time[0]),2)>0.000001){
-				is_ultrametric_return=false;
-				//cout<<Net_nodes[node_i].label<<endl;
-				break;
-			}
-			//cout<<Net_nodes[node_i].path_time[path_time_i]<<" ";
-		}
-		//cout<<Net_nodes[node_i].label<<endl;
-		//if (!is_ultrametric){
-			//break;
-		//}
-		Net_nodes[node_i]->set_height(Net_nodes[node_i]->path_time[0]);
-	}
-	return is_ultrametric_return;
+	
+	//sort(tax_name.begin(), tax_name.end());
+	sort(tip_name.begin(), tip_name.end());	
+	return tip_name;
+	
 }
 
 /*! \brief Checking Parenthesis of a (extended) Newick string */
@@ -292,54 +239,32 @@ void Net::checking_Parenthesis(string in_str){
 }
 
 void Net::linking_nodes(){
-	
-	
+	for (size_t i=0;i<Net_nodes.size();i++){
+		if (net_str[Net_nodes[i]->node_content_start()] == '('){
+			dout<<net_str.substr(Net_nodes[i]->nodeName_start(),Net_nodes[i]->nodeName_length())<<": ";			
+			for (size_t ii = Net_nodes[i]->node_content_start()+1; ii < Net_nodes[i]->node_content_end(); ii++){
+						//if (net_str[ii] =='(' || start_of_tax_name(net_str,ii)){
+				if (net_str[ii] == '('){
+					ii = Parenthesis_balance_index_forwards(net_str,ii)+1;
+				}
+				size_t ii_end = end_of_label_or_bl(net_str, ii);
+				string child_node1_str = net_str.substr(ii, ii_end-ii+1);
+				
+				for (size_t j=0;j<Net_nodes.size();j++){
+					if (child_node1_str == net_str.substr(Net_nodes[j]->nodeName_start(),Net_nodes[j]->nodeName_length())){
+						dout<<child_node1_str<<" ";
+						Net_nodes[j]->add_to_parent(Net_nodes[i]);
+					}
+				}
+						//}			
+			}
+			dout<<endl;
+		}
+	}
+	this->find_tips();
 }
 
 
-
-///*! \brief Write a fixed parameter into a externed newick formatted network string*/
-//string write_para_into_tree(string in_str /*! Externed newick formatted network string*/, 
-//double para /*! Coalescent parameter or fixed population sizes */){
-	//if (in_str.size()==0){
-		//cout<<"Define input tree (network) first!"<<endl;
-		//exit(1);;
-	//}
-	//Net para_Net(in_str);
-	//vector <Node*> para_Net_node_ptr;
-	//if (utility_debug_bool){
-		//cout<<"write_para_into_tree flag1"<<endl;
-	//}
-	//for (unsigned int node_i=0;node_i<para_Net.Net_nodes.size();node_i++){
-		//Node* new_node_ptr=NULL;
-        //para_Net_node_ptr.push_back(new_node_ptr);
-        //para_Net_node_ptr[node_i]=&para_Net.Net_nodes[node_i];
-		//para_Net_node_ptr[node_i]->brchlen1=para;
-		//if (para_Net.Net_nodes[node_i].hybrid){
-			//para_Net_node_ptr[node_i]->brchlen2=para;
-		//}
-	//}
-	//if (utility_debug_bool){
-		//cout<<"write_para_into_tree flag2"<<para<<endl;
-	//}
-	//para_Net_node_ptr.back()->brchlen1=para;
-	//rewrite_node_content(para_Net_node_ptr);
-	//string para_string=construct_adding_new_Net_str(para_Net);
-	//return para_string;	
-//}
-
-//string construct_adding_new_Net_str(Net in_Net){
-	//string out_str;
-	//out_str=in_Net.Net_nodes.back().node_content;
-	//out_str=out_str+in_Net.Net_nodes.back().label;
-	//if (in_Net.Net_nodes.back().brchlen1!=0){
-		//ostringstream brchlen_str;
-		//brchlen_str<<in_Net.Net_nodes.back().brchlen1;
-		//out_str=out_str+":"+brchlen_str.str();
-	//}
-	//out_str.push_back(';');
-	//return out_str;
-//}
 
 
 
@@ -370,45 +295,54 @@ void Net::linking_nodes(){
 		//sort(tax_name.begin(), tax_name.end());
 		//sort(tip_name.begin(), tip_name.end());
 		
-
-		
-		
-		//for (unsigned int i=0;i<Net_nodes.size();i++){
-			//if (Net_nodes[i].node_content[0]=='('){
-				//char child_node1[Net_nodes[i].node_content.length()];
-				//unsigned int i_content_len;
-				//unsigned int j_content_len;
-				//for (i_content_len=1;i_content_len<Net_nodes[i].node_content.length();){
-					////if (Net_nodes[i].node_content[i_content_len]=='(' ||  isalpha(Net_nodes[i].node_content[i_content_len])){	
-					//if (Net_nodes[i].node_content[i_content_len]=='(' ||  start_of_tax_name(Net_nodes[i].node_content,i_content_len) ){	
-					////if (Net_nodes[i].node_content[i_content_len]=='(' ||  isalpha(Net_nodes[i].node_content[i_content_len]) || isdigit(Net_nodes[i].node_content[i_content_len]) ){	
-						//if (Net_nodes[i].node_content[i_content_len]=='('){
-							//j_content_len=Parenthesis_balance_index_forwards(Net_nodes[i].node_content,i_content_len)+1;
-						//}
-						//else{
-							//j_content_len=i_content_len;
-						//}
-						//int child1_node_content_i=0;
-						//for (;j_content_len<Net_nodes[i].node_content.length(); j_content_len++){
-							//child_node1[child1_node_content_i]=Net_nodes[i].node_content[j_content_len];
-							//char stop=Net_nodes[i].node_content[j_content_len+1];
-							//if (stop==',' || stop==')' || stop==':'){
-								//child_node1[child1_node_content_i+1]='\0';
-								//break;}
-							//child1_node_content_i++;
-							//}
-							//string child_node1_str=child_node1;		
-							//i_content_len=j_content_len+2;
-							//for (unsigned int j=0;j<Net_nodes.size();j++){
-								//if (child_node1_str==Net_nodes[j].label){
-									//add_node(Net_nodes_ptr[i],Net_nodes_ptr[j]);
-								//}
-							//}
-					//}
-					//else{i_content_len++;}
-				//}	
+			//if ( start_of_tax_name(net_str,i_str_len)){
+			////if (isalpha(net_str[i_str_len]) || isdigit(net_str[i_str_len])){	
+				//size_t nodename_start_index = i_str_len;
+				//size_t nodename_end_index = end_of_label_or_bl(net_str, nodename_start_index);
+			
 			//}
-		//}
+			
+			
+			//char child_node1[Net_nodes[i]->node_content_length()];
+			//size_t i_content_len;
+			//size_t j_content_len;
+			
+			
+			//for (i_content_len=1;i_content_len<Net_nodes[i]->node_content_length();){
+				//if (Net_nodes[i]->node_content[i_content_len]=='(' ||  start_of_tax_name(Net_nodes[i].node_content,i_content_len) ){	
+				////if (Net_nodes[i].node_content[i_content_len]=='(' ||  isalpha(Net_nodes[i].node_content[i_content_len]) || isdigit(Net_nodes[i].node_content[i_content_len]) ){	
+					//if (Net_nodes[i].node_content[i_content_len]=='('){
+						//j_content_len=Parenthesis_balance_index_forwards(Net_nodes[i].node_content,i_content_len)+1;
+					//}
+					//else{
+						//j_content_len=i_content_len;
+					//}
+					//int child1_node_content_i=0;
+					//for (;j_content_len<Net_nodes[i].node_content.length(); j_content_len++){
+						//child_node1[child1_node_content_i]=Net_nodes[i].node_content[j_content_len];
+						//char stop=Net_nodes[i].node_content[j_content_len+1];
+						//if (stop==',' || stop==')' || stop==':'){
+							//child_node1[child1_node_content_i+1]='\0';
+							//break;}
+						//child1_node_content_i++;
+						//}
+						//string child_node1_str=child_node1;		
+						//i_content_len=j_content_len+2;
+						
+						
+						
+						//for (size_t j=0;j<Net_nodes.size();j++){
+							//if (child_node1_str==Net_nodes[j].label){
+								//add_node(Net_nodes_ptr[i],Net_nodes_ptr[j]);
+							//}
+						//}
+				//}
+				//else{i_content_len++;}
+			//}	
+	
+		
+		
+
 		////cout<<descndnt.size()<<endl;
 		
 		//if (utility_debug_bool){
