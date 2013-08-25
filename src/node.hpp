@@ -90,6 +90,8 @@ class Node {
 		size_t nodeName_end() const {return this->nodeName_end_;};
 		void set_nodeName_end(size_t index){this->nodeName_end_ = index;};
 		
+		size_t nodeName_length(){return this->nodeName_end_-this->nodeName_start_+1;};
+		
 		size_t node_content_start() const {return this->node_content_start_;};
 		void set_node_content_start(size_t index){this->node_content_start_ = index;};
 		

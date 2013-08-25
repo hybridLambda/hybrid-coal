@@ -3,6 +3,12 @@
 
 
 void Node::init(size_t nodeName_start, size_t nodeName_end, size_t node_content_start, size_t node_content_end, double bl1, double bl2){
+	this->set_nodeName_start(nodeName_start);
+	this->set_nodeName_end(nodeName_end);
+	this->set_node_content_start(node_content_start);
+	this->set_node_content_end(node_content_end);
+	
+	
 	//this->set_label(label);
 	//this->set_nodeContent(nodeContent);
 	//num_descndnt=0;
@@ -52,6 +58,9 @@ Node::Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start
 
 
 bool Node::print_net_Node(const char* net_str) const{
+	//for (size_t i=nodeName_end();i<=12;i++){dout<<" ";}
+	for (size_t i=nodeName_start();i<=nodeName_end();i++){dout<<net_str[i];}
+	for (size_t i=(nodeName_end()-nodeName_start());i<=12;i++){dout<<" ";}
 	//dout<<setw(12)<<label;
 	dout<<setw(6)<<hybrid();
 	dout<<setw(8)<<descndnt_of_hybrid();
@@ -81,6 +90,11 @@ bool Node::print_net_Node(const char* net_str) const{
 
 
 bool Node::print_tree_Node(const char* tree_str) const{
+	//dout<<"nodeName_start() = "<<nodeName_start();
+	
+	for (size_t i=this->nodeName_start();i<=this->nodeName_end();i++){dout<<tree_str[i];}
+	for (size_t i=(nodeName_end()-nodeName_start());i<=12;i++){dout<<" ";}
+
 	//dout<<setw (12)<<label;
 	dout<<setw(5)<<tip();
 	//if (parent1){dout<<setw (11)<<(parent1->label);}

@@ -170,12 +170,12 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		}
 		
 	}
+	if (argc==1){net_str="((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;";}
 	
 	
-	
-		Net net_dummy(net_str);
+	Net* net_dummy = new Net(net_str);
 		if (print_tree){
-			net_dummy.print_all_node();
+			net_dummy->print_all_node();
 			appending_log_file("Tree printed");
 		}
 		//plot_option=set_plot_option(plot_label,plot_branch);
