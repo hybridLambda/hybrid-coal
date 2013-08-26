@@ -19,7 +19,10 @@ class Net{
 		bool is_net_;
 		int max_rank_;
 		void find_tips();
-		void find_descndnt();
+		//void find_descndnt();
+		void find_interior_descndnt();
+
+		
 		size_t num_tips_;
 	public:
 		size_t num_tips() const {return this->num_tips_;};
@@ -30,12 +33,14 @@ class Net{
 		
 		//class Network_s SubNetworkS; /*!< \brief sub species networks \todo this is new!!!*/
 		
-		//vector< valarray <int> > descndnt;
+		vector< valarray <int> > descndnt;
 		//vector< valarray <int> > descndnt2;
-		//vector<string> tax_name;
-		//vector<string> tip_name;
+		vector<string> tax_name;
+		vector<string> tip_name;
 		
-		vector<string> extract_tip_names();
+		//vector<string> extract_tip_names();
+		void extract_tip_names();
+		void extract_tax_names();
 		//vector<string> extract_tax_names();
 		
 		//vector <Node*> Net_nodes_ptr; /*!< \brief pointers to the nodes of Net \todo use this instead of Net_nodes */
@@ -50,7 +55,7 @@ class Net{
 		//bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
 		void clear(); 
 		bool print_all_node();
-		//void extract_tip_names();
+		
 		//bool is_ultrametric_func(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
 	
 		//Net (){

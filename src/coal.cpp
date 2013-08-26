@@ -15,7 +15,7 @@ gijoemat::gijoemat(Net* my_sp_net){
 			
 			brchlens_vec[index_enum-1]=current_node->brchlen1();
 			//cout<<current_node->label<<"  "<<current_node->brchlen1<<endl;
-			max_num_brch_vec[index_enum-1]=current_node->num_descndnt();
+			max_num_brch_vec[index_enum-1]=current_node->num_descndnt_tips();
 			//cout<<index_enum<<" "<<brchlens_vec[index_enum-1]<<" "<<max_num_brch_vec[index_enum-1]<<endl;
 			
 		}
@@ -25,7 +25,7 @@ gijoemat::gijoemat(Net* my_sp_net){
 			index_enum=current_node->e_num2();
 			brchlens_vec[index_enum-1]=current_node->brchlen2();
 			//cout<<current_node->label<<"  "<<current_node->brchlen1<<endl;
-			max_num_brch_vec[index_enum-1]=current_node->num_descndnt();
+			max_num_brch_vec[index_enum-1]=current_node->num_descndnt_tips();
 			dout<<index_enum <<" "<<current_node->brchlen1()<<endl;
 		}		
 

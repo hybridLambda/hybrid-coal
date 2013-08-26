@@ -25,15 +25,18 @@ class Node {
 	public:
 		
 		//vector<int> descndnt;
-		vector<int> des_num_descndnt_interior;
+		//vector<int> des_num_descndnt_interior;
+		
+		
+		//vector<size_t> descndnt; // This is the index of the tip node of the 
 		vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
 		vector<Node*> child; /*!< \brief list of pointers to its child nodes */		
 		//vector<Node*> descndnt;
 		//vector <double> path_time;
 //valarray <int>	descndnt;
 		
-		size_t num_descndnt() const {return this->num_descndnt_;}; /*!< \brief number of the tip nodes, that are descendant from this node */
-		void set_num_descndnt(size_t num){this->num_descndnt_ = num;};
+		size_t num_descndnt_tips() const {return this->num_descndnt_tips_;}; /*!< \brief number of the tip nodes, that are descendant from this node */
+		void set_num_descndnt_tips(size_t num){this->num_descndnt_tips_ = num;};
 		
 		
 		size_t num_descndnt_interior() const {return this->descndnt_interior_node.size();}; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
@@ -127,8 +130,10 @@ class Node {
 		bool print_tree_Node(const char* tree_str ) const;
 		void clear();
 	
+		
+	
 	private:
-		size_t num_descndnt_;
+		size_t num_descndnt_tips_;
 	
 		Node* parent1_; /*!< \brief pointer to its parent node. */
 		Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
@@ -155,6 +160,8 @@ class Node {
 		
 		size_t node_content_start_;
 		size_t node_content_end_;
+		
+		size_t * name_index_;
 		
 		//size_t name_;
 		

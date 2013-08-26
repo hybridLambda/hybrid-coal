@@ -50,7 +50,7 @@ void Node::init(size_t nodeName_start, size_t nodeName_end, size_t node_content_
 	//this->set_height(0.0);
 	//prob_to_hybrid_left=1.0;
 	this->set_visited(false);
-	this->set_num_descndnt(0);
+	this->set_num_descndnt_tips(0);
 	//vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
 	//vector<Node*> child; 
 	
@@ -78,7 +78,7 @@ bool Node::print_net_Node(const char* net_str) const{
 
 	dout<<setw (8)<<brchlen2();
 	dout<<setw (7)<<num_child();
-	dout<<setw (8)<<num_descndnt();
+	dout<<setw (8)<<num_descndnt_tips();
 	dout<<setw(4)<<num_descndnt_interior();
 //	dout<<setw (7)<<current.e_num;
 //	dout<<setw (3)<<current.e_num2;
@@ -106,7 +106,7 @@ bool Node::print_tree_Node(const char* tree_str) const{
 	//dout<<setw (11)<<height();
 	dout<<setw (11)<<brchlen1();
 	dout<<setw (7)<<num_child();
-	dout<<setw (8)<<num_descndnt();
+	dout<<setw (8)<<num_descndnt_tips();
 	dout<<setw(4)<<num_descndnt_interior();
 	dout<<setw (6)<<rank()<<"   ";
 	//for (unsigned int i=0;i<descndnt.size();i++){
@@ -239,27 +239,27 @@ void Node::find_hybrid_descndnt(){
 	//}
 }
 
-bool find_descndnt(Node* current, string taxname){
-	bool descndnt_found=false;
-	if (current->tip()){
-		//if (current->label==taxname){
-			//cout<<current->name<<endl;
-			//cout<<taxname<<endl;
-		if (current->name==taxname){
-			descndnt_found=true;
-		}
-		//else{
-			//descndnt_found=false;
+//bool find_descndnt(Node* current, string taxname){
+	//bool descndnt_found=false;
+	//if (current->tip()){
+		////if (current->label==taxname){
+			////cout<<current->name<<endl;
+			////cout<<taxname<<endl;
+		//if (current->name==taxname){
+			//descndnt_found=true;
 		//}
-	}
-	else {//int i;
-		for (int i=0;i<current->num_child;i++){
-			if (find_descndnt(current->child[i],taxname)){
-				descndnt_found=true;
-				break;
-			}
-			//else descndnt_found=false;
-		}
-	}	
-	return descndnt_found;
-}
+		////else{
+			////descndnt_found=false;
+		////}
+	//}
+	//else {//int i;
+		//for (int i=0;i<current->num_child;i++){
+			//if (find_descndnt(current->child[i],taxname)){
+				//descndnt_found=true;
+				//break;
+			//}
+			////else descndnt_found=false;
+		//}
+	//}	
+	//return descndnt_found;
+//}

@@ -27,6 +27,12 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 		this->linking_nodes();
 		this->Net_nodes.back()->find_hybrid_descndnt();
 		this->set_max_rank(Net_nodes.back()->ranking());
+		this->extract_tip_names();
+		
+		this->extract_tax_names();
+		//this->find_descndnt();
+		this->find_interior_descndnt();
+		
 		this->is_net_func();
 		this->Net_nodes.back()->enumerate_internal_branch(0);
 		assert(print_all_node());
@@ -35,7 +41,6 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 }
 
 void Net::find_tips(){
-	
 	for (size_t i = 0; i < Net_nodes.size(); i++){
 		if (Net_nodes[i]->num_child() == 0){
 			Net_nodes[i]->set_tip(true);
@@ -84,9 +89,11 @@ void Net::create_node_list(){
 				if (net_str[i_str_len]==':'){
 					i_str_len++;
 					size_t bl_end_index = end_of_label_or_bl(net_str, i_str_len);
-					istringstream bl_istrm(net_str.substr(i_str_len,bl_end_index-i_str_len-1));
+					istringstream bl_istrm(net_str.substr(i_str_len,bl_end_index-i_str_len+1));
 					double bl;
 					bl_istrm >> bl;
+					//cout<<net_str.substr(i_str_len,bl_end_index-i_str_len-1)<<endl;
+					//cout<<bl<<endl;
 					node_ptr= new Node(nodename_start_index,nodename_end_index, node_content_start_idx, node_content_end_idx, bl);
 				}
 				else{
@@ -99,7 +106,7 @@ void Net::create_node_list(){
 			}
 		}
 	}
-	assert(this->print_all_node());
+	//assert(this->print_all_node());
 }
 
 void Net::merge_repeated_nodes_as_one(){
@@ -153,12 +160,13 @@ void Net::is_net_func(){
 bool Net::print_all_node(){
 	//bool debug_switch=false;
 	if ( this->is_net() ){
+		for (size_t i=0; i<tax_name.size();i++){dout<<" ";}
 		dout<<"           label  hybrid hyb_des tpNode parent1  brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
 		
 		for (size_t i=0;i<Net_nodes.size();i++){
-			//for (unsigned int j=0;j<descndnt[i].size();j++){
-				//cout<<descndnt[i][j];
-			//}
+			for (unsigned int j=0;j<descndnt[i].size();j++){
+				cout<<descndnt[i][j];
+			}
 		assert(Net_nodes[i]->print_net_Node(net_str.c_str()));
 			//Net_nodes[i].print_net_Node();
 			//cout<<"  ";
@@ -169,11 +177,12 @@ bool Net::print_all_node(){
 		}	
 	}
 	else{
-		dout<<"label            tpNode   parent        brchln #child #dsndnt #id rank e_num   Clade "<<endl;
+		for (size_t i=0; i<tax_name.size();i++){dout<<" ";}
+		dout<<"           label tpNode   parent        brchln #child #dsndnt #id rank e_num   Clade "<<endl;
 		for (size_t i=0;i<Net_nodes.size();i++){
-			//for (unsigned int j=0;j<descndnt[i].size();j++){
-				//cout<<descndnt[i][j];
-			//}
+			for (unsigned int j=0;j<descndnt[i].size();j++){
+				cout<<descndnt[i][j];
+			}
 			assert(Net_nodes[i]->print_tree_Node(net_str.c_str()));
 			//Net_nodes[i].print_tree_Node();
 						//cout<<"  ";
@@ -187,44 +196,119 @@ bool Net::print_all_node(){
 }
 
 
-vector<string> extract_tax_names(vector<string> tip_name){
+//vector<string> extract_tax_names(vector<string> tip_name){
 	
 	
-}
+//}
 
 
-vector<string> Net::extract_tip_names(){
-	vector <string> tip_name;
+
+
+void Net::extract_tip_names(){
+//vector<string> Net::extract_tip_names(){
+	//vector <string> tip_name;
 	for (size_t i=0;i<Net_nodes.size();i++){
 		Node * current_node = Net_nodes[i];
 		if(current_node->tip()){
-			
-			//if (Net_nodes[i].label.find("_")>0){
-				////Net_nodes[i].name=Net_nodes[i].label.substr(0,Net_nodes[i].label.find("_"));
-				//bool new_tax_bool=true;
-				//for (size_t tax_i=0;tax_i<tax_name.size();tax_i++){
-					//if (tax_name[tax_i]==Net_nodes[i].name){
-						//new_tax_bool=false;
-						//break;
-					//}
-				//}
-				////if (new_tax_bool){
-					////tax_name.push_back(Net_nodes[i].name);
-				////}
-			//}
-			////else{
-				////tax_name.push_back(Net_nodes[i].label);
-			////}
 			string tipname=net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
 			tip_name.push_back(tipname);
 		}
 	}
 	
-	//sort(tax_name.begin(), tax_name.end());
 	sort(tip_name.begin(), tip_name.end());	
-	return tip_name;
+	dout<<"Extract "<<tip_name.size()<<" tip names:"<<endl;
+	for (size_t i = 0 ; i<tip_name.size(); i++){dout<<tip_name[i]<<" ";}
+	dout<<endl;
+	for (size_t i = 0 ; i < Net_nodes.size(); i++){
+		Node* current_node = Net_nodes[i]; 
+		size_t num_tips=0;
+		string content=net_str.substr(current_node->node_content_start(), current_node->node_content_length());
+		for (size_t ii = 0 ; ii < tip_name.size(); ii++){
+			if (content.find(tip_name[ii])!=std::string::npos){num_tips++;}
+		}
+		current_node->set_num_descndnt_tips(num_tips);		
+	}
+
+	
+	//return tip_name;
+}
+
+
+void Net::extract_tax_names(){
+	for (size_t i = 0; i < tip_name.size(); i++){
+		// extract for & sign
+		vector <string> new_tip_list;	
+		size_t found = min(tip_name[i].find("&"), tip_name[i].size());
+		for (size_t ii = 0; ii < tip_name[i].size(); ii++){
+			new_tip_list.push_back(tip_name[i].substr(ii, found - ii ));
+			ii = found;
+			found = min(tip_name[i].find("&", found+1 ), tip_name[i].size());
+		}
+		for (size_t ii = 0 ; ii < new_tip_list.size(); ii++){
+			bool new_tax_bool=true;
+			string undetermin_taxname = new_tip_list[ii].substr(0,new_tip_list[ii].find("_"));
+				
+			for (size_t tax_i = 0; tax_i < tax_name.size(); tax_i++){
+				if (tax_name[tax_i] == undetermin_taxname){
+					new_tax_bool=false;
+					break;
+				}
+			}
+			if (new_tax_bool){
+				tax_name.push_back(undetermin_taxname);
+			}
+		}
+	}
+	sort(tax_name.begin(), tax_name.end());
+	dout<<"Extract "<<tax_name.size()<<" taxon names:"<<endl;
+	for (size_t i = 0 ; i<tax_name.size(); i++){dout<<tax_name[i]<<" ";}
+	dout<<endl;
+	for (size_t i = 0 ; i < Net_nodes.size(); i++){
+		Node * current_node = Net_nodes[i];
+		string content=net_str.substr(current_node->node_content_start(), current_node->node_content_length());
+		valarray <int> descndnt_dummy(0,tax_name.size());
+		for (size_t ii = 0 ; ii < tax_name.size(); ii++){
+			if (content.find(tax_name[ii])!=std::string::npos){descndnt_dummy[ii]=1;}
+		}
+		descndnt.push_back(descndnt_dummy);
+	}
+	
+		//for (size_t i = 0 ; i < Net_nodes.size(); i++){
+		//Node* current_node = Net_nodes[i]; 
+		//size_t num_tips=0;
+		//string content=net_str.substr(current_node->node_content_start(), current_node->node_content_length());
+		//for (size_t ii = 0 ; ii < tip_name.size(); ii++){
+			//if (content.find(tip_name[ii])!=std::string::npos){num_tips++;}
+		//}
+		//current_node->set_num_descndnt_tips(num_tips);		
+	//}
+
+	//for (unsigned int i=0;i<Net_nodes.size();i++){
+			//valarray <int> descndnt_dummy(0,tax_name.size());
+			//descndnt.push_back(descndnt_dummy);
+			//valarray <int> descndnt2_dummy(0,tip_name.size());
+			//descndnt2.push_back(descndnt2_dummy);
+			////cout<<Net_nodes_ptr[i]->name<<"  "<<Net_nodes_ptr[i]->label<<"  "<<Net_nodes_ptr[i]->tip_bool << " ";
+			//for (unsigned int tax_name_i=0;tax_name_i<tax_name.size();tax_name_i++){
+				////cout<<Net_nodes_ptr[i]->label<<"   "<<tax_name[tax_name_i]<<"  ";
+				//if (find_descndnt(Net_nodes_ptr[i],tax_name[tax_name_i])){
+					//descndnt[i][tax_name_i]=1;
+				//}
+				////cout<<descndnt[i][tax_name_i];
+			//}
+			////cout<<endl;
+			//for (unsigned int tip_name_i=0;tip_name_i<tip_name.size();tip_name_i++){
+				//if (find_descndnt2(Net_nodes_ptr[i],tip_name[tip_name_i])){
+					//descndnt2[i][tip_name_i]=1;
+				//}
+			//}
+			//Net_nodes[i].num_descndnt=descndnt[i].sum();
+		//}
+		
 	
 }
+
+
 
 /*! \brief Checking Parenthesis of a (extended) Newick string */
 void Net::checking_Parenthesis(string in_str){
@@ -284,31 +368,25 @@ string rm_one_child_root(string in_str){
 	}
 }
 
-void Net::find_descndnt(){
-		for (unsigned int i=0;i<Net_nodes.size();i++){
-			valarray <int> descndnt_dummy(0,tax_name.size());
-			descndnt.push_back(descndnt_dummy);
-			//valarray <int> descndnt2_dummy(0,tip_name.size());
-			//descndnt2.push_back(descndnt2_dummy);
-			//cout<<Net_nodes_ptr[i]->name<<"  "<<Net_nodes_ptr[i]->label<<"  "<<Net_nodes_ptr[i]->tip_bool << " ";
-			for (unsigned int tax_name_i=0;tax_name_i<tax_name.size();tax_name_i++){
-				//cout<<Net_nodes_ptr[i]->label<<"   "<<tax_name[tax_name_i]<<"  ";
-				if (find_descndnt(Net_nodes_ptr[i],tax_name[tax_name_i])){
-					descndnt[i][tax_name_i]=1;
+
+void Net::find_interior_descndnt(){
+		for (size_t i=0;i<Net_nodes.size();i++){
+			for (size_t j=0;j<Net_nodes.size();j++){ // see if this can be changed to j=i+1
+			//for (size_t j = i+1 ; j<Net_nodes.size();j++){
+				if (i!=j){
+					valarray <int> descndnt_diff=(this->descndnt[i]-this->descndnt[j]);
+					//cout<<"hea"<<endl;
+					if (descndnt_diff.min() >= 0 && Net_nodes[i]->rank() > Net_nodes[j]->rank() && Net_nodes[j]->rank()>=2){
+						//Net_nodes[i]->num_descndnt_interior=Net_nodes[i]->num_descndnt_interior+1;
+						Net_nodes[i]->descndnt_interior_node.push_back(Net_nodes[j]);
+					}
+					
 				}
-				//cout<<descndnt[i][tax_name_i];
+			
 			}
-			//cout<<endl;
-			//for (unsigned int tip_name_i=0;tip_name_i<tip_name.size();tip_name_i++){
-				//if (find_descndnt2(Net_nodes_ptr[i],tip_name[tip_name_i])){
-					//descndnt2[i][tip_name_i]=1;
-				//}
-			//}
-			Net_nodes[i].num_descndnt=descndnt[i].sum();
+			//cout<<"checking #interior_des "<<Net_nodes_ptr[i]->label<<"  "<<Net_nodes_ptr[i]->num_descndnt_interior<<" "<<Net_nodes_ptr[i]->descndnt_interior_node.size()<<endl;
 		}
-}
-
-
+}	
 
 
 

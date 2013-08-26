@@ -197,8 +197,9 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		}
 			
 		if (all_gt_tree_bool){
-			vector<string> tip_names = net_dummy->extract_tip_names();
-			gt_tree_str_s=all_n_tax_gene_tree(tip_names);
+			//vector<string> tip_names = net_dummy->extract_tip_names();
+			//gt_tree_str_s=all_n_tax_gene_tree(tip_names);
+			gt_tree_str_s=all_n_tax_gene_tree(net_dummy->tip_name);
 			if (print_gene_topo_bool){
 				print_all_gt_topo(gtopo_F_name.c_str(),gt_tree_str_s);
 			}
