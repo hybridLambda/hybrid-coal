@@ -3,7 +3,7 @@
 //#include"utility.hpp"
 #include"export.hpp"
 #include"all_gene_topo.hpp"
-
+#include"coal.hpp"
 
 int main(int argc, char *argv[]){
 	//bool main_debug_bool=false; 	
@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
 	//bool coal_debug_bool=false;
 	//bool utility_debug_bool=false;
 	//bool rm_debug_bool=false;
-	
+	check_and_remove("log_file");
 	bool acc_bool=false;
 	
 //bool latex_bool;
@@ -173,7 +173,12 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 		}
 		
 	}
-	if (argc==1){net_str="((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;";}
+	if (argc==1){
+		//net_str="((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;";
+		net_str="(((B:0.2,C:0.2):0.2,A:0.2):0.2,((D:0.2,E:0.2):0.2,(F:0.2,G:0.2):0.2):0.2);";
+		string gtstr("((A:1,B:1):1,(C:1,((D:1,F:1):1,(E:1,G:1):1):1):1);");
+		gt_tree_str_s.push_back(gtstr);
+		}
 	
 	
 	Net* net_dummy = new Net(net_str);
@@ -212,5 +217,35 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			//return 0;
 			return my_exit();
 		}		
+		
+	if (net_dummy->is_net()){
+		}
+	else{
+		delete net_dummy;
+		net_str=rm_one_child_root(net_str);
+			
+		net_dummy = new Net(net_str);
+		gijoemat * gmat = new gijoemat(net_dummy);
+		
+		Net * current_gt;
+		
+		//for (size_t topo_i=0;topo_i<gt_tree_str_s.size();topo_i++){
+			//current_gt=new Net(gt_tree_str_s[topo_i]);
+			////gt_coal_in_st gt_in_sp(current_gt,net_dummy);
+			//if (latex_bool){
+				//latex_tre_body(latex_F_name.c_str(),gt_tree_str_s[topo_i],net_str);
+				////gt_in_sp.latex_print(latex_F_name.c_str());
+			//}
+			
+			////prob_out_body(out_file.c_str(),topo_i+1,gt_tree_str_s[topo_i],gt_in_sp.probability,net_dummy.tax_name.size());
+		
+			////total_prob=total_prob+gt_in_sp.probability;
+			
+			//delete current_gt;
+			////gt_in_sp.clear();
+		//}
+		delete gmat;
+	}
+	
 
 }

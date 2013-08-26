@@ -98,7 +98,6 @@ void write_maple_block(const char* file_name,string sp_str,vector <string> maple
 //void rm_zero_kids_hybrid_node(vector <Node*> sp_nodes_ptr_rm);
 //void simplify_Networks_maple(string old_net_string, vector <string> gt_string);
 
-string rm_one_child_root(string in_str);
 
 
 

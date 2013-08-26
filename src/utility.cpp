@@ -110,30 +110,7 @@ string checking_labeled(string in_str){
 
 
 
-//bool find_descndnt(Node* current, string taxname){
-	//bool descndnt_found=false;
-	//if (current->tip()){
-		////if (current->label==taxname){
-			////cout<<current->name<<endl;
-			////cout<<taxname<<endl;
-		//if (current->name==taxname){
-			//descndnt_found=true;
-		//}
-		////else{
-			////descndnt_found=false;
-		////}
-	//}
-	//else {//int i;
-		//for (int i=0;i<current->num_child;i++){
-			//if (find_descndnt(current->child[i],taxname)){
-				//descndnt_found=true;
-				//break;
-			//}
-			////else descndnt_found=false;
-		//}
-	//}	
-	//return descndnt_found;
-//}
+
 
 //bool find_descndnt2(Node* current, string taxname){
 	//bool descndnt_found=false;

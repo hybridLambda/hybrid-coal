@@ -19,9 +19,12 @@ class Net{
 		bool is_net_;
 		int max_rank_;
 		void find_tips();
-		
+		void find_descndnt();
+		size_t num_tips_;
 	public:
-	
+		size_t num_tips() const {return this->num_tips_;};
+		void set_num_tips(size_t num){this->num_tips_ =  num;};
+		
 		void init();
 		string net_str; /*!< \brief species network string \todo this is new!!!*/
 		
@@ -60,14 +63,19 @@ class Net{
 			////vector <Node*> Net_nodes_ptr;
 		//}
 		Net();
-		//~Net(){
+		~Net(){
+			net_str.clear();
+			for (size_t i = 0; i < Net_nodes.size(); i++){delete Net_nodes[i];}
 			//tax_name.clear();
 			//tip_name.clear();
 			//Net_nodes.clear();
-		//}
+		}
 		
 		Net(string Net_str);
 };
+
+string rm_one_child_root(string in_str);
+
 
 
 

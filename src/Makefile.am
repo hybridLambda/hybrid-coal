@@ -1,6 +1,7 @@
 bin_PROGRAMS = test_hybrid_coal
 PROG = TEST_HYBRID_COAL
 test_hybrid_coal_SOURCES = all_gene_topo.cpp  all_gene_topo.hpp \
+coal.cpp  coal.hpp  \
 node.cpp node.hpp \
 newmain.cpp  \
 net.cpp net.hpp \

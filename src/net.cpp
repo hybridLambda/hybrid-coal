@@ -1,12 +1,14 @@
 #include"net.hpp"
 
-void Net::init(){
-	this->set_is_net(false);
-	this->set_max_rank(0);
-}
 
 Net::Net(){
 	this->init();
+}
+
+void Net::init(){
+	this->set_is_net(false);
+	this->set_max_rank(0);
+	this->set_num_tips(0);
 }
 
 
@@ -26,14 +28,19 @@ Net::Net(string in_str /*! input (extended) newick form string */){
 		this->Net_nodes.back()->find_hybrid_descndnt();
 		this->set_max_rank(Net_nodes.back()->ranking());
 		this->is_net_func();
+		this->Net_nodes.back()->enumerate_internal_branch(0);
 		assert(print_all_node());
 	dout<<"Net of "<<net_str <<" is built"<<endl;
 
 }
 
 void Net::find_tips(){
+	
 	for (size_t i = 0; i < Net_nodes.size(); i++){
-		if (Net_nodes[i]->num_child() == 0){Net_nodes[i]->set_tip(true);}
+		if (Net_nodes[i]->num_child() == 0){
+			Net_nodes[i]->set_tip(true);
+			this->num_tips_++;
+		}
 	}
 }
 
@@ -208,7 +215,7 @@ vector<string> Net::extract_tip_names(){
 			////else{
 				////tax_name.push_back(Net_nodes[i].label);
 			////}
-			string tipname=net_str.substr(current_node->nodeName_start(), current_node->nodeName_length()+1);
+			string tipname=net_str.substr(current_node->nodeName_start(), current_node->nodeName_length());
 			tip_name.push_back(tipname);
 		}
 	}
@@ -263,6 +270,44 @@ void Net::linking_nodes(){
 	}
 	this->find_tips();
 }
+
+
+string rm_one_child_root(string in_str){
+	string out_str=tree_topo(in_str);
+	size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
+	size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
+	if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
+		return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
+	}
+	else{
+		return in_str;
+	}
+}
+
+void Net::find_descndnt(){
+		for (unsigned int i=0;i<Net_nodes.size();i++){
+			valarray <int> descndnt_dummy(0,tax_name.size());
+			descndnt.push_back(descndnt_dummy);
+			//valarray <int> descndnt2_dummy(0,tip_name.size());
+			//descndnt2.push_back(descndnt2_dummy);
+			//cout<<Net_nodes_ptr[i]->name<<"  "<<Net_nodes_ptr[i]->label<<"  "<<Net_nodes_ptr[i]->tip_bool << " ";
+			for (unsigned int tax_name_i=0;tax_name_i<tax_name.size();tax_name_i++){
+				//cout<<Net_nodes_ptr[i]->label<<"   "<<tax_name[tax_name_i]<<"  ";
+				if (find_descndnt(Net_nodes_ptr[i],tax_name[tax_name_i])){
+					descndnt[i][tax_name_i]=1;
+				}
+				//cout<<descndnt[i][tax_name_i];
+			}
+			//cout<<endl;
+			//for (unsigned int tip_name_i=0;tip_name_i<tip_name.size();tip_name_i++){
+				//if (find_descndnt2(Net_nodes_ptr[i],tip_name[tip_name_i])){
+					//descndnt2[i][tip_name_i]=1;
+				//}
+			//}
+			Net_nodes[i].num_descndnt=descndnt[i].sum();
+		}
+}
+
 
 
 

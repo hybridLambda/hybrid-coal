@@ -133,7 +133,7 @@ size_t Node::enumerate_internal_branch(size_t e_num_old) /*!< enumerator which i
 //needs modification, this is not correct.	
 	
 	
-	dout<<"Net::enumerate_internal_branch start"<<endl;
+	//dout<<"Net::enumerate_internal_branch start"<<endl;
 	
 	int e_num_new;
 	if (this->tip()){
@@ -161,7 +161,7 @@ size_t Node::enumerate_internal_branch(size_t e_num_old) /*!< enumerator which i
 		}
 	}
 
-	dout<<"Net::enumerate_internal_branch end"<<endl;
+	//dout<<"Net::enumerate_internal_branch end"<<endl;
 	return e_num_new;
 }
 
@@ -239,3 +239,27 @@ void Node::find_hybrid_descndnt(){
 	//}
 }
 
+bool find_descndnt(Node* current, string taxname){
+	bool descndnt_found=false;
+	if (current->tip()){
+		//if (current->label==taxname){
+			//cout<<current->name<<endl;
+			//cout<<taxname<<endl;
+		if (current->name==taxname){
+			descndnt_found=true;
+		}
+		//else{
+			//descndnt_found=false;
+		//}
+	}
+	else {//int i;
+		for (int i=0;i<current->num_child;i++){
+			if (find_descndnt(current->child[i],taxname)){
+				descndnt_found=true;
+				break;
+			}
+			//else descndnt_found=false;
+		}
+	}	
+	return descndnt_found;
+}

@@ -1380,17 +1380,7 @@ void write_maple_block(const char* file_name,string sp_str,vector <string> maple
 	}		
 }
 
-string rm_one_child_root(string in_str){
-	string out_str=tree_topo(in_str);
-	size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
-	size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
-	if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
-		return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
-	}
-	else{
-		return in_str;
-	}
-}
+
 
 
 double compute_rm_S_omega(int n_child,int k_clade,vector < valarray < int > > brand_new_current_prior_coal_clades, Net gt_tree){
