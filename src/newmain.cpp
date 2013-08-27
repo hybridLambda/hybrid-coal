@@ -237,8 +237,9 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			vector < vector < int > > R_matrix=building_R_matrix(current_gt);	
 			vector < vector < int > > M_matrix=building_M_matrix(current_gt,net_dummy);
 
-			vector < vector <unsigned int> > coal_hist_mat = build_coal_hist_mat(M_matrix, current_gt,  net_dummy);
-			vector < vector <unsigned int> > coal_hist =recur_coal_hist(coal_hist_mat, R_matrix, net_dummy, current_gt);
+			vector < vector <size_t> > coal_hist_mat = build_coal_hist_mat(M_matrix, current_gt,  net_dummy);
+			vector < vector <size_t> > coal_hist =recur_coal_hist(coal_hist_mat, R_matrix, current_gt);
+			double prob = calc_prob_of_hist(S_matrix, R_matrix, M_matrix, coal_hist_mat, coal_hist, net_dummy, gmat);
 			////gt_coal_in_st gt_in_sp(current_gt,net_dummy);
 			//if (latex_bool){
 				//latex_tre_body(latex_F_name.c_str(),gt_tree_str_s[topo_i],net_str);
