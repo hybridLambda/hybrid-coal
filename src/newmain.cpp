@@ -176,6 +176,7 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 	if (argc==1){
 		//net_str="((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;";
 		net_str="(((B:0.2,C:0.2):0.2,A:0.2):0.2,((D:0.2,E:0.2):0.2,(F:0.2,G:0.2):0.2):0.2);";
+		all_gt_tree_bool=false;
 		string gtstr("((A:1,B:1):1,(C:1,((D:1,F:1):1,(E:1,G:1):1):1):1);");
 		gt_tree_str_s.push_back(gtstr);
 		}
@@ -227,11 +228,17 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			
 		net_dummy = new Net(net_str);
 		gijoemat * gmat = new gijoemat(net_dummy);
+		vector < vector < int > > S_matrix=building_S_matrix(net_dummy);
 		
 		Net * current_gt;
 		
-		//for (size_t topo_i=0;topo_i<gt_tree_str_s.size();topo_i++){
-			//current_gt=new Net(gt_tree_str_s[topo_i]);
+		for (size_t topo_i=0;topo_i<gt_tree_str_s.size();topo_i++){
+			current_gt=new Net(gt_tree_str_s[topo_i]);
+			vector < vector < int > > R_matrix=building_R_matrix(current_gt);	
+			vector < vector < int > > M_matrix=building_M_matrix(current_gt,net_dummy);
+
+			vector < vector <unsigned int> > coal_hist_mat = build_coal_hist_mat(M_matrix, current_gt,  net_dummy);
+			vector < vector <unsigned int> > coal_hist =recur_coal_hist(coal_hist_mat, R_matrix, net_dummy, current_gt);
 			////gt_coal_in_st gt_in_sp(current_gt,net_dummy);
 			//if (latex_bool){
 				//latex_tre_body(latex_F_name.c_str(),gt_tree_str_s[topo_i],net_str);
@@ -244,7 +251,7 @@ for (int argc_i=0;argc_i<argc;argc_i++){
 			
 			//delete current_gt;
 			////gt_in_sp.clear();
-		//}
+		}
 		delete gmat;
 	}
 	

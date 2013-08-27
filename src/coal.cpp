@@ -107,3 +107,274 @@ gijoemat::gijoemat(Net* my_sp_net){
 	//return gijoe_matrix;
 }
 
+
+double calc_prob_of_hist_para(vector < vector <size_t> > coal_hist,
+vector < vector <int> > all_w,
+vector < vector <int> > all_d,
+vector < vector <int> > num_enter,
+vector < vector <int> > num_out,
+Net * my_sp_net,
+gijoemat * gijoe_matrix
+//vector < vector < vector < double > > > gijoe_matrix
+){
+	double probability=0.0;
+	for (size_t i_coal_hist=0;i_coal_hist<coal_hist.size();i_coal_hist++){
+		double current_prob_of_hist=1;
+		for (size_t i=0;i<all_w[i_coal_hist].size();i++){
+			size_t current_enum;
+			for (size_t node_i=0; node_i<my_sp_net->Net_nodes.size();node_i++){
+				Node * current_node = my_sp_net->Net_nodes[node_i];
+				if (current_node->e_num() == (i+1)){
+					//current_branch_lengths=my_sp_net.Net_nodes[node_i].brchlen1;
+					current_enum = current_node->e_num();
+					break;
+				}
+			}	
+			double current_gijoe;
+			if ((i+1) == my_sp_net->Net_nodes.back()->e_num()){
+				current_gijoe=1;
+				}
+				else{
+				current_gijoe=gijoe_matrix->mat[current_enum-1][num_enter[i_coal_hist][i]-1][num_out[i_coal_hist][i]-1];
+//!!! this works!!! //current_gijoe=gijoe(num_enter[i_coal_hist][i], num_out[i_coal_hist][i], current_branch_lengths); 				
+			}
+			current_prob_of_hist=current_prob_of_hist*all_w[i_coal_hist][i]/all_d[i_coal_hist][i]*current_gijoe;
+				dout<<current_prob_of_hist<<endl;
+		}
+		//prob_of_hist.push_back(current_prob_of_hist);
+		probability=probability+current_prob_of_hist;
+		dout<<"gt prob = "<<probability<<endl;
+	}
+	return probability;
+}
+
+
+	
+vector < vector < int > > building_M_matrix(
+Net* my_gt_tree,
+Net* my_sp_net)
+{
+	int sp_max_enum=my_sp_net->Net_nodes.back()->e_num();
+	int gt_max_enum=my_gt_tree->Net_nodes.back()->e_num();
+	vector < vector < int > > M_matrix;
+	
+	for (int i_sp_enum=0;i_sp_enum<sp_max_enum;i_sp_enum++){
+		vector < int > M_matrix_row((gt_max_enum-1),1);
+		M_matrix.push_back(M_matrix_row);
+	
+	}
+	for (size_t i=0;i<my_sp_net->Net_nodes.size()-1;i++){
+		if (!my_sp_net->Net_nodes[i]->tip()){
+			for (size_t j=0;j<my_gt_tree->Net_nodes.size()-1;j++){
+				if (!my_gt_tree->Net_nodes[j]->tip()){
+					int des_diff_prod=1;
+					for (size_t i_des=0;i_des<my_gt_tree->tax_name.size();i_des++){
+						int des_diff=my_sp_net->descndnt[i][i_des]-my_gt_tree->descndnt[j][i_des]; /*! \todo this may not be right for multiple lineages per species*/
+						if (des_diff<0){
+							des_diff_prod=0;
+							M_matrix[my_sp_net->Net_nodes[i]->e_num()-1][my_gt_tree->Net_nodes[j]->e_num()-1]=0;
+							break;
+						}
+						else{  /*! \todo check this else!!! dont think this is needed */
+							if (des_diff>0){
+								des_diff_prod=0;}
+						}
+					}
+					if (des_diff_prod==1){
+						M_matrix[my_sp_net->Net_nodes[i]->e_num()-1][my_gt_tree->Net_nodes[j]->e_num()-1]=1;
+					}
+				}
+			}
+		}
+	}
+	
+		dout<<"M matrix"<<endl;
+		print_matrix(M_matrix);
+	
+	return M_matrix;
+}
+
+
+vector < vector < int > > building_R_matrix(Net* gt_tree){
+	size_t gt_max_enum=gt_tree->Net_nodes.back()->e_num();
+	vector < vector < int > > R_matrix;
+	for (size_t i_gt_enum=0;i_gt_enum<gt_max_enum;i_gt_enum++){
+		//vector <int> R_matrix_row;
+		//for (size_t j_gt_enum=0;j_gt_enum<i_gt_enum;j_gt_enum++){
+			//R_matrix_row.push_back(1);
+		//}
+		vector <int> R_matrix_row(i_gt_enum,1);
+
+		//vector <int> R_matrix_row(gt_max_enum,1);
+		R_matrix.push_back(R_matrix_row);
+		
+	}
+		//print_matrix(R_matrix);
+
+	for (size_t i=0;i<gt_tree->Net_nodes.size()-1;i++){
+		if (!gt_tree->Net_nodes[i]->tip()){
+			for (size_t j=0;j<i;j++){
+				if (!gt_tree->Net_nodes[j]->tip()){
+					for (size_t i_des=0;i_des<gt_tree->descndnt[i].size();i_des++){
+						int des_diff=gt_tree->descndnt[i][i_des]-gt_tree->descndnt[j][i_des];
+						if (des_diff<0){
+							R_matrix[gt_tree->Net_nodes[i]->e_num()-1][gt_tree->Net_nodes[j]->e_num()-1]=0;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	dout<<"R matrix"<<endl;
+	print_matrix(R_matrix);
+	return R_matrix;
+}
+
+vector < vector < int > > building_S_matrix(Net* my_sp_net){
+	//dout<<"Build S matrix"<<endl;
+	int sp_max_enum=my_sp_net->Net_nodes.back()->e_num();
+	vector < vector < int > > S_matrix;
+	
+	for (int i_sp_enum=0;i_sp_enum<sp_max_enum;i_sp_enum++){
+		vector < int > S_matrix_row(sp_max_enum,1);
+		S_matrix_row[i_sp_enum]=0;
+		S_matrix.push_back(S_matrix_row);
+	}
+	for (size_t i=0;i<my_sp_net->Net_nodes.size()-1;i++){
+		if (!my_sp_net->Net_nodes[i]->tip()){
+			for (size_t j=0;j<my_sp_net->Net_nodes.size()-1;j++){
+				if (!my_sp_net->Net_nodes[j]->tip()){
+					for (size_t i_des=0;i_des<my_sp_net->descndnt[i].size();i_des++){
+						int des_diff=my_sp_net->descndnt[i][i_des]-my_sp_net->descndnt[j][i_des];
+						if (des_diff<0){
+							S_matrix[my_sp_net->Net_nodes[i]->e_num()-1][my_sp_net->Net_nodes[j]->e_num()-1]=0;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+	}
+
+	dout<<"S matrix"<<endl;
+	print_matrix(S_matrix);
+	return S_matrix;
+}
+
+
+
+void print_matrix(vector < vector < int > > mat){
+	for (size_t i=0;i<mat.size();i++){
+		for (size_t j=0;j<mat[i].size();j++){
+			dout<<mat[i][j];
+		}
+		dout<<endl;
+	}
+	dout<<endl;		
+}
+
+
+vector < vector <unsigned int> > build_coal_hist_mat(
+vector < vector < int > > M_matrix,
+Net * my_gt_tree,
+Net * my_sp_net
+){
+	vector < vector <unsigned int> > coal_hist_mat;
+	size_t sp_max_enum=my_sp_net->Net_nodes.back()->e_num();
+	size_t gt_max_enum=my_gt_tree->Net_nodes.back()->e_num();
+	
+	if (gt_max_enum==1){
+		vector <unsigned int> coal_hist_vec;
+		coal_hist_vec.push_back(1);
+		coal_hist_mat.push_back(coal_hist_vec);
+	}
+	else{
+		int max_coal_hist_num=1;
+		for (size_t i_gt_enum=0;i_gt_enum<gt_max_enum-1;i_gt_enum++){
+			vector <unsigned int> coal_hist_vec;
+			for (unsigned int i_sp_enum=0;i_sp_enum<sp_max_enum;i_sp_enum++){
+				if (M_matrix[i_sp_enum][i_gt_enum]==1){
+					coal_hist_vec.push_back(i_sp_enum+1);
+				}
+			}
+			max_coal_hist_num=max_coal_hist_num*(coal_hist_vec.size());
+			coal_hist_mat.push_back(coal_hist_vec);
+		}
+	}
+	return coal_hist_mat;
+}
+
+
+
+vector < vector <unsigned int> > build_coal_hist(
+vector < vector <unsigned  int> > coal_hist,
+unsigned int node_i,
+vector < vector <unsigned int> > coal_hist_mat, 
+vector < vector < int > > R_matrix)
+{
+	//dout<<"Start of build_coal_hist"<<endl;
+	
+	vector < vector <unsigned  int> > new_coal_hist;
+	for (unsigned int coal_hist_i=0;coal_hist_i<coal_hist.size();coal_hist_i++){
+		vector <unsigned int> coal_hist_dummy;
+		coal_hist_dummy=coal_hist[coal_hist_i];
+		unsigned int coal_hist_mat_node_i_i=0;
+		for (unsigned int j_R_mat=0;j_R_mat<node_i;j_R_mat++){
+			while (R_matrix[node_i][j_R_mat]==1 && coal_hist_mat[node_i][coal_hist_mat_node_i_i]< coal_hist_dummy[j_R_mat]){
+				coal_hist_mat_node_i_i++;
+			}
+		}
+		for (;coal_hist_mat_node_i_i<coal_hist_mat[node_i].size();coal_hist_mat_node_i_i++ ){
+			vector <unsigned int> coal_hist_dummy_dummy;
+			coal_hist_dummy_dummy=coal_hist_dummy;
+			coal_hist_dummy_dummy.push_back(coal_hist_mat[node_i][coal_hist_mat_node_i_i]);
+			new_coal_hist.push_back(coal_hist_dummy_dummy);
+		}
+	}
+	
+		//dout<<new_coal_hist.size()<<"new_coal_hist"<<endl;	
+		//print_matrix(new_coal_hist);
+		dout<<"Recurse to "<<new_coal_hist.size()<<" histories: "<<endl;	
+		for (unsigned int i=0;i<new_coal_hist.size();i++){
+			for (unsigned int j=0;j<new_coal_hist[i].size()-1;j++){
+				dout<<new_coal_hist[i][j]<<",";
+			}
+			dout<<new_coal_hist[i].back()<<endl;
+		}
+	
+	if (node_i<coal_hist_mat.size()-1){
+		node_i++;
+		new_coal_hist=build_coal_hist(new_coal_hist,node_i,coal_hist_mat,R_matrix);		
+	}
+
+		//dout<<"End of build_coal_hist"<<endl;
+
+	return new_coal_hist;
+}
+
+vector < vector <unsigned int> >recur_coal_hist(
+vector < vector <unsigned int> > coal_hist_mat,
+vector < vector < int > > R_matrix,
+Net * my_sp_net,
+Net * my_gt_tree
+){
+	vector < vector <unsigned int> > coal_hist;
+
+	for (unsigned int first_coal_mat_i=0;first_coal_mat_i<coal_hist_mat[0].size();first_coal_mat_i++){
+		vector <unsigned int> coal_hist_dummy;
+		coal_hist_dummy.push_back(coal_hist_mat[0][first_coal_mat_i]);
+		coal_hist.push_back(coal_hist_dummy);
+	}
+	int gt_max_enum=my_gt_tree->Net_nodes.back()->e_num();	
+	if (gt_max_enum-1>1){
+		coal_hist=build_coal_hist(coal_hist,1,coal_hist_mat,R_matrix);
+	}
+
+	size_t sp_max_enum=my_sp_net->Net_nodes.back()->e_num();
+	for (unsigned int i_coal_hist=0;i_coal_hist<coal_hist.size();i_coal_hist++){
+		coal_hist[i_coal_hist].push_back(sp_max_enum);
+	}
+	return coal_hist;
+}
