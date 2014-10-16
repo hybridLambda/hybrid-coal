@@ -1,0 +1,7 @@
+[submodule "plot"]
+      path = plot
+      url = https://github.com/hybridLambda/plot.git
+      
+[submodule "tree_topo"]
+      path = tree_topo
+      url = git@github.com:hybridLambda/tree_topo.git
