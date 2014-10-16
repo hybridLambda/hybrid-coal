@@ -19,12 +19,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include<vector>
-//#include<string>
-#include<iostream>
-#include<iomanip>
-#include<cassert>
+#include <iomanip>  // std::setw
+#include <iostream> //std::cout
+#include <vector>
+#include <string>
+#include <cassert>
+#include <stdexcept>
 
+using namespace std;
+
+//Unless compiled with options NDEBUG, we will produce a debug output using 
+//'dout' instead of cout and execute (expensive) assert statements.
 #ifndef NDEBUG
 #define dout std::cout
 #else
@@ -32,173 +37,93 @@
 #define dout 0 && std::cout
 #endif
 
-
-// do not use string here!!!
-
-using namespace std;
-
 #ifndef NODE
 #define NODE
-
 /*! \brief Node of a tree or network, it also represent the branch between this node and its parent node
  */
+
+enum NAMETYPE { TAXA, TIP };
+
 class Node {
+    friend class Tree;
+    friend class Net;
+    friend class simTree;
+    friend class HybridLambda;
+    friend class Figure;
 	public:
-		
-		//vector<int> descndnt;
-		//vector<int> des_num_descndnt_interior;
-		
-		
-		//vector<size_t> descndnt; // This is the index of the tip node of the 
-		vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
-		vector<Node*> child; /*!< \brief list of pointers to its child nodes */		
-		//vector<Node*> descndnt;
-		//vector <double> path_time;
-//valarray <int>	descndnt;
-		
-		size_t num_descndnt_tips() const {return this->num_descndnt_tips_;}; /*!< \brief number of the tip nodes, that are descendant from this node */
-		void set_num_descndnt_tips(size_t num){this->num_descndnt_tips_ = num;};
-		
-		
-		size_t num_descndnt_interior() const {return this->descndnt_interior_node.size();}; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
-		size_t num_child() const {return this->child.size();}; /*!< \brief number of child \todo this can be replaced by child.size */
+        // Getters and Setters
+        double height() const { return this->height_;}
+        void set_height ( double h ){ this->height_ = h; }
+        
+        double brchlen1() const { return this->brchlen1_;}
+        void set_brchlen1 ( double bl ){ this->brchlen1_ = bl; }
+        
+        double brchlen2() const { return this->brchlen2_;}
+        void set_brchlen2 ( double bl ){ this->brchlen2_ = bl; }
 
+        string label; /*!< \brief String label of a node, each node has unique label */
+        size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
+        string node_content; /*!< \brief node content, the subtree string at this node */
+        bool hybrid() const { return (this->parent2) ? true : false;} /*!< \brief Hybrid node only, indicator of a hybrid node */
+        
+    private:    
+        // Members
+        size_t rank_;     /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */        
+        bool visited_;
+        size_t e_num_;    /*!< \brief numbering the branch */
+        size_t e_num2_;   /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
+        double brchlen1_; /*!< \brief Branch length */
+        double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
-		
-		//class Net * SubNetwork; /*!< \brief \todo pointer to the subtree of this node */
+        //vector<int> descndnt;
+        vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
+        vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
+        Node* parent1; /*!< \brief pointer to its parent node. */
+        string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
+        
+        int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
+        int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
+        vector <double> path_time; 
+        double height_; /*!< \brief distance to the bottom of the tree */
+            
+        bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
+        bool tip_bool; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
+            
+        Node* parent2; /*!< \brief Hybrid node only, pointer to its second parent node. */
+        //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
+        
+        string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
+        
+        vector <size_t> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
+        vector <size_t> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
+        
+        
+        size_t e_num() const {return this->e_num_;}
+        void set_enum( size_t num ) { this->e_num_ = num; }
+    
+        size_t e_num2() const {return this->e_num2_;}
+        void set_enum2( size_t num ) { this->e_num2_ = num; }
+    
+        bool visited() const { return this->visited_; }
+        void set_visited ( bool TorF ){ this->visited_ = TorF; }
 
-// Getter and setter
-		Node* parent1() const {return this->parent1_;} /*!< \brief pointer to its parent node. */
-		void set_parent1(Node* parent1){this->parent1_ = parent1;}
-		
-		size_t e_num() const {return this->e_num_;}; /*!< \brief numbering the branch */
-		void set_e_num(size_t e_num){this->e_num_ = e_num;}
-		
-		int ranking();
-		int rank() const {return this->rank_;}; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
-		void set_rank(int rank){this->rank_ = rank;}
-		 
-		//double height() const {return this->height_;}
-		//void set_height(double height){this->height_ = height;}
-		
-		double brchlen1() const {return this->brchlen1_;}; /*!< \brief Branch length */
-		void set_brchlen1(double bl){this->brchlen1_ = bl;}
-		
-		bool visited() const {return this->visited_;};
-		void set_visited (bool yesorno){this->visited_ = yesorno;}
-		
-		bool descndnt_of_hybrid() const {return this->descndnt_of_hybrid_;}; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-		void set_descndnt_of_hybrid(bool yesorno){this->descndnt_of_hybrid_ = yesorno;}
-		
-		bool tip() const {return this->tip_;}; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-		void set_tip(bool yesorno){this->tip_ = yesorno;}
-		
-		/* These members apply to only hybrid nodes */
-		bool hybrid() const {return this->hybrid_;}; /*!< \brief Hybrid node only, indicator of a hybrid node */
-		void set_hybrid(bool yesorno){this->hybrid_ = yesorno;};
-		
-		Node* parent2() const {return this->parent2_;} /*!< \brief pointer to its parent node. */
-		void set_parent2(Node* parent2){this->parent2_ = parent2;}
-
-		size_t e_num2() const { return this->e_num2_;}; /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
-		void set_e_num2(size_t e_num2){this->e_num2_ = e_num2;}
-		
-		
-		double brchlen2() const {return this->brchlen2_;};/*!< \brief Hybrid node only, Branch length to the second parent*/
-		void set_brchlen2(double bl){this->brchlen2_ = bl;};
-		//double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
-		
-		size_t nodeName_start() const {return this->nodeName_start_;};
-		void set_nodeName_start(size_t index){this->nodeName_start_ = index;};
-		
-		size_t nodeName_end() const {return this->nodeName_end_;};
-		void set_nodeName_end(size_t index){this->nodeName_end_ = index;};
-		
-		size_t nodeName_length(){return this->nodeName_end_ - this->nodeName_start_ + 1;};
-		
-		size_t node_content_start() const {return this->node_content_start_;};
-		void set_node_content_start(size_t index){this->node_content_start_ = index;};
-		
-		size_t node_content_end() const {return this->node_content_end_;};
-		void set_node_content_end(size_t index){this->node_content_end_ = index;};
-		
-		size_t node_content_length(){return this->node_content_end_ - node_content_start_ + 1;}	
-		
-		void add_to_parent(Node* parent);
-		void find_hybrid_descndnt();
-		
-		void init(
-			size_t nodeName_start = 0,
-			size_t nodeName_end = 0, 
-			size_t node_content_start = 0, 
-			size_t node_content_end = 0, 
-			double bl1=0.0,
-			double bl2=0.0);
-			
-		Node(); /*!< \brief Initialize Node class*/
-		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end);
-		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end, double bl1);
-		Node(size_t nodeName_start,	size_t nodeName_end, size_t node_content_start, size_t node_content_end, double bl1, double bl2);
-		
-		~Node();
-		
-		
-		size_t enumerate_internal_branch(size_t e_num_old);  /*!< enumerator which is about to be updated \todo change e_num_old to int* type */ 
-		void print_all_child();
-		void print_parent();
-		
-		bool print_net_Node(const char* net_str) const; 
-		bool print_tree_Node(const char* tree_str ) const;
-		void clear();
-	
-		
-	
-	private:
-		size_t num_descndnt_tips_;
-	
-		Node* parent1_; /*!< \brief pointer to its parent node. */
-		Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
-		
-		size_t e_num_; /*!< \brief numbering the branch */
-		size_t e_num2_; /*!< \brief Hybrid node only, numbering the branch between the node and its second parent */
-
-		int rank_; /*!< \brief rank of the node, tip node has rank one, the root has the highest rank */
-		
-		size_t node_index_; /*!< \brief node index in the array, \todo use this more often!!!*/
-
-		//double height_; /*!< \brief distance to the bottom of the tree */
-
-		double brchlen1_; /*!< \brief Branch length */
-		double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
-
-		bool visited_;
-		bool descndnt_of_hybrid_; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-		bool tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-		bool hybrid_; /*!< \brief Hybrid node only, indicator of a hybrid node */
-
-		size_t nodeName_start_;
-		size_t nodeName_end_;
-		
-		size_t node_content_start_;
-		size_t node_content_end_;
-		
-		size_t * name_index_;
-		
-		//size_t name_;
-		
-		//string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */		
-		//string label; /*!< \brief String label of a node, each node has unique label */
-		//string node_content; /*!< \brief node content, the subtree string at this node */
-		//string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
-
-		
+        size_t rank() const { return this->rank_; }
+        
+        // Methods    
+        Node(); /*!< \brief Initialize Node class*/
+        void add_child( Node *child_node /*! pointer to the child node*/);
+        void CalculateRank();
+        void print( bool is_Net = false );
+        bool print_dout( bool is_Net = false );
+        void find_tip();
+        void find_hybrid_descndnt();
+        bool find_descndnt ( string &name, NAMETYPE type );
+        
+        double extract_hybrid_para(){
+            size_t hash_index = this->label.find('#');
+            return strtod( this->label.substr(hash_index+1).c_str(), NULL) ;
+        }   
 };
 
 
-
-//void find_hybrid_descndnt(Node *current);
-//void find_tip(Node *current);
-
-
-#endif
-
+#endif    
