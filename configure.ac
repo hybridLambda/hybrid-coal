@@ -2,8 +2,12 @@ AC_INIT([hybrid_coal],[beta],[sha.joe.zhu@gmail.com])
 #AC_INIT([hybrid_sim],esyscmd([sh -c "date \"+%Y%m%d\" | tr -d '\n'"]),[joe.zhu@pg.canterbury.ac.nz])
 dnl AC_CONFIG_SRCDIR([simu.c])
 
-AM_INIT_AUTOMAKE
 AC_PROG_INSTALL
+
+AM_INIT_AUTOMAKE([subdir-objects])
+m4_ifndef([AM_SILENT_RULES], [m4_define([AM_SILENT_RULES],[])])
+AM_SILENT_RULES([yes])
+
 
 AC_CANONICAL_HOST
 

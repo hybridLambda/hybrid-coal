@@ -12,22 +12,12 @@ hybrid_coal_CXXFLAGS = -DNDEBUG $(common_flags)#options for not showing debug me
 #hybrid_coal_dbg_CXXFLAGS = $(common_flags)
 #hybrid_coal_prof_CXXFLAGS = $(common_flags) -DNDEBUG -pg #options for not showing debug messages. -fpermissive
 
-shared_SOURCES = src/hybridcoal.cpp \
-				 src/node.cpp \
+shared_src = src/node.cpp \
 				 src/net.cpp \
-				 src/sim_gt.cpp \
-				 src/plot/figure.cpp  
+				 src/plot/figure.cpp  \
+				 src/tree_topo/all_gene_topo.cpp \
+				 src/coal.cpp 
+				 
+hybrid_coal_SOURCES = $(shared_src) src/main.cpp  
 
-hybrid_Lambda_SOURCES = $(shared_SOURCES) src/main.cpp  
-
-test_hybrid_coal_SOURCES = all_gene_topo.cpp  all_gene_topo.hpp \
-coal.cpp  coal.hpp  \
-node.cpp node.hpp \
-newmain.cpp  \
-net.cpp net.hpp \
-utility.cpp  utility.hpp \
-export.cpp export.hpp
-
-
-
-include_HEADERS = net.hpp node.hpp utility.hpp export.hpp
+include_HEADERS = src/net.hpp src/node.hpp src/utility.hpp src/export.hpp

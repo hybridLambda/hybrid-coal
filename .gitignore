@@ -7,3 +7,10 @@ compile
 config.log
 config.status
 configure
+config.guess
+config.sub
+depcomp
+install-sh
+missing
+*.dirstamp
+*.o
