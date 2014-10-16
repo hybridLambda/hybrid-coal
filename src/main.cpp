@@ -25,23 +25,8 @@
  */
 
 #include "hybridcoal.hpp"
-//#include"export.hpp"
-
-//#include"all_gene_topo.hpp"
-//#include"coal.hpp"
 
 using namespace std;
-
-//bool log_file_bool; /*! \todo fix log file */ 
-
-
-//bool acc_bool;
-
-//bool debug_bool;
-//bool export_debug_bool;
-//bool coal_debug_bool;
-//bool utility_debug_bool;
-//bool rm_debug_bool; 
 
 /*! 
  * \fn int main(int argc, char *argv[])

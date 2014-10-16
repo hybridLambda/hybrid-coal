@@ -21,6 +21,7 @@
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
 #include <net.hpp>
 #include <sstream>      // std::stringstream
+
 #ifndef HYBRDRIDCOAL_PARAM_INCLUDED
 #define HYBRDRIDCOAL_PARAM_INCLUDED
 using namespace std;
