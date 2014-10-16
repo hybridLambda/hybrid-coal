@@ -33,7 +33,7 @@ Net sub_brchlen_by_enum(string old_net_string, vector < vector <int> > e_num_vec
 		cout<<"sub_brchlen_by_enum!!!!"<<old_Net.Net_nodes.size()<<"  "<<e_num_vec_dummy.size() <<endl;
 	}
 	vector <Node*> old_Net_node_ptr;
-	for (unsigned int i=0;i<old_Net.Net_nodes.size();i++){
+	for (size_t i=0;i<old_Net.Net_nodes.size();i++){
 		Node* new_node_ptr=NULL;
 		old_Net_node_ptr.push_back(new_node_ptr);
 		old_Net_node_ptr[i]=&old_Net.Net_nodes[i];	
@@ -49,9 +49,9 @@ Net sub_brchlen_by_enum(string old_net_string, vector < vector <int> > e_num_vec
 
 
 void print_H_S_A_matrix(vector < vector < valarray < int > > > A_matrix){
-	for (unsigned int A_matrix_i=0;A_matrix_i<A_matrix.size();A_matrix_i++){
-		for (unsigned int A_matrix_i_i=0;A_matrix_i_i<A_matrix[A_matrix_i].size();A_matrix_i_i++){
-			for (unsigned int A_matrix_i_i_i=0;A_matrix_i_i_i<A_matrix[A_matrix_i][A_matrix_i_i].size();A_matrix_i_i_i++){
+	for (size_t A_matrix_i=0;A_matrix_i<A_matrix.size();A_matrix_i++){
+		for (size_t A_matrix_i_i=0;A_matrix_i_i<A_matrix[A_matrix_i].size();A_matrix_i_i++){
+			for (size_t A_matrix_i_i_i=0;A_matrix_i_i_i<A_matrix[A_matrix_i][A_matrix_i_i].size();A_matrix_i_i_i++){
 				cout<<A_matrix[A_matrix_i][A_matrix_i_i][A_matrix_i_i_i];
 			}
 			cout<<" ";
@@ -62,8 +62,8 @@ void print_H_S_A_matrix(vector < vector < valarray < int > > > A_matrix){
 
 
 int choose_rm_node(Net current_Net){
-	unsigned int first_rm=current_Net.Net_nodes.size()-1;
-	for (unsigned int i=0;i<current_Net.Net_nodes.size();i++){
+	size_t first_rm=current_Net.Net_nodes.size()-1;
+	for (size_t i=0;i<current_Net.Net_nodes.size();i++){
 		if (((current_Net.Net_nodes[i].hybrid+current_Net.Net_nodes[i].descndnt_of_hybrid)*(1-current_Net.Net_nodes[i].tip_bool))>=1 && current_Net.Net_nodes[i].rank < current_Net.Net_nodes[first_rm].rank){ /*! \todo Check if a tip node should be removed or not */
 			first_rm=i;
 		}
@@ -78,7 +78,7 @@ int choose_rm_node(Net current_Net){
 
 vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A){
 	vector <int> disjoint_list_s_return;
-	for (unsigned int j=pow(2.0,1.0*(n-1))-1;j<A.size();j++){
+	for (size_t j=pow(2.0,1.0*(n-1))-1;j<A.size();j++){
 		valarray <int> A_j=A[j];
 		int a_inter_b=0;
 		for (int A_j_i=0;A_j_i<n;A_j_i++){
@@ -97,7 +97,7 @@ vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <i
 int disjoint_list_h(int n,int i,vector <valarray <int> >A){
 	 valarray <int> A_i=A[i];
 	int disjoint_list_h_return;
-	for (unsigned int j=0;j<pow(2.0,1.0*n);j++){
+	for (size_t j=0;j<pow(2.0,1.0*n);j++){
 		valarray <int> A_j=A[j];
 		valarray <int> A_ij_sum=A_i+A_j;
 		int a_inter_b=0;
@@ -131,7 +131,7 @@ vector < valarray <int> > all_possible_comb(int n){
 	for (int ii=0;ii<(pow(1.0*2,1.0*n));ii++){
 		int	A_row_array[n];
 		int A_row_array_ind=0;
-		for (unsigned int i=0;i<Avec.size();i++){
+		for (size_t i=0;i<Avec.size();i++){
 			if (fmod(i+1,pow(1.0*2,1.0*n))==ii){
 				A_row_array[A_row_array_ind]=Avec[i];
 				A_row_array_ind++;
@@ -175,17 +175,17 @@ vector < vector < valarray <int> > > build_s_child(int n){
 	vector < vector <int> > empty_vec_dim2;
 	empty_vec_dim2.push_back(empty_vec_dim1);
 	all_list.push_back(empty_vec_dim2);
-	for (unsigned int i=1; i<pow(1.0*2,1.0*(n-1))+1;i++){
+	for (size_t i=1; i<pow(1.0*2,1.0*(n-1))+1;i++){
 		valarray <int> A_i=A[i];
 		vector <int> disjoint_set_list=disjoint_list_s(n,A_i,i,A);
 		vector < vector <int> > new_list;
-		for (unsigned int disjoint_i=0;disjoint_i<disjoint_set_list.size();disjoint_i++){
+		for (size_t disjoint_i=0;disjoint_i<disjoint_set_list.size();disjoint_i++){
 			valarray <int> new_A=A_i+A[disjoint_set_list[disjoint_i]];
-			for (unsigned int upto_i=0;upto_i<i;upto_i++){
+			for (size_t upto_i=0;upto_i<i;upto_i++){
 				valarray<bool> comp = (new_A==A[upto_i]);
 				if (comp.min() == true){
 					vector < vector <int> > current_list=all_list[upto_i];
-					for (unsigned int current_list_i=0;current_list_i<current_list.size();current_list_i++){
+					for (size_t current_list_i=0;current_list_i<current_list.size();current_list_i++){
 						current_list[current_list_i].push_back(disjoint_set_list[disjoint_i]);
 						}
 					new_list.insert(new_list.begin(),current_list.begin(),current_list.end());
@@ -195,27 +195,27 @@ vector < vector < valarray <int> > > build_s_child(int n){
 		all_list.push_back(new_list);
 	}
 	vector < vector <int> > all_list_in_vec;
-	for (unsigned int print_all_list_i=0;print_all_list_i<all_list.size();print_all_list_i++){
-		for (unsigned int print_all_list_i_i=0;print_all_list_i_i<all_list[print_all_list_i].size();print_all_list_i_i++){
+	for (size_t print_all_list_i=0;print_all_list_i<all_list.size();print_all_list_i++){
+		for (size_t print_all_list_i_i=0;print_all_list_i_i<all_list[print_all_list_i].size();print_all_list_i_i++){
 			all_list[print_all_list_i][print_all_list_i_i].push_back(print_all_list_i);
-			for (unsigned int print_all_list_i_i_i=0;print_all_list_i_i_i<all_list[print_all_list_i][print_all_list_i_i].size();print_all_list_i_i_i++){
+			for (size_t print_all_list_i_i_i=0;print_all_list_i_i_i<all_list[print_all_list_i][print_all_list_i_i].size();print_all_list_i_i_i++){
 				all_list_in_vec.push_back(all_list[print_all_list_i][print_all_list_i_i]);
 			}
 		}
 	}
 
-	for (unsigned int i=0;i<all_list_in_vec.size();i++){
+	for (size_t i=0;i<all_list_in_vec.size();i++){
 		sort(all_list_in_vec[i].begin(),all_list_in_vec[i].end());
 	}
 
 	vector < vector <int> > new_all_list;
 	new_all_list.push_back(all_list_in_vec[0]);
-	for (unsigned int i=0;i<all_list_in_vec.size();i++){
+	for (size_t i=0;i<all_list_in_vec.size();i++){
 		int all_compare=0;
-		for (unsigned int ii=0;ii<new_all_list.size();ii++){
+		for (size_t ii=0;ii<new_all_list.size();ii++){
 			if (all_list_in_vec[i].size()==new_all_list[ii].size()){
 				int compare=1;
-				for (unsigned int iii=0;iii<all_list_in_vec[i].size();iii++){
+				for (size_t iii=0;iii<all_list_in_vec[i].size();iii++){
 					if (all_list_in_vec[i][iii]!=new_all_list[ii][iii]){
 						compare=0;
 						break;
@@ -232,9 +232,9 @@ vector < vector < valarray <int> > > build_s_child(int n){
 	}
 	
 	vector < vector < valarray <int> > > descdent_all_list;
-	for (unsigned int i=0;i<new_all_list.size();i++){
+	for (size_t i=0;i<new_all_list.size();i++){
 		vector < valarray <int> > current_descent;
-		for (unsigned int ii=0;ii<new_all_list[i].size();ii++){
+		for (size_t ii=0;ii<new_all_list[i].size();ii++){
 			valarray <int> descent(0,n);
 			for (int iii=0;iii<n;iii++){
 				descent[iii]=A[new_all_list[i][ii]][iii];
@@ -253,7 +253,7 @@ vector < vector < valarray <int> > > build_s_child(int n){
 vector < vector < valarray < int > > > build_h_child(int n){
 	vector < vector < valarray < int > > > descdent_all_list;
 	vector < valarray < int > > A=all_possible_comb(n);
-	for (unsigned int i=0; i<pow(1.0*2,1.0*n);i++){
+	for (size_t i=0; i<pow(1.0*2,1.0*n);i++){
 		int i_comp=disjoint_list_h(n,i,A);
 		vector < valarray < int > > current_descdent_list;
 		valarray <int> current_descdent_list_i=A[i];
@@ -269,7 +269,7 @@ vector < vector < valarray < int > > > build_h_child(int n){
 
 void rm_zero_kids_hybrid_node(vector <Node*> sp_nodes_ptr_rm){
 	//check hybrid node has zero kids
-	for (unsigned int sp_nodes_ptr_rm_i=0;sp_nodes_ptr_rm_i<sp_nodes_ptr_rm.size();sp_nodes_ptr_rm_i++){
+	for (size_t sp_nodes_ptr_rm_i=0;sp_nodes_ptr_rm_i<sp_nodes_ptr_rm.size();sp_nodes_ptr_rm_i++){
 		if ( ((sp_nodes_ptr_rm[sp_nodes_ptr_rm_i]->num_child==0) && sp_nodes_ptr_rm[sp_nodes_ptr_rm_i]->hybrid==1 ) ){
 			Node * rm_parent_dummy_hybrid[2];
 			rm_parent_dummy_hybrid[0]=NULL;
@@ -316,12 +316,12 @@ vector < vector <int> > rm_one_child_interior_lambda_sum(string old_net_string, 
 string rm_one_child_interior_node(string old_net_string,bool e_num_bool){
 	Net old_Net(old_net_string);
 	vector <Node*> sp_nodes_ptr;
-	for (unsigned int i=0;i<old_Net.Net_nodes.size();i++){
+	for (size_t i=0;i<old_Net.Net_nodes.size();i++){
 		Node* new_node_ptr=NULL;
 		sp_nodes_ptr.push_back(new_node_ptr);
 		sp_nodes_ptr[i]=&old_Net.Net_nodes[i];
 	}
-	for (unsigned int sp_nodes_ptr_i=0;sp_nodes_ptr_i<sp_nodes_ptr.size();sp_nodes_ptr_i++){
+	for (size_t sp_nodes_ptr_i=0;sp_nodes_ptr_i<sp_nodes_ptr.size();sp_nodes_ptr_i++){
 		if (sp_nodes_ptr[sp_nodes_ptr_i]->num_child==1 && sp_nodes_ptr[sp_nodes_ptr_i]->parent2==NULL){
 			Node * rm_one_parent_dummy=sp_nodes_ptr[sp_nodes_ptr_i]->parent1;
 			int which_one_child_parent;
@@ -348,7 +348,7 @@ string rm_one_child_interior_node(string old_net_string,bool e_num_bool){
 
 vector <int> build_left_or_right_vec(int n_child,vector < valarray <int> > A_matrix_ith_row,size_t A_matrix_i){
 	vector <int> left_or_right(2,0);
-	for (unsigned int parent_i=0;parent_i<2;parent_i++){
+	for (size_t parent_i=0;parent_i<2;parent_i++){
 		if (A_matrix_i>1){				
 			for (int A_matrix_i_i_i=0;A_matrix_i_i_i<n_child;A_matrix_i_i_i++){
 				if (A_matrix_ith_row[parent_i][A_matrix_i_i_i]==1){
@@ -395,7 +395,7 @@ string nchild_gt_one_core(string current_removing_net_string,string new_node_nam
 	current_removing_net.descndnt.push_back(new_parrent_dummy_descndent);
 	current_removing_net.descndnt.push_back(new_parrent_dummy_descndent);	
 
-	for (unsigned int i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
+	for (size_t i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
 		Node* new_node_ptr=NULL;
 		sp_nodes_ptr_rm.push_back(new_node_ptr);
 		sp_nodes_ptr_rm[i_link_ptr_rm]=&current_removing_net.Net_nodes[i_link_ptr_rm];		
@@ -408,7 +408,7 @@ string nchild_gt_one_core(string current_removing_net_string,string new_node_nam
 	rm_parent_dummy[1]=sp_nodes_ptr_rm[rm_node_index]->parent2;
 	int which_child_node[2];
 
-	for (unsigned int parent_i=0;parent_i<2;parent_i++){
+	for (size_t parent_i=0;parent_i<2;parent_i++){
 		for (int child_i=0;rm_parent_dummy[parent_i]->child.size();child_i++){
 			if (rm_parent_dummy[parent_i]->child[child_i]->label==sp_nodes_ptr_rm[rm_node_index]->label){								
 				which_child_node[parent_i]=child_i;
@@ -447,9 +447,9 @@ string nchild_gt_one_core(string current_removing_net_string,string new_node_nam
 	//check hybrid node has zero kids
 	rm_zero_kids_hybrid_node(sp_nodes_ptr_rm);
 	
-	for (unsigned int sp_nodes_ptr_rm_i=0;sp_nodes_ptr_rm_i<sp_nodes_ptr_rm.size();sp_nodes_ptr_rm_i++){
+	for (size_t sp_nodes_ptr_rm_i=0;sp_nodes_ptr_rm_i<sp_nodes_ptr_rm.size();sp_nodes_ptr_rm_i++){
 		sp_nodes_ptr_rm[sp_nodes_ptr_rm_i]->num_descndnt=0;
-		for (unsigned int tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
+		for (size_t tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
 			if (find_descndnt(sp_nodes_ptr_rm[sp_nodes_ptr_rm_i],current_removing_net.tax_name[tax_name_i])){
 				current_removing_net.descndnt[sp_nodes_ptr_rm_i][tax_name_i]=1;
 				}
@@ -578,7 +578,7 @@ vec_Net_wiz_prior_p rm_H_node::nchild_gt_one(int rm_node_index,bool maple_bool_l
 string nchild_eq_one_core(string in_str,int rm_node_index,size_t i_one_hybrid_child){		
 	Net current_removing_net(in_str);
 	vector <Node*> sp_nodes_ptr_rm;
-	for (unsigned int i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
+	for (size_t i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
 		Node* new_node_ptr=NULL;
 		sp_nodes_ptr_rm.push_back(new_node_ptr);
 		sp_nodes_ptr_rm[i_link_ptr_rm]=&current_removing_net.Net_nodes[i_link_ptr_rm];
@@ -630,7 +630,7 @@ string nchild_eq_one_core(string in_str,int rm_node_index,size_t i_one_hybrid_ch
 
 vec_Net_wiz_prior_p rm_H_node::nchild_eq_one(int rm_node_index,bool maple_bool_local){
 	vec_Net_wiz_prior_p my_rmd_networks;
-	for (unsigned int i_one_hybrid_child=0;i_one_hybrid_child<2;i_one_hybrid_child++){
+	for (size_t i_one_hybrid_child=0;i_one_hybrid_child<2;i_one_hybrid_child++){
 		string adding_new_Net_string=nchild_eq_one_core(current_removing_net_string, rm_node_index, i_one_hybrid_child);
 		string adding_new_Net_string_enum=nchild_eq_one_core(current_removing_net_string_enum, rm_node_index, i_one_hybrid_child);
 
@@ -727,7 +727,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 	
 	//string net_str=new_Net_wiz_prior_p.s_net_string;
 	vector <string> original_tax_name=pre_current_net.tax_name;
-	//for (unsigned int tax_i=0;tax_i<original_tax_name.size();tax_i++){
+	//for (size_t tax_i=0;tax_i<original_tax_name.size();tax_i++){
 		//cout<<original_tax_name[tax_i]<<endl;
 	//}
 	//cout<<original_tax_name.size()<<endl;
@@ -756,13 +756,13 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 			string dummy_string=construct_adding_new_Net_str(my_gt_tree);
 			Net load_gt_tree(dummy_string);
 			vector <Node*> gt_nodes_ptr_rm;
-			for (unsigned int i_link_ptr_rm=0;i_link_ptr_rm<load_gt_tree.Net_nodes.size();i_link_ptr_rm++){
+			for (size_t i_link_ptr_rm=0;i_link_ptr_rm<load_gt_tree.Net_nodes.size();i_link_ptr_rm++){
 				Node* new_node_ptr=NULL;
 				gt_nodes_ptr_rm.push_back(new_node_ptr);
 				gt_nodes_ptr_rm[i_link_ptr_rm]=&load_gt_tree.Net_nodes[i_link_ptr_rm];
 			}
-			for (unsigned int i_gt_node=0;i_gt_node<load_gt_tree.descndnt.size();i_gt_node++){
-				for (unsigned int i_st_node=0;i_st_node<pre_current_net.descndnt.size();i_st_node++){
+			for (size_t i_gt_node=0;i_gt_node<load_gt_tree.descndnt.size();i_gt_node++){
+				for (size_t i_st_node=0;i_st_node<pre_current_net.descndnt.size();i_st_node++){
 					valarray <bool> comp = (load_gt_tree.descndnt[i_gt_node]==pre_current_net.descndnt[i_st_node]);
 					if (comp.min() && pre_current_net.Net_nodes[i_st_node].tip_bool ){
 						gt_nodes_ptr_rm[i_gt_node]->num_child=0;
@@ -831,7 +831,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 		
 			//gt_tree.print_all_node();
 				//cout<<"gt_tree.print_all_node(); not changed?"<<endl;
-		for (unsigned int A_matrix_i=0;A_matrix_i<A_matrix.size();A_matrix_i++){
+		for (size_t A_matrix_i=0;A_matrix_i<A_matrix.size();A_matrix_i++){
 			Net current_removing_net(current_removing_net_string);
 			Net current_removing_net_enum(current_s_net_string_enum);
 			//cout<<current_s_net_string_enum<<endl;
@@ -839,7 +839,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 			vector <Node*> sp_nodes_ptr_rm;
 			vector <Node*> sp_nodes_ptr_rm_enum;
 	
-			for (unsigned int i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
+			for (size_t i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
 				Node* new_node_ptr=NULL;
 				sp_nodes_ptr_rm.push_back(new_node_ptr);
 				sp_nodes_ptr_rm[i_link_ptr_rm]=&current_removing_net.Net_nodes[i_link_ptr_rm];
@@ -876,7 +876,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 			vector < valarray < int > > brand_new_current_prior_coal_clades;
 			
 			
-			for (unsigned int A_matrix_i_i=0;A_matrix_i_i<A_matrix[A_matrix_i].size();A_matrix_i_i++){
+			for (size_t A_matrix_i_i=0;A_matrix_i_i<A_matrix[A_matrix_i].size();A_matrix_i_i++){
 				Node* current_rm_child_dummy=NULL;	
 				Node* current_rm_child_dummy_enum=NULL;	
 				int howmany_coaled=0;
@@ -912,9 +912,9 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 				if (A_matrix_i_i_coaled){
 					valarray <int> A_matrix_i_i_valarray (0,current_removing_net.tax_name.size());
 					vector <string> contained_tax_s;
-					for (unsigned int current_rm_child_dummy_label_i=0;current_rm_child_dummy_label_i<current_rm_child_dummy->label.size();){
+					for (size_t current_rm_child_dummy_label_i=0;current_rm_child_dummy_label_i<current_rm_child_dummy->label.size();){
 							string contained_tax;
-							unsigned int current_rm_child_dummy_label_j;
+							size_t current_rm_child_dummy_label_j;
 							for (current_rm_child_dummy_label_j=current_rm_child_dummy_label_i;current_rm_child_dummy_label_j<current_rm_child_dummy->label.size();current_rm_child_dummy_label_j++){
 								if (current_rm_child_dummy->label[current_rm_child_dummy_label_j+1]=='&'){
 									break;
@@ -924,8 +924,8 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 							contained_tax_s.push_back(contained_tax);
 							current_rm_child_dummy_label_i=current_rm_child_dummy_label_j+2;
 					}
-					for (unsigned int contained_tax_i=0;contained_tax_i<contained_tax_s.size();contained_tax_i++){
-						for (unsigned int tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
+					for (size_t contained_tax_i=0;contained_tax_i<contained_tax_s.size();contained_tax_i++){
+						for (size_t tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
 							if (contained_tax_s[contained_tax_i]==current_removing_net.tax_name[tax_name_i]){
 								A_matrix_i_i_valarray[tax_name_i]=1;
 							}
@@ -976,7 +976,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 			if (sp_coal_valid){
 				
 
-				for (unsigned int dummy_i=0;dummy_i<rm_child_dummy.size();dummy_i++){
+				for (size_t dummy_i=0;dummy_i<rm_child_dummy.size();dummy_i++){
 					rm_child_dummy[dummy_i]->brchlen1=rm_child_dummy[dummy_i]->brchlen1+sp_nodes_ptr_rm[rm_node_index]->brchlen1;
 					rm_child_dummy[dummy_i]->parent1=NULL;
 					rm_child_dummy[dummy_i]->parent2=NULL;
@@ -1046,7 +1046,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 								
 
 							//}
-							////for (unsigned int interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
+							////for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
 								////new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior)));
 								
 							////}
@@ -1094,7 +1094,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 				if (maple_bool_local){
 					//if (current_lambda_sum[brch_lambda-1].size()>0){
 						current_omega_string=omega_w_str.str()+"/"+omega_d_str.str()+"*puvT("+num_in.str()+","+num_out.str()+","+"lambda["+brch_num.str()+"]";
-						for (unsigned int lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
+						for (size_t lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
 							ostringstream brch_num_new;
 							brch_num_new<<current_lambda_sum[brch_lambda-1][lambda_sum_i];
 							current_omega_string=current_omega_string+"+lambda["+brch_num_new.str()+"]";
@@ -1111,7 +1111,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 			
 					current_omega=prior_prior_prob_num*gijoe(n_child,A_matrix[A_matrix_i].size(),current_brchlen)*new_omega_prob;
 					current_omega_string=prior_prior_prob_string+"\\frac{"+omega_w_str.str()+ "}{"+omega_d_str.str()+"}p_{"+num_in.str()+num_out.str()+"}(\\lambda_{"+brch_num.str()+"}";
-					for (unsigned int lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
+					for (size_t lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
 						ostringstream brch_num_new;
 						brch_num_new<<current_lambda_sum[brch_lambda-1][lambda_sum_i];
 						current_omega_string=current_omega_string+"+\\lambda_{"+brch_num_new.str()+"}";
@@ -1162,7 +1162,7 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 Net initialize_enum_net(string in_str){
 	Net enum_net(in_str);
 	vector <Node*> enum_net_ptr;
-	for (unsigned int node_i=0;node_i<enum_net.Net_nodes.size();node_i++){
+	for (size_t node_i=0;node_i<enum_net.Net_nodes.size();node_i++){
 		Node* new_node_ptr=NULL;
 		enum_net_ptr.push_back(new_node_ptr);
 		enum_net_ptr[node_i]=&enum_net.Net_nodes[node_i];	
@@ -1177,7 +1177,7 @@ Net initialize_enum_net(string in_str){
 
 vector < vector <int> > initialize_lambda_sum(Net enum_net){
 	vector < vector <int> > lambda_sum_initial;
-	for (unsigned int enum_i=0;enum_i<enum_net.Net_nodes.back().e_num;enum_i++){
+	for (size_t enum_i=0;enum_i<enum_net.Net_nodes.back().e_num;enum_i++){
 		vector <int> lambda_sum_dummy;
 		lambda_sum_initial.push_back(lambda_sum_dummy);
 	}
@@ -1254,7 +1254,7 @@ vec_Net_wiz_prior_p simplify_Networks(string sp_str, string gt_string){
 			}
 		}
 		needs_to_rm=true;
-		for (unsigned int j=0;j<my_rmd_networks.Net_vec.size();){
+		for (size_t j=0;j<my_rmd_networks.Net_vec.size();){
 			Net checking_rm_net(my_rmd_networks.Net_vec[j].s_net_string);
 			int rm_node_index=choose_rm_node(checking_rm_net);
 			if (rm_node_index>=0){
@@ -1350,7 +1350,7 @@ vector <string> build_maple_block_omega_part(vector <string> maple_block_vec_str
 }
 
 vector <string> build_maple_block_gt_part(vector <string> maple_block_vec_str,vec_Net_wiz_prior_p my_rmd_networks,string gt_i,string gt_tree_str){
-	for (unsigned int i=0;i<my_rmd_networks.Net_vec.size();i++){
+	for (size_t i=0;i<my_rmd_networks.Net_vec.size();i++){
 		Net current_net(my_rmd_networks.Net_vec[i].s_net_string);
 		if (!current_net.is_net){
 			ostringstream i_str;
@@ -1430,7 +1430,7 @@ double compute_rm_S_omega(int n_child,int k_clade,vector < valarray < int > > br
 					
 
 				}
-				//for (unsigned int interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
+				//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
 					//new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior)));
 					
 				//}

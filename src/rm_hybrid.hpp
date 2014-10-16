@@ -59,7 +59,7 @@ class rm_H_node{
 		string current_omega_string;
 		class vec_Net_wiz_prior_p nchild_gt_one(int rm_node_index,bool maple_bool_local,int n_child);
 		class vec_Net_wiz_prior_p nchild_eq_one(int rm_node_index,bool maple_bool_local);
-		unsigned int new_node_name_i;
+		size_t new_node_name_i;
 		//int rm_node_index; // remove this
 		int current_root_enum;
 		//int n_child; //remove this

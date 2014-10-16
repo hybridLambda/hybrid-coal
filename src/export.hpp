@@ -36,11 +36,11 @@
 
 void print_all_gt_topo(const char* file_name, vector <string> gt_tree_str_s);
 
-string Fname_ext(const char* file_name, const char* ext);
-string Fname_no_ext(const char* file_name, const char* ext);
+//string Fname_ext(const char* file_name, const char* ext);
+//string Fname_no_ext(const char* file_name, const char* ext);
 
-void plot_in_latex(const char* file_name, Net* net_dummy, int plot_option);
-void plot_in_latex_file(const char* file_name, Net* net_dummy, int plot_option);
+//void plot_in_latex(const char* file_name, Net* net_dummy, int plot_option);
+//void plot_in_latex_file(const char* file_name, Net* net_dummy, int plot_option);
 
 void latex_header(const char* file_name);
 void latex_nt_body1(const char* file_name,size_t topo_idx,string topo);
@@ -48,7 +48,7 @@ void latex_nt_body1(const char* file_name,size_t topo_idx,string topo);
 void latex_tre_body(const char* file_name,string gt_str,string sp_str);
 void latex_tail(const char* file_name);
 
-void plot_in_dot(const char* file_name, Net* net_dummy, int plot_option);
+//void plot_in_dot(const char* file_name, Net* net_dummy, int plot_option);
 
 void produce_maple(const char* file_name, string in_str, bool symb_bool, vector <string> gt_tree_str_s);
 void maple_head(const char* file_name, string in_str,bool symb_bool);
@@ -64,9 +64,9 @@ void list_sub_tree(string in_str,string gt_str);
 void list_sub_net(string in_str,string gt_str);
 void list_sub(string in_str,string gt_str);
 
-int set_plot_option(bool plot_label,bool plot_branch);
-valarray <int>  det_x_node (Net* net_dummy);
-void print_help();
+//int set_plot_option(bool plot_label,bool plot_branch);
+//valarray <int>  det_x_node (Net* net_dummy);
+//void print_help();
 
 
 #endif

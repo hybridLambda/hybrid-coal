@@ -1,14 +1,11 @@
 /* 
  * hybrid_coal is used to compute gene tree probabilities given species network under coalescent process.
  * 
- * hybrid_sim is used to simulate gene trees given species network under 
- * coalescent process.
+ * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
  * 
- * Copyright (C) 2011 Sha (Joe) Zhu
+ * This file is part of hybrid_coal
  * 
- * This file is part of hybrid_sim and hybrid_coal
- * 
- * hybrid_sim is free software: you can redistribute it and/or modify
+ * hybrid_coal is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -20,7 +17,6 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 /*! \file utility.cpp
@@ -191,23 +187,23 @@ void appending_log_file(string log_file_input /*! Information added*/){
 ///*! \brief rewrite node content of nodes */
 //void rewrite_node_content(vector <Node*> Net_ptr /*! vector of pointers pointing to nodes */){
 	//int highest_i=0;
-	//for (unsigned int i =0; i<Net_ptr.size();i++){
+	//for (size_t i =0; i<Net_ptr.size();i++){
 		//if (Net_ptr[i]->num_descndnt > Net_ptr[highest_i]->num_descndnt ){highest_i=i;}
 	//}
 	
-	////for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+	////for (size_t node_i=0;node_i<Net_ptr.size();node_i++){
 		////Net_ptr[node_i]->print_net_Node();
 		////cout<<endl;
 	////}
 	
 	//ranking(Net_ptr[highest_i]);
 	////cout<<Net_ptr[highest_i]->node_content<<endl;
-	////for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+	////for (size_t node_i=0;node_i<Net_ptr.size();node_i++){
 		////Net_ptr[node_i]->print_net_Node();
 		////cout<<endl;
 	////}
 	//for (int rank_i=1;rank_i<=Net_ptr.back()->rank;rank_i++){
-		//for (unsigned int node_i=0;node_i<Net_ptr.size();node_i++){
+		//for (size_t node_i=0;node_i<Net_ptr.size();node_i++){
 			//if (Net_ptr[node_i]->rank==1){
 				//Net_ptr[node_i]->node_content=Net_ptr[node_i]->label;
 			//}
@@ -222,7 +218,7 @@ void appending_log_file(string log_file_input /*! Information added*/){
 						//new_node_content=new_node_content+Net_ptr[node_i]->child[child_i]->label+":"+brchlen_str.str();}
 					//else{
 						//bool new_hybrid_node=false;
-						//for (unsigned int node_ii=0;node_ii<node_i;node_ii++){
+						//for (size_t node_ii=0;node_ii<node_i;node_ii++){
 							//for (int node_ii_child_i=0;node_ii_child_i<Net_ptr[node_ii]->num_child;node_ii_child_i++){
 								//if (Net_ptr[node_ii]->child[node_ii_child_i]->node_content==Net_ptr[node_i]->child[child_i]->node_content){
 									//new_hybrid_node=true;
@@ -249,7 +245,7 @@ void appending_log_file(string log_file_input /*! Information added*/){
 			//}
 		//}	
 	//}
-	////for (unsigned int i =0; i<Net_ptr.size();i++){
+	////for (size_t i =0; i<Net_ptr.size();i++){
 		////cout<<Net_ptr[i]->label<<" "<<Net_ptr[i]->node_content<<endl;//<<"!!!!";
 	////}
 //}

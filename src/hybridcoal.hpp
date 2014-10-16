@@ -19,7 +19,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
-
+#include <net.hpp>
+#include <sstream>      // std::stringstream
 #ifndef HYBRDRIDCOAL_PARAM_INCLUDED
 #define HYBRDRIDCOAL_PARAM_INCLUDED
 using namespace std;
@@ -43,58 +44,58 @@ class HybridCoal{
         char * const* argv_;
         string tmp_input_str;
 
-        int num_sim_gt;
+        //int num_sim_gt;
         bool print_tree_bool;
         bool plot_bool;
-        bool simulation_bool;
-        bool seg_bool;
-        bool tmrca_bool;
-        bool bl_bool;        
-        bool firstcoal_bool;        
-        bool freq_bool;
-        bool fst_bool;
-        size_t seed;	
+        //bool simulation_bool;
+        //bool seg_bool;
+        //bool tmrca_bool;
+        //bool bl_bool;        
+        //bool firstcoal_bool;        
+        //bool freq_bool;
+        //bool fst_bool;
+        //size_t seed;	
         			
         string gt_file_name;
-        string mt_file_name;
-        vector <string> mt_tree_str_s;
+        //string mt_file_name;
+        //vector <string> mt_tree_str_s;
         vector <string> gt_tree_str_s;
-        string seg_dir_name;
-        string extract_file_name;
+        //string seg_dir_name;
+        //string extract_file_name;
 
-       	ofstream sim_gt_file_coal_unit;
-        ofstream sim_gt_file_mut_unit;
-        ofstream sim_gt_file_num_gener;
-        ofstream sim_gt_file_num_mut;
-        ofstream extract_file;
+       	//ofstream sim_gt_file_coal_unit;
+        //ofstream sim_gt_file_mut_unit;
+        //ofstream sim_gt_file_num_gener;
+        //ofstream sim_gt_file_num_mut;
+        //ofstream extract_file;
         bool read_GENE_trees;
-        bool read_mt_trees;        
+        //bool read_mt_trees;        
 
 		//vector <string> tax_name;
-        vector <double> monophyly;
+        //vector <double> monophyly;
 
-        action_board* simulation_jobs_;
-        SimulationParameters* parameters_;
+        //action_board* simulation_jobs_;
+        //SimulationParameters* parameters_;
         string prefix;
 
         /*! Methods */              
-        action_board* simulation_jobs() const { return this->simulation_jobs_; }
-        SimulationParameters* parameters() const { return this->parameters_;   }         
+        //action_board* simulation_jobs() const { return this->simulation_jobs_; }
+        //SimulationParameters* parameters() const { return this->parameters_;   }         
         
-        bool mono_fst_not_feasiable ( string flag );
+        //bool mono_fst_not_feasiable ( string flag );
         bool is_num ( const char *inchar );
 
-        string read_input_para ( const char *inchar, string in_str );
+        //string read_input_para ( const char *inchar, string in_str );
         string read_input_line ( const char *inchar );
         void init();
         void parse() ;
         void print();
         void read_input_lines(const char inchar[], vector <string> & out_vec);
         void read_sp_str( string & argv_i );
-        void read_sample_sizes();
-        void extract_mm_or_pop_param( string & mm_pop_string );
-        void create_new_site_data(string &gt_string_mut_num, int site_i);
-        void outtable_header( std::ofstream &output );
+        //void read_sample_sizes();
+        //void extract_mm_or_pop_param( string & mm_pop_string );
+        //void create_new_site_data(string &gt_string_mut_num, int site_i);
+        //void outtable_header( std::ofstream &output );
         void finalize();
 
         template < class T > T readNextInput() {

@@ -52,7 +52,7 @@ bool start_of_tax_name(string in_str,size_t i);
 //void rewrite_node_content(vector <Node*> Net_ptr);
 //string construct_adding_new_Net_str(Net old_Net);
 //int ranking(Node *current);
-//vector <string> all_n_tax_gene_tree(unsigned int tax_num);
+//vector <string> all_n_tax_gene_tree(size_t tax_num);
 double factorial(double a);	
 double n_permu_a(double n, double a);
 double n_choose_k(double n, double k);

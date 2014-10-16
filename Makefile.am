@@ -9,15 +9,16 @@ PROG = HYBRID-COAL
 
 common_flags = -O3 -g -std=c++0x -I src/ 
 hybrid_coal_CXXFLAGS = -DNDEBUG $(common_flags)#options for not showing debug messages.
-#hybrid_coal_dbg_CXXFLAGS = $(common_flags)
-#hybrid_coal_prof_CXXFLAGS = $(common_flags) -DNDEBUG -pg #options for not showing debug messages. -fpermissive
+hybrid_coal_dbg_CXXFLAGS = $(common_flags)
+hybrid_coal_prof_CXXFLAGS = $(common_flags) -DNDEBUG -pg #options for not showing debug messages. -fpermissive
 
 shared_src = src/node.cpp \
-				 src/net.cpp \
-				 src/plot/figure.cpp  \
-				 src/tree_topo/all_gene_topo.cpp \
-				 src/coal.cpp 
+			 src/net.cpp \
+			 src/plot/figure.cpp  \
+			 src/tree_topo/all_gene_topo.cpp 
 				 
 hybrid_coal_SOURCES = $(shared_src) src/main.cpp  
+hybrid_coal_dbg_SOURCES = $(shared_src) src/main.cpp src/debug/node_debug.cpp src/debug/net_debug.cpp
+hybrid_coal_prof_SOURCES = $(shared_src) src/main.cpp  
 
-include_HEADERS = src/net.hpp src/node.hpp src/utility.hpp src/export.hpp
+#include_HEADERS = src/net.hpp src/node.hpp src/utility.hpp src/export.hpp
