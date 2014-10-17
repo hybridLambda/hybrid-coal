@@ -15,8 +15,9 @@ hybrid_coal_prof_CXXFLAGS = $(common_flags) -DNDEBUG -pg #options for not showin
 shared_src = src/node.cpp \
 			 src/net.cpp \
 			 src/plot/figure.cpp  \
-			 src/tree_topo/all_gene_topo.cpp 
-				 
+			 src/tree_topo/all_gene_topo.cpp \
+			 src/hybridcoal.cpp 
+			  
 hybrid_coal_SOURCES = $(shared_src) src/main.cpp  
 hybrid_coal_dbg_SOURCES = $(shared_src) src/main.cpp src/debug/node_debug.cpp src/debug/net_debug.cpp
 hybrid_coal_prof_SOURCES = $(shared_src) src/main.cpp  

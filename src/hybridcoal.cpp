@@ -22,148 +22,103 @@
 #include "hybridcoal.hpp"
 #include "plot/figure.hpp"
 
-HybridCoal::init(){}
+void HybridCoal::init(){
+    this->prefix    = "OUT";    
+    this->symb_bool = false;
+    this->print_tree_bool = false;
+    this->print_gene_topo_bool = false; 
+    this->plot_bool       = false;
+    this->latex_bool = false;
+    this->argc_i = 1;
+    this->maple_bool = false;
+    this->all_gt_tree_bool = true;
+}
+
+void HybridCoal::read_sp_str( string & argv_i ){
+    readNextStringto( this->tmp_input_str , this->argc_i, this->argc_,  this->argv_ );
+    this->sp_str = read_input_line( tmp_input_str.c_str() );
+}
+
+void HybridCoal::read_input_lines(const char inchar[], vector <string> & out_vec){
+    ifstream in_file( inchar );
+    string out_str;
+    if ( in_file.good() ){
+        getline ( in_file, out_str );
+        while ( out_str.size() > 0 ){   
+            out_vec.push_back( out_str );
+            getline ( in_file, out_str );
+        }
+    } else {
+        string dummy_str(inchar);
+        if (dummy_str.find('(')!=string::npos && dummy_str.find(')')!=string::npos){
+            out_str=dummy_str;
+            out_vec.push_back(out_str);
+        } else{
+            throw std::invalid_argument("Invalid input file. " + string (inchar) );
+        }
+    }
+    in_file.close();
+}
+
+void HybridCoal::check_gt_str_and_sign( string &gt_str ){
+	if ( gt_str.find('&') != string::npos ){
+        throw std::invalid_argument ( "Error: gene tree " + gt_str + " can not be a gene tree string" );
+	}	
+}
+
+
 
 void HybridCoal::parse(){
-    
-	for (int argc_i=0;argc_i<argc;argc_i++){
-		string argv_i(argv[argc_i]);
-		
-		if (argv_i=="-gt"){
-			gt_tree_str_s=read_input_lines(argv[argc_i+1]);
-			all_gt_tree_bool=false;
-			string gt_log=argv[argc_i+1];
-			gt_log="Gene trees Input: "+gt_log;
-			appending_log_file(gt_log);
+    while (argc_i < argc_){	
+        std::string argv_i(argv_[argc_i]);
+        if ( argv_i == "-h" || argv_i == "-help" ){ print_help(); }		
+		else if (argv_i=="-gt"){
+            readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ );
 		}
-		if (argv_i=="-sp"){
-			net_str=read_input_line(argv[argc_i+1]);
-			string sp_log=argv[argc_i+1];
-			sp_log="Species Input: "+sp_log;
-			appending_log_file(sp_log);
-			sp_log="Species structure: "+net_str;
-			appending_log_file(sp_log);
+		else if (argv_i=="-latex"){  this->latex_bool=true;	}
+        if ( argv_i == "-sp"){ this->read_sp_str(argv_i); }
 
-		}
-		if (argv_i=="-latex"){
-			latex_bool=true;			
-		}
-		
-		if (argv_i=="-latexF"){
-			latex_bool=true;
-			latex_F_name=Fname_ext(argv[argc_i+1],".tex");
-		}
-		if (argv_i=="-out"){
-			out_bool=true;
-			out_file=argv[argc_i+1];
-		}
-		
-		if (argv_i=="-pdf"){
-			latex_bool=true;
-			pdf_bool=true;
-		}
-		//if (argv_i=="-history"){
-			//coal_history=true;
+        else if ( argv_i =="-o" ) readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );
+
+		// else if (argv_i=="-pdf"){
+			//latex_bool=true;
+			//pdf_bool=true;
 		//}
-		if (argv_i=="-maple"){
-			maple_bool=true;
-		}
-		if (argv_i=="-mapleF"){
-			maple_bool=true;
-			maple_F_name=Fname_ext(argv[argc_i+1],".mw");
-		}
-		
-		if (argv_i=="-h" || argv_i=="-help" ){
-			help=true;
-		}
-
-		//if (argv_i=="-debug"){
-			//debug_bool=true;
+		else if ( argv_i == "-maple" ){ this->maple_bool=true; }
+		//if (argv_i=="-mapleF"){
+			//maple_bool=true;
+			//maple_F_name=Fname_ext(argv[argc_i+1],".mw");
 		//}
-		if (argv_i=="-debug"){
-			//samples_bool=true;
-			for (int argc_j=argc_i+1;argc_j<argc;argc_j++){
-				string s(argv[argc_j]);
-				if (s[0]=='-'){
-					break;
-				}
-				if (s=="coal"){
-					coal_debug_bool=true;
-				}
-				if (s=="utility"){
-					utility_debug_bool=true;
-				}
-				if (s=="rm"){
-					rm_debug_bool=true;
-				}
-				if (s=="export"){
-					export_debug_bool=true;
-				}
-				if (s=="main"){
-					main_debug_bool=true;
-				}
-			}
-		}
-		
-		if (argv_i=="-symb"){
-			symb_bool=true;
-		}
-		if (argv_i=="-print"){
-			print_tree=true;
-		}
-		if (argv_i=="-plot"){
-			plot_bool=true;
-		}
-		if (argv_i=="-plotF"){
-			plot_bool=true;
-			tex_fig_name=argv[argc_i+1];
-		}
-		
-		
-		if (argv_i=="-label"){
-			plot_label=true;
-		}
-
-		if (argv_i=="-branch"){
-			plot_branch=true;
-		}		
-
-		if (argv_i=="-dot"){
-			dot_bool=true;
-		}
-		if (argv_i=="-dotF"){
-			dot_bool=true;
-			dot_fig_name=argv[argc_i+1];
-		}
-		
-
-		if (argv_i=="-gtopo"){
-			print_gene_topo_bool=true;
-		}
-		if (argv_i=="-gtopoF"){
-			print_gene_topo_bool=true;
-			gtopo_F_name=argv[argc_i+1];
-		}
-		
-		
-		if (argv_i=="-sub"){
-			list_sub_network_bool=true;
-		}
-		if (argv_i=="-acc"){
-			acc_bool=true;
-		}
-		
+		else if ( argv_i == "-symb" ){ this->symb_bool=true; }
+        else if ( argv_i == "-plot" || argv_i == "-dot" ){ this->plot_bool = true; }
+        else if ( argv_i == "-label" || argv_i == "-branch" ){ argc_i++; continue; }        
+        else if ( argv_i == "-print" ){ this->print_tree_bool = true; }
+		else if ( argv_i == "-gtopo" ){ this->print_gene_topo_bool = true; }
+		//else if (argv_i=="-sub"){ list_sub_network_bool=true;}
+		//else if (argv_i=="-acc"){ acc_bool=true;	}
+        else { throw std::invalid_argument ( "Unknown flag:" + argv_i); }
+        //else { cout <<"  need to change this !!!" << argv_i<<endl; argc_i++;continue; } // need to change this !!!
+        argc_i++;	
 	}
+    this->finalize();
+}
 
 
-    
+string HybridCoal::read_input_line(const char *inchar){
+	string out_str;
+    ifstream in_file( inchar );
+	if (in_file.good())	getline ( in_file, out_str); 
+	else{
+		string dummy_str(inchar);
+		if (dummy_str.find('(')!=string::npos && dummy_str.find(')')!=string::npos) out_str=dummy_str;
+		else  throw std::invalid_argument("Invalid input file. " + string (inchar) );
+	}
+	in_file.close();			
+    return 	out_str;
 }
 
 
 void HybridCoal::finalize(){
-    
-    this->parameters()->finalize( );    
-   
     if ( this->print_tree_bool ) 
         this->print();
    
@@ -171,13 +126,20 @@ void HybridCoal::finalize(){
         Figure figure_para ( this->argc_, this->argv_ );
         figure_para.figure_file_prefix = this->prefix;
         figure_para.finalize();
-        figure_para.plot( this->parameters()->net_str );
+        figure_para.plot( this->sp_str );
         exit(EXIT_SUCCESS);
+    }
+    if ( this->gt_file_name.size() > 0 ) {
+        this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
     }
 }
 
+void HybridCoal_core(){
+    
+}
+
 void HybridCoal::print(){
-    Net net( this->parameters_->net_str );
+    Net net( this->sp_str );
     net.print_all_node();
     exit(EXIT_SUCCESS);
 }
