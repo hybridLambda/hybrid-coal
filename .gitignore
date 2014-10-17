@@ -14,3 +14,10 @@ install-sh
 missing
 *.dirstamp
 *.o
+hybrid-coal
+
+*.dot
+*.eps
+*.pdf
+*.ps
+*.tex
