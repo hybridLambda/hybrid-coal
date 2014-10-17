@@ -34,7 +34,7 @@ class HybridCoal{
     public:	
         /*! Constructors and Destructors */  
         HybridCoal(int argc, char *argv[]) : argc_(argc), argv_(argv) { this->init(); this->parse(); }        
-        ~HybridCoal(){};
+        ~HybridCoal(){ dout << "~HybridCoal()" <<endl;};
         
         // ACTION
         void HybridCoal_core ( );

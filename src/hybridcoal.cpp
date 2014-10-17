@@ -119,16 +119,20 @@ string HybridCoal::read_input_line(const char *inchar){
 
 
 void HybridCoal::finalize(){
-    if ( this->print_tree_bool ) 
+    if ( this->print_tree_bool ) {
         this->print();
+        return;
+    }
    
     if ( this->plot_bool ){
         Figure figure_para ( this->argc_, this->argv_ );
         figure_para.figure_file_prefix = this->prefix;
         figure_para.finalize();
         figure_para.plot( this->sp_str );
-        exit(EXIT_SUCCESS);
+        //exit(EXIT_SUCCESS);
+        return;
     }
+    
     if ( this->gt_file_name.size() > 0 ) {
         this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
     }
@@ -141,7 +145,7 @@ void HybridCoal_core(){
 void HybridCoal::print(){
     Net net( this->sp_str );
     net.print_all_node();
-    exit(EXIT_SUCCESS);
+    //exit(EXIT_SUCCESS);
 }
 
 void print_example(){

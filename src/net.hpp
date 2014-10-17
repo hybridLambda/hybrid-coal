@@ -71,7 +71,7 @@ class Tree{
         vector< valarray <int> > samples_below;
         vector<string> tip_name;
         bool is_Net_() const { return this->is_Net ; }
-        string extract_label(string in_str, size_t i);
+        string extract_label(string &in_str, size_t i);
         void print_all_node();
         bool print_all_node_dout();
         Tree (){ this->init(); }

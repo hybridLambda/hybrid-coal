@@ -51,6 +51,7 @@ class Node {
     friend class HybridLambda;
     friend class Figure;
 	public:
+        ~Node();
         // Getters and Setters
         double height() const { return this->height_;}
         void set_height ( double h ){ this->height_ = h; }
@@ -79,6 +80,8 @@ class Node {
         vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
         vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
         Node* parent1; /*!< \brief pointer to its parent node. */
+        //Node* parent1_() const { return this->parent1; }
+        //void set_parent1 ( Node * node ) 
         string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
         
         int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
@@ -111,6 +114,7 @@ class Node {
         
         // Methods    
         Node(); /*!< \brief Initialize Node class*/
+        
         void add_child( Node *child_node /*! pointer to the child node*/);
         void CalculateRank();
         void print( bool is_Net = false );

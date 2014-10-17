@@ -47,7 +47,9 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
             else{
                 if ( start_of_tax_name(net_str,i_str_len) ){
                     size_t str_start_index = i_str_len;
-                    string label = extract_label(net_str,i_str_len);
+                    //string label = extract_label(net_str,i_str_len);
+                    size_t end_index = end_of_label_or_bl(net_str, i_str_len);//end_of_label_or_bl(in_str, i)
+                    string label = net_str.substr(i_str_len,end_index+1-i_str_len);
                     labels.push_back(label);
 
                     string node_content;
@@ -107,8 +109,8 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     this->NodeContainer.back().CalculateRank();
     this->max_rank = NodeContainer.back().rank();    
     this->enumerate_internal_branch( this->NodeContainer.back() );
-    this->init_descendant();
-    this->init_node_clade();
+    //this->init_descendant();
+    //this->init_node_clade();
     //this->rewrite_descendant();
     this->check_isNet();
     this->check_isUltrametric();
@@ -157,10 +159,11 @@ void Tree::init_node_clade(){
     }
 }
 
-string Tree::extract_label(string in_str, size_t i){
-    size_t j=end_of_label_or_bl(in_str, i);
+string Tree::extract_label(string &in_str, size_t i){
+    //size_t j=end_of_label_or_bl(in_str, i);
     //cout<<"i="<<i<<", j="<<j<<endl;
-    return in_str.substr(i,j+1-i);
+    string label(in_str.substr(i,end_of_label_or_bl(in_str, i)+1-i));
+    return label;
 }
 
 
@@ -218,7 +221,10 @@ void Tree::connect_graph(){
                 string child_node1_str = child_node1;        
                 i_content_len = j_content_len + 2;
                 for ( size_t j = 0; j < NodeContainer.size(); j++){
-                    if (child_node1_str == NodeContainer[j].label) NodeContainer[i].add_child( &NodeContainer[j] );
+                    if (child_node1_str == NodeContainer[j].label) {
+                        this->NodeContainer.at(i).add_child( &this->NodeContainer.at(j) );
+                        //dout << "node " << &this->NodeContainer[i] << " has child "<< &this->NodeContainer[j]<<endl;
+                    }
                 }
             }
             else { i_content_len++;}
@@ -298,10 +304,10 @@ void Tree::print_all_node(){
     if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
     else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank e_num   Clade "<<endl;
     for (size_t i = 0; i < this->NodeContainer.size(); i++ ){
-        for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
+        //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
         this->NodeContainer[i].print( this->is_Net_() );
         cout<<"  ";        
-        for (size_t j=0;j<this->samples_below[i].size();j++) {cout<<this->samples_below[i][j]; }
+        //for (size_t j=0;j<this->samples_below[i].size();j++) {cout<<this->samples_below[i][j]; }
         cout<<endl;
     }
 }
