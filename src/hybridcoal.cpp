@@ -1,11 +1,11 @@
 /* 
- * hybrid_coal is used to compute gene tree probabilities given species network under coalescent process.
+ * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
  * 
  * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
  * 
- * This file is part of hybrid_coal
+ * This file is part of hybrid-coal
  * 
- * hybrid_coal is free software: you can redistribute it and/or modify
+ * hybrid-coal is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -146,18 +146,18 @@ void HybridCoal::print(){
 
 void print_example(){
 	cout<<"Examples:"<<endl;
-	cout<<"hybrid_coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'"<<endl;	
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B)'"<<endl;	
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -maple"<<endl;	
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -maple -latex"<<endl;	
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -plot"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -plot -branch"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -plot -label"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -dot"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
-	cout<<"hybrid_coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
+	cout<<"hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'"<<endl;	
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B)'"<<endl;	
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -maple"<<endl;	
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -maple -latex"<<endl;	
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -branch"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -label"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -dot"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
 	cout<<endl;	
 }
 
