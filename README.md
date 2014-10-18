@@ -1,11 +1,11 @@
-hybrid_coal 
+hybrid-coal 
 
-hybrid_coal is used to compute gene tree probabilities given species network under coalescent process.
+hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
 
 
 INSTALLATION
 
-To install hybrid_coal, type the following commands:
+To install hybrid-coal, type the following commands:
 ./bootstrap
 make;
 

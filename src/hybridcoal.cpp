@@ -21,6 +21,7 @@
 
 #include "hybridcoal.hpp"
 #include "plot/figure.hpp"
+#include "tree_topo/all_gene_topo.hpp"
 
 void HybridCoal::init(){
     this->prefix    = "OUT";    
@@ -32,6 +33,7 @@ void HybridCoal::init(){
     this->argc_i = 1;
     this->maple_bool = false;
     this->all_gt_tree_bool = true;
+    this->enumerate_gt_bool = true;
 }
 
 void HybridCoal::read_sp_str( string & argv_i ){
@@ -71,24 +73,12 @@ void HybridCoal::check_gt_str_and_sign( string &gt_str ){
 void HybridCoal::parse(){
     while (argc_i < argc_){	
         std::string argv_i(argv_[argc_i]);
-        if ( argv_i == "-h" || argv_i == "-help" ){ print_help(); }		
-		else if (argv_i=="-gt"){
-            readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ );
-		}
-		else if (argv_i=="-latex"){  this->latex_bool=true;	}
-        if ( argv_i == "-sp"){ this->read_sp_str(argv_i); }
-
-        else if ( argv_i =="-o" ) readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );
-
-		// else if (argv_i=="-pdf"){
-			//latex_bool=true;
-			//pdf_bool=true;
-		//}
+        if      ( argv_i == "-h" || argv_i == "-help" ){ print_help(); }		
+		else if ( argv_i == "-gt" ){ readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ ); this->enumerate_gt_bool = false; }
+		else if ( argv_i == "-latex"){  this->latex_bool=true;	}
+        else if ( argv_i == "-sp"){ this->read_sp_str(argv_i); }
+        else if ( argv_i == "-o" ) readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );
 		else if ( argv_i == "-maple" ){ this->maple_bool=true; }
-		//if (argv_i=="-mapleF"){
-			//maple_bool=true;
-			//maple_F_name=Fname_ext(argv[argc_i+1],".mw");
-		//}
 		else if ( argv_i == "-symb" ){ this->symb_bool=true; }
         else if ( argv_i == "-plot" || argv_i == "-dot" ){ this->plot_bool = true; }
         else if ( argv_i == "-label" || argv_i == "-branch" ){ argc_i++; continue; }        
@@ -97,6 +87,14 @@ void HybridCoal::parse(){
 		//else if (argv_i=="-sub"){ list_sub_network_bool=true;}
 		//else if (argv_i=="-acc"){ acc_bool=true;	}
         else { throw std::invalid_argument ( "Unknown flag:" + argv_i); }
+		// else if (argv_i=="-pdf"){
+			//latex_bool=true;
+			//pdf_bool=true;
+		//}
+		//if (argv_i=="-mapleF"){
+			//maple_bool=true;
+			//maple_F_name=Fname_ext(argv[argc_i+1],".mw");
+		//}
         //else { cout <<"  need to change this !!!" << argv_i<<endl; argc_i++;continue; } // need to change this !!!
         argc_i++;	
 	}
@@ -119,6 +117,18 @@ string HybridCoal::read_input_line(const char *inchar){
 
 
 void HybridCoal::finalize(){
+    if ( this->gt_file_name.size() > 0 ) {
+        this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
+    }
+    
+    if ( this->enumerate_gt_bool ){
+        Net net( this->sp_str );
+        GeneTopoList topologies( net.tip_name );
+        this->gt_tree_str_s = topologies.TreeList;
+    }
+}
+
+void HybridCoal::HybridCoal_core(){
     if ( this->print_tree_bool ) {
         this->print();
         return;
@@ -129,23 +139,27 @@ void HybridCoal::finalize(){
         figure_para.figure_file_prefix = this->prefix;
         figure_para.finalize();
         figure_para.plot( this->sp_str );
-        //exit(EXIT_SUCCESS);
         return;
     }
-    
-    if ( this->gt_file_name.size() > 0 ) {
-        this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
-    }
-}
+        
+    if ( this->print_gene_topo_bool ){
+        string gt_out = this->prefix+".topo";
 
-void HybridCoal_core(){
-    
+        ifstream tmp_file( gt_out.c_str() );
+        if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
+
+        ofstream gt_ofstream;
+        gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+        for ( size_t i = 0; i < this->gt_tree_str_s.size(); i++ )
+            gt_ofstream << this->gt_tree_str_s[i] << "\n";
+        gt_ofstream.close();
+        return;
+    }
 }
 
 void HybridCoal::print(){
     Net net( this->sp_str );
     net.print_all_node();
-    //exit(EXIT_SUCCESS);
 }
 
 void print_example(){
