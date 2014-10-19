@@ -109,9 +109,9 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     this->NodeContainer.back().CalculateRank();
     this->max_rank = NodeContainer.back().rank();    
     this->enumerate_internal_branch( this->NodeContainer.back() );
-    //this->init_descendant();
-    //this->init_node_clade();
-    //this->rewrite_descendant();
+    this->init_descendant();
+    this->init_node_clade();
+    this->rewrite_descendant();
     this->check_isNet();
     this->check_isUltrametric();
     //dout<<"Net constructed"<<endl;

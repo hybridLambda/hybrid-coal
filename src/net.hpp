@@ -70,20 +70,43 @@ class Tree{
         
         string net_str; /*!< \brief species network string \todo this is new!!!*/
         size_t max_rank;
+        
         vector< valarray <int> > descndnt;
         vector< valarray <int> > samples_below;
         vector<string> tip_name;
+        
         vector < vector < int > > R_matrix;
         vector < vector < int > > M_matrix;
-        vector < vector <size_t> > coal_hist_mat;
-        void build_coal_hist_mat( Net & sp_net );
+        vector < vector < size_t > > coal_hist_mat;
+        vector < vector <size_t> > valid_coal_hist;
+        vector < vector <int> > all_w;
+        vector < vector <int> > all_d;
+        vector < vector <int> > num_enter;
+        vector < vector <int> > num_out;
+        
+        void initialize_possible_coal_hist( Net & sp_net );
         void building_R_matrix();
         void building_M_matrix( Net & sp_net ) ;
+        double sum_coalescent_history_prob( Net & sp_net );
+        void enumerate_coal_events( Net & sp_net );
+        vector < vector < size_t > > recur_coal_hist ( vector < vector <size_t > > coal_hist, size_t node_i);
+        void build_coal_hist( );
         bool is_Net_() const { return this->is_Net ; }
         string extract_label(string &in_str, size_t i);
         void print_all_node();
         bool print_all_node_dout();
-        bool print_matrix( vector < vector < int > > & mat );
+    
+        template < class T > bool print_matrix( vector < vector < T > > & mat ){
+            for ( size_t i = 0; i < mat.size(); i++ ){
+                for ( size_t j = 0; j < mat[i].size(); j++){
+                    dout << mat[i][j];
+                }
+                dout << endl;
+            }
+            dout<<endl;
+            return true;
+        }
+
         //Tree (){ this->init(); }
         Tree(string Tree_str);
         ~Tree(){};
@@ -99,6 +122,7 @@ class Tree{
 
 class Net: public Tree {
     friend class HybridCoal;
+    friend class Tree;
         vector < double > brchlens_vec;
         vector < int > max_num_brch_vec;
         vector < vector < vector < double > > > gijoemat;

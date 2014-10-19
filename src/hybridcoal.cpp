@@ -156,7 +156,22 @@ void HybridCoal::HybridCoal_core(){
         return;
     }
     
-    
+    for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
+        Net sp( this->sp_str );
+        dout << "stopped here"<<endl;
+        sp.build_gijoe();
+        dout << "stopped here"<<endl;
+        sp.building_S_matrix();
+        
+        dout << this->gt_tree_str_s[gt_i] << endl;
+        Tree gt( this->gt_tree_str_s[gt_i] );
+        gt.building_R_matrix();
+        gt.building_M_matrix( sp );
+        gt.initialize_possible_coal_hist( sp );
+        gt.build_coal_hist();
+        gt.enumerate_coal_events(sp);
+        cout << gt.sum_coalescent_history_prob(sp) <<endl;
+    }
 }
 
 void HybridCoal::print(){
@@ -167,7 +182,7 @@ void HybridCoal::print(){
 void print_example(){
 	cout<<"Examples:"<<endl;
 	cout<<"hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'"<<endl;	
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B)'"<<endl;	
+	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B);'"<<endl;	
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -maple"<<endl;	
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex"<<endl;
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -maple -latex"<<endl;	
@@ -178,6 +193,7 @@ void print_example(){
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
 	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
+    cout<<"./hybrid-coal_dbg -sp trees/7_tax_sp_james02.tre -gt trees/7_tax_gt_james"<<endl;
 	cout<<endl;	
 }
 
