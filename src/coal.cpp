@@ -264,7 +264,7 @@ double Tree::sum_coalescent_history_prob( Net & sp_net ){
 			}	
 			double current_gijoe = ( (i+1) == sp_net.NodeContainer.back().e_num() ) ? 1 :
                                                                                       sp_net.gijoemat[current_enum-1][num_enter[hist_i][i]-1][num_out[hist_i][i]-1];
-            //dout << " current_gijoe " <<current_gijoe << " all_w[hist_i][i] " <<all_w[hist_i][i] <<" all_d[hist_i][i] "<<all_d[hist_i][i] << endl;
+            dout << " current_gijoe ["<<num_enter[hist_i][i]<<"]["<<num_out[hist_i][i]<<"]" <<current_gijoe << " all_w[hist_i][i] " <<all_w[hist_i][i] <<" all_d[hist_i][i] "<<all_d[hist_i][i] << endl;
 			current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
 		}
         dout<<current_prob_of_hist<<endl;
@@ -287,8 +287,8 @@ void Tree::enumerate_coal_events( Net & sp_net ){
         vector <int> num_enter_i_coal;
         vector <int> num_out_i_coal;
         vector <int> num_coal_in_branch_i_coal;
-        vector <int> w_i_coal;
-        vector <int> d_i_coal;
+        vector <double> w_i_coal;
+        vector <double> d_i_coal;
     
         for ( size_t i = 0; i < sp_max_enum; i++ ){
             for ( size_t node_i = 0; node_i < sp_net.NodeContainer.size(); node_i++ ){

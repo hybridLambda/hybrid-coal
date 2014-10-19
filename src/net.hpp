@@ -79,8 +79,8 @@ class Tree{
         vector < vector < int > > M_matrix;
         vector < vector < size_t > > coal_hist_mat;
         vector < vector <size_t> > valid_coal_hist;
-        vector < vector <int> > all_w;
-        vector < vector <int> > all_d;
+        vector < vector <double> > all_w;
+        vector < vector <double> > all_d;
         vector < vector <int> > num_enter;
         vector < vector <int> > num_out;
         
