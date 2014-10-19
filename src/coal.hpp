@@ -23,16 +23,16 @@
 //coal.hpp
 #include<vector>
 #include"net.hpp"
-class gijoemat{
-	public:
-	gijoemat();
-	gijoemat(Net* sp_net);
-	~gijoemat(){};
-	vector < vector < vector < double > > > mat;
-};
+//class gijoemat{
+	//public:
+	//gijoemat();
+	//gijoemat(Net* sp_net);
+	//~gijoemat(){};
+	//vector < vector < vector < double > > > mat;
+//};
 
-void print_matrix(vector < vector < int > > mat);
-vector < vector < int > > building_S_matrix(Net* my_sp_net);
+//void print_matrix(vector < vector < int > > mat);
+//vector < vector < int > > building_S_matrix(Net* my_sp_net);
 vector < vector < int > > building_M_matrix(Net* my_gt_tree, Net* my_sp_net);
 vector < vector < int > > building_R_matrix(Net* gt_tree);
 vector < vector <size_t> > build_coal_hist_mat(
@@ -68,21 +68,21 @@ Net * my_sp_net,
 gijoemat * gijoe_matrix
 );
 
-    /*! \brief Compute factorial of a \return double a! */
-    template < class T > T factorial ( T a ){
-        if (a > 1) return (a * factorial (a-1));
-        else       return (1);
-    }
-    
-    /*! \brief Compute a permutations of n \return double */
-    template < class T > T n_permu_a ( T n, T a ){
-        if   ( a > 1 ) return (n*n_permu_a(n-1,a-1));
-        else if (a==1) return (n);
-        else           return (1);
-    }
-    
-    /*! \brief Compute n choose k \return double */
-    template < class T > T n_choose_k ( T n, T k ){
-        if ( k < ( n/2 ) ) return (n_choose_k(n,n-k));
-        else               return (n_permu_a(n,k)/factorial(k));
-    }
+/*! \brief Compute factorial of a \return double a! */
+template < class T > T factorial ( T a ){
+    if (a > 1) return (a * factorial (a-1));
+    else       return (1);
+}
+
+/*! \brief Compute a permutations of n \return double */
+template < class T > T n_permu_a ( T n, T a ){
+    if   ( a > 1 ) return (n*n_permu_a(n-1,a-1));
+    else if (a==1) return (n);
+    else           return (1);
+}
+
+/*! \brief Compute n choose k \return double */
+template < class T > T n_choose_k ( T n, T k ){
+    if ( k < ( n/2 ) ) return (n_choose_k(n,n-k));
+    else               return (n_permu_a(n,k)/factorial(k));
+}
