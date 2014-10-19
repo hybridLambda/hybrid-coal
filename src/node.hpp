@@ -91,7 +91,7 @@ class Node {
             
         bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
         bool tip_bool; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-            
+        
         Node* parent2; /*!< \brief Hybrid node only, pointer to its second parent node. */
         //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
         
@@ -111,6 +111,8 @@ class Node {
         void set_visited ( bool TorF ){ this->visited_ = TorF; }
 
         size_t rank() const { return this->rank_; }
+        
+        bool tip() const { return this->tip_bool; }
         
         // Methods    
         Node(); /*!< \brief Initialize Node class*/

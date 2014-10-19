@@ -65,7 +65,6 @@ class HybridCoal{
         bool is_num ( const char *inchar );
 
         string read_input_line ( const char *inchar );
-        //void read_gt();
         void init();
         void parse() ;
         void print();

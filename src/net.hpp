@@ -27,6 +27,9 @@
 #define NETWORK
 
 /*! \brief Network class*/
+
+class Net;
+
 class Tree{
     friend class Net;
     friend class HybridCoal;
@@ -81,7 +84,7 @@ class Tree{
         void print_all_node();
         bool print_all_node_dout();
         bool print_matrix( vector < vector < int > > & mat );
-        Tree (){ this->init(); }
+        //Tree (){ this->init(); }
         Tree(string Tree_str);
         ~Tree(){};
 
@@ -96,18 +99,18 @@ class Tree{
 
 class Net: public Tree {
     friend class HybridCoal;
-        vector < double > brchlens_vec();
-        vector < int > max_num_brch_vec();
+        vector < double > brchlens_vec;
+        vector < int > max_num_brch_vec;
         vector < vector < vector < double > > > gijoemat;
         vector < vector < int > > S_matrix;
-        void assign_bl_to_vec()
+        void assign_bl_to_vec();
         void build_gijoe();
         bool print_gijoemat();
         void building_S_matrix();
         
     public:
         Net (string Net_str) : Tree ( Net_str){};
-        Net () { this->init();}
+        //Net () { this->init();}
         ~Net(){};
     };
 

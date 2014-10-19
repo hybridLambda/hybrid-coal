@@ -16,6 +16,7 @@ shared_src = src/node.cpp \
 			 src/net.cpp \
 			 src/plot/figure.cpp  \
 			 src/tree_topo/all_gene_topo.cpp \
+			 src/coal.cpp \
 			 src/hybridcoal.cpp 
 			  
 hybrid_coal_SOURCES = $(shared_src) src/main.cpp  

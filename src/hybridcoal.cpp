@@ -155,6 +155,8 @@ void HybridCoal::HybridCoal_core(){
         gt_ofstream.close();
         return;
     }
+    
+    
 }
 
 void HybridCoal::print(){
