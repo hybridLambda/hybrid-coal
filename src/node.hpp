@@ -45,6 +45,7 @@ using namespace std;
 enum NAMETYPE { TAXA, TIP };
 
 class Node {
+    friend class NodeIterator;
     friend class Tree;
     friend class Net;
     friend class CoalGT;
@@ -65,7 +66,7 @@ class Node {
         void set_brchlen2 ( double bl ){ this->brchlen2_ = bl; }
 
         string label; /*!< \brief String label of a node, each node has unique label */
-        size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
+        //size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
         string node_content; /*!< \brief node content, the subtree string at this node */
         bool hybrid() const { return (this->parent2) ? true : false;} /*!< \brief Hybrid node only, indicator of a hybrid node */
         
@@ -82,6 +83,8 @@ class Node {
         vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
         vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
         Node* parent1; /*!< \brief pointer to its parent node. */
+        Node* previous_;
+        Node* next_;
         //Node* parent1_() const { return this->parent1; }
         //void set_parent1 ( Node * node ) 
         string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
@@ -99,10 +102,9 @@ class Node {
         
         string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
         
-        vector <size_t> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
-        vector <size_t> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
-        
-        
+        //vector <size_t> Net_node_contains_gt_node1; /*!< Used while simulation, check if a Network node contains a gene tree node */
+        //vector <size_t> Net_node_contains_gt_node2; /*!< Used while simulation, check if a Network node contains a gene tree node */
+                
         size_t e_num() const {return this->e_num_;}
         void set_enum( size_t num ) { this->e_num_ = num; }
     
@@ -115,6 +117,16 @@ class Node {
         size_t rank() const { return this->rank_; }
         
         bool tip() const { return this->tip_bool; }
+
+        // NodeIterator
+        Node* previous() const { return this->previous_ ; }
+        void set_previous ( Node * node ) { this->previous_ = node; }
+        
+        Node* next() const { return this->next_; }
+        void set_next ( Node * node ) { this->next_ = node; }
+        
+        bool is_first() const { return( this->previous_ == NULL ); }
+        bool is_last()  const { return( this->next_ == NULL ); }
         
         // Methods    
         Node(); /*!< \brief Initialize Node class*/

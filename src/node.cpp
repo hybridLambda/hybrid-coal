@@ -27,8 +27,10 @@ Node::Node(){
 	//num_child=0;
 	num_descndnt=0;
 	num_descndnt_interior=0;
-	parent1=NULL;
-	parent2=NULL;
+	this->parent1 = NULL;
+	this->parent2 = NULL;
+    this->previous_ = NULL;
+    this->next_     = NULL;
 	this->brchlen1_ = 0.0;
 	this->brchlen2_ = 0.0;
 	this->rank_     = 0;

@@ -627,7 +627,7 @@ size_t end_of_label_or_bl( string &in_str, size_t i ){
 }
 
     
-void readNextStringto( string &readto , int& argc_i, int argc_, char * const* argv_ ){
+void readNextStringto( string &readto, int& argc_i, int argc_, char * const* argv_ ){
     argc_i++;
     if (argc_i >= argc_) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]); 
     readto = std::string(argv_[argc_i]);

@@ -91,8 +91,11 @@ class Tree{
         vector <string> tax_name;
         bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
         bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
-    public:    
-        vector < Node > NodeContainer;  /*!< \brief vector of nodes */
+        
+        NodeContainer nodes_;
+    public:
+        NodeContainer *nodes() { return &(this->nodes_); }
+        //vector < Node > NodeContainer;  /*!< \brief vector of nodes */
         void rewrite_node_content();
         string print_newick( Node * node );
 };
