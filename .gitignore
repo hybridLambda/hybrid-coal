@@ -22,3 +22,7 @@ hybrid-coal
 *.ps
 *.tex
 OUT.*
+
+html/
+hybrid-coal_dbg
+hybrid-coal_prof
