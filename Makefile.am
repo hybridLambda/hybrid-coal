@@ -2,7 +2,7 @@ EXTRA_DIST = trees/*tax* bootstrap
 #DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) example/eg* 
 distdir = $(PACKAGE)-$(VERSION)
 
-bin_PROGRAMS = hybrid-coal hybrid-coal_dbg
+bin_PROGRAMS = hybrid-coal hybrid-coal_dbg hybrid-coal_prof
 PROG = HYBRID-COAL
 #check_PROGRAMS = hybrid-coal_dbg hybrid-coal_prof unit_tests
 #TESTS = unit_tests 

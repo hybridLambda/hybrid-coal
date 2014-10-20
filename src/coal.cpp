@@ -23,11 +23,10 @@
 #include "net.hpp"
 
 void Net::assign_bl_to_vec(){
-    this->print_all_node();
+    assert( this->print_all_node_dout() );
 	this->brchlens_vec = vector < double > ( this->NodeContainer.back().e_num(), 0 );
 	this->max_num_brch_vec = vector < int > ( this->NodeContainer.back().e_num(),0);
-		
-	dout<<"branch lengths labellings"<<endl;
+
 	for ( size_t node_i = 0; node_i < this->NodeContainer.size(); node_i++){
 		Node * current_node = &this->NodeContainer[node_i];
 		size_t index_enum = current_node->e_num();
@@ -61,7 +60,6 @@ void Net::build_gijoe(){
 		vector < double > empty_gijoe_matrix_b_1;
 		gijoe_matrix_b.push_back(empty_gijoe_matrix_b_1);
 		for ( u = 2; u <= this->max_num_brch_vec[b]; u++){
-			
 			vector < double > gijoe_matrix_b_u;
 				for ( v = 1; v <= u; v++){
 					double gi_joe_buv;
@@ -123,7 +121,6 @@ void Tree::building_M_matrix( Net & sp_net ) {
 	int sp_max_enum = sp_net.NodeContainer.back().e_num();
 	int gt_max_enum = this->NodeContainer.back().e_num();
 	
-	
 	for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
 		vector < int > M_matrix_row( ( gt_max_enum - 1 ), 1 );
 		this->M_matrix.push_back( M_matrix_row );
@@ -140,8 +137,7 @@ void Tree::building_M_matrix( Net & sp_net ) {
                     des_diff_prod = 0;
                     M_matrix[sp_net.NodeContainer[i].e_num()-1][this->NodeContainer[j].e_num()-1] = 0;
                     break;
-                }
-                else{  /*! \todo check this else!!! dont think this is needed */
+                } else{  /*! \todo check this else!!! dont think this is needed */
                     if (des_diff>0){
                         des_diff_prod=0;}
                 }
@@ -219,7 +215,6 @@ void Net::building_S_matrix(){
 
 
 void Tree::initialize_possible_coal_hist( Net& sp_net ){
-	
 	size_t sp_max_enum = sp_net.NodeContainer.back().e_num();
 	size_t gt_max_enum = this->NodeContainer.back().e_num();
 	
@@ -244,8 +239,8 @@ void Tree::initialize_possible_coal_hist( Net& sp_net ){
 }
 
 
-double Tree::sum_coalescent_history_prob( Net & sp_net ){
-	double probability = 0.0;
+void Tree::sum_coalescent_history_prob( Net & sp_net ){
+	this->probability = 0.0;
     double current_prob_of_hist ;
     
 	for ( size_t hist_i = 0; hist_i < this->valid_coal_hist.size(); hist_i++ ){
@@ -268,12 +263,10 @@ double Tree::sum_coalescent_history_prob( Net & sp_net ){
 			current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
 		}
         dout<<current_prob_of_hist<<endl;
-		probability += current_prob_of_hist;
+		this->probability += current_prob_of_hist;
 		//dout<<"gt prob = "<<probability<<endl;
 	}
-	return probability;
 }
-
 
 
 void Tree::enumerate_coal_events( Net & sp_net ){
@@ -297,34 +290,32 @@ void Tree::enumerate_coal_events( Net & sp_net ){
                 }
             }
         }	
-        for (size_t i=0;i<sp_max_enum;i++){
+        for ( size_t i = 0; i < sp_max_enum; i++ ){
             vector < int > clades_coal_in_branch;
-            int num_coal_in_branch_i_coal_dummy=0;
-            for (size_t coal_hist_position=0;coal_hist_position<valid_coal_hist[i_coal_hist].size();coal_hist_position++){
-                if (valid_coal_hist[i_coal_hist][coal_hist_position]==i+1){
-                    num_coal_in_branch_i_coal_dummy++;
-                    clades_coal_in_branch.push_back(coal_hist_position);
-                    for (size_t i_S_mat=i;i_S_mat<(sp_max_enum);i_S_mat++){
-                        if ( sp_net.S_matrix[i_S_mat][i] == 1 ){
-                            num_enter_i_coal[i_S_mat]--;
-                        }
-                    }	
-                }			
+            int num_coal_in_branch_i_coal_dummy = 0;
+            for ( size_t coal_hist_position=0; coal_hist_position < valid_coal_hist[i_coal_hist].size(); coal_hist_position++ ){
+                if ( valid_coal_hist[i_coal_hist][coal_hist_position] != i+1 ) continue;
+                num_coal_in_branch_i_coal_dummy++;
+                clades_coal_in_branch.push_back( coal_hist_position );
+                for ( size_t i_S_mat = i; i_S_mat < (sp_max_enum); i_S_mat++ ){
+                    if ( sp_net.S_matrix[i_S_mat][i] != 1 ) continue;
+                    num_enter_i_coal[i_S_mat]--;
+                }	
             }
-            num_coal_in_branch_i_coal.push_back(num_coal_in_branch_i_coal_dummy);	
-            num_out_i_coal.push_back(num_enter_i_coal[i]-num_coal_in_branch_i_coal[i]);
+            num_coal_in_branch_i_coal.push_back( num_coal_in_branch_i_coal_dummy );
+            num_out_i_coal.push_back( num_enter_i_coal[i] - num_coal_in_branch_i_coal[i] );
             int d_dummy=1;
             int coal_dummy=num_enter_i_coal[i];
-            for (int y=0;y<num_coal_in_branch_i_coal_dummy;y++){
+            for ( int y = 0; y < num_coal_in_branch_i_coal_dummy; y++ ){
                 //d_dummy=d_dummy*n_choose_k(coal_dummy,2);
-                d_dummy=d_dummy*coal_dummy*(coal_dummy-1)/2;
+                d_dummy *= coal_dummy*(coal_dummy-1)/2;
                 coal_dummy--;
             }
             d_i_coal.push_back(d_dummy);
             
-            int w_dummy=factorial(num_coal_in_branch_i_coal_dummy);
+            int w_dummy = factorial( num_coal_in_branch_i_coal_dummy );
             vector < vector < int > > updated_R_mat;
-            if (clades_coal_in_branch.size()>1){
+            if ( clades_coal_in_branch.size() > 1 ){
                 for (size_t updated_R_i=0;updated_R_i<clades_coal_in_branch.size();updated_R_i++){
                     vector < int > updated_R_mat_row;
                     for (size_t updated_R_j=0;updated_R_j<updated_R_i;updated_R_j++){
@@ -337,11 +328,11 @@ void Tree::enumerate_coal_events( Net & sp_net ){
                     for (size_t updated_R_mat_j=0;updated_R_mat_j<updated_R_mat[updated_R_mat_i].size();updated_R_mat_j++){
                         sum_r += updated_R_mat[updated_R_mat_i][updated_R_mat_j];
                     }
-                    w_dummy=w_dummy/sum_r;
+                    w_dummy /= sum_r; //w_dummy=w_dummy/sum_r;
                 }
             }	
             
-            w_i_coal.push_back(w_dummy);
+            w_i_coal.push_back( w_dummy );
             //if (w_dummy/d_dummy!=1){
                 //cout<<w_dummy<<"/"<<d_dummy;
             //}
@@ -350,12 +341,12 @@ void Tree::enumerate_coal_events( Net & sp_net ){
             //}
         }
         //cout<<endl;
-        num_enter.push_back(num_enter_i_coal);
-        num_out.push_back(num_out_i_coal);
+        num_enter.push_back( num_enter_i_coal );
+        num_out.push_back( num_out_i_coal );
         //num_coal_in_branch.push_back(num_coal_in_branch_i_coal);
-        all_w.push_back(w_i_coal);
-        all_d.push_back(d_i_coal);	
-        valid_coal_hist[i_coal_hist].push_back(sp_max_enum);
+        all_w.push_back( w_i_coal );
+        all_d.push_back( d_i_coal );
+        valid_coal_hist[i_coal_hist].push_back( sp_max_enum );
     }	
     
     dout<<"valid_coal_hist"<<endl;	
@@ -365,26 +356,26 @@ void Tree::enumerate_coal_events( Net & sp_net ){
 
 vector < vector < size_t > > Tree::recur_coal_hist( vector < vector <size_t > > coal_hist, size_t  node_i ) {
 	vector < vector <size_t> > new_coal_hist;
-    for (size_t  coal_hist_i=0;coal_hist_i<coal_hist.size();coal_hist_i++){
+    for ( size_t  coal_hist_i = 0; coal_hist_i < coal_hist.size(); coal_hist_i++ ){
 		vector <size_t > coal_hist_dummy;
-		coal_hist_dummy=coal_hist[coal_hist_i];
+		coal_hist_dummy = coal_hist[coal_hist_i];
 		int  coal_hist_mat_node_i_i=0;
-		for (size_t  j_R_mat=0;j_R_mat<node_i;j_R_mat++){
-			while (R_matrix[node_i][j_R_mat]==1 && coal_hist_mat[node_i][coal_hist_mat_node_i_i]< coal_hist_dummy[j_R_mat]){
+		for ( size_t j_R_mat = 0; j_R_mat < node_i; j_R_mat++ ){
+			while ( R_matrix[node_i][j_R_mat] == 1 && coal_hist_mat[node_i][coal_hist_mat_node_i_i] < coal_hist_dummy[j_R_mat] ){
 				coal_hist_mat_node_i_i++;
 			}
 		}
-		for (;coal_hist_mat_node_i_i<coal_hist_mat[node_i].size();coal_hist_mat_node_i_i++ ){
+		for ( ; coal_hist_mat_node_i_i < coal_hist_mat[node_i].size(); coal_hist_mat_node_i_i++ ){
 			vector <size_t> coal_hist_dummy_dummy;
-			coal_hist_dummy_dummy=coal_hist_dummy;
-			coal_hist_dummy_dummy.push_back(coal_hist_mat[node_i][coal_hist_mat_node_i_i]);
-			new_coal_hist.push_back(coal_hist_dummy_dummy);
+			coal_hist_dummy_dummy = coal_hist_dummy;
+			coal_hist_dummy_dummy.push_back( coal_hist_mat[node_i][coal_hist_mat_node_i_i] );
+			new_coal_hist.push_back( coal_hist_dummy_dummy );
 		}
 	}
 		
-	if (node_i<coal_hist_mat.size()-1){
+	if ( node_i < coal_hist_mat.size() - 1 ){
 		node_i++;
-		new_coal_hist = recur_coal_hist(new_coal_hist,node_i);
+		new_coal_hist = recur_coal_hist( new_coal_hist, node_i );
 	}
 
 	return new_coal_hist;
@@ -394,12 +385,22 @@ vector < vector < size_t > > Tree::recur_coal_hist( vector < vector <size_t > > 
 void Tree::build_coal_hist ( ){
 	for ( size_t first_coal_mat_i = 0; first_coal_mat_i < coal_hist_mat[0].size(); first_coal_mat_i++ ){
 		vector <size_t> coal_hist_dummy;
-		coal_hist_dummy.push_back(coal_hist_mat[0][first_coal_mat_i]);
-		valid_coal_hist.push_back(coal_hist_dummy);
+		coal_hist_dummy.push_back( coal_hist_mat[0][first_coal_mat_i] );
+		valid_coal_hist.push_back( coal_hist_dummy );
 	}
     
-	int gt_max_enum=this->NodeContainer.back().e_num();	
+	int gt_max_enum = this->NodeContainer.back().e_num();	
 	if ( gt_max_enum-1 > 1){
         valid_coal_hist = recur_coal_hist( valid_coal_hist, (size_t)1 );
 	}
+}
+
+
+void Tree::prob_given_sp_tree ( Net & sp_tree ){
+    this->building_R_matrix();
+    this->building_M_matrix( sp_tree );
+    this->initialize_possible_coal_hist( sp_tree );
+    this->build_coal_hist();
+    this->enumerate_coal_events( sp_tree );
+    this->sum_coalescent_history_prob( sp_tree );
 }

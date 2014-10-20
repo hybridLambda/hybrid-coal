@@ -148,31 +148,35 @@ void HybridCoal::HybridCoal_core(){
         ifstream tmp_file( gt_out.c_str() );
         if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
 
-        ofstream gt_ofstream;
         gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
         for ( size_t i = 0; i < this->gt_tree_str_s.size(); i++ )
             gt_ofstream << this->gt_tree_str_s[i] << "\n";
         gt_ofstream.close();
         return;
     }
-    
+
+    // If there is one species tree, species tree should be built outside the loop
+    Net sp( this->sp_str );
+    sp.build_gijoe();
+    sp.building_S_matrix();
+
+    double total_prob = 0;
+    string gt_out = this->prefix+".prob";
+    ifstream tmp_file( gt_out.c_str() );
+    if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
+
+    gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
     for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
-        Net sp( this->sp_str );
-        dout << "stopped here"<<endl;
-        sp.build_gijoe();
-        dout << "stopped here"<<endl;
-        sp.building_S_matrix();
-        
         dout << this->gt_tree_str_s[gt_i] << endl;
         Tree gt( this->gt_tree_str_s[gt_i] );
-        gt.building_R_matrix();
-        gt.building_M_matrix( sp );
-        gt.initialize_possible_coal_hist( sp );
-        gt.build_coal_hist();
-        gt.enumerate_coal_events(sp);
-        cout << gt.sum_coalescent_history_prob(sp) <<endl;
+        gt.prob_given_sp_tree( sp );
+        total_prob += gt.probability;
+        gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
     }
+    std::clog << "Total probability = " << total_prob <<endl;
+    gt_ofstream.close();
 }
+
 
 void HybridCoal::print(){
     Net net( this->sp_str );

@@ -58,6 +58,7 @@ class HybridCoal{
         vector <string> gt_tree_str_s;
         bool read_GENE_trees;
         string prefix;
+        ofstream gt_ofstream;
 
         /*! Methods */              
         void check_gt_str_and_sign( string &gt_str );

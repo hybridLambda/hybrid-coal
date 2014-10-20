@@ -21,3 +21,4 @@ hybrid-coal
 *.pdf
 *.ps
 *.tex
+OUT.*

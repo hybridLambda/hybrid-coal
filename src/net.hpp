@@ -74,7 +74,8 @@ class Tree{
         vector< valarray <int> > descndnt;
         vector< valarray <int> > samples_below;
         vector<string> tip_name;
-        
+
+                
         vector < vector < int > > R_matrix;
         vector < vector < int > > M_matrix;
         vector < vector < size_t > > coal_hist_mat;
@@ -84,13 +85,16 @@ class Tree{
         vector < vector <int> > num_enter;
         vector < vector <int> > num_out;
         
-        void initialize_possible_coal_hist( Net & sp_net );
+        double probability;
+        void prob_given_sp_tree ( Net & sp_tree );
+        void initialize_possible_coal_hist( Net & sp_tree );
         void building_R_matrix();
-        void building_M_matrix( Net & sp_net ) ;
-        double sum_coalescent_history_prob( Net & sp_net );
-        void enumerate_coal_events( Net & sp_net );
+        void building_M_matrix( Net & sp_tree ) ;
+        void sum_coalescent_history_prob( Net & sp_tree );
+        void enumerate_coal_events( Net & sp_tree );
         vector < vector < size_t > > recur_coal_hist ( vector < vector <size_t > > coal_hist, size_t node_i);
         void build_coal_hist( );
+
         bool is_Net_() const { return this->is_Net ; }
         string extract_label(string &in_str, size_t i);
         void print_all_node();
