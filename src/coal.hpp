@@ -58,10 +58,13 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
 class CoalST: public Tree {
     friend class HybridCoal;
     friend class CoalGT;
+    // Members
     vector < double > brchlens_vec;
     vector < int > max_num_brch_vec;
-    vector < vector < vector < double > > > gijoemat;
     vector < vector < int > > S_matrix;
+    vector < vector < vector < double > > > gijoemat;
+    
+    // Methods
     void assign_bl_to_vec();
     void build_gijoe();
     bool print_gijoemat();
@@ -73,17 +76,18 @@ class CoalST: public Tree {
 
 class CoalGT: public Tree {
     friend class HybridCoal;
-    //friend class Tree;
-    vector < vector < int > > R_matrix;
-    vector < vector < int > > M_matrix;
+    // Members
+    vector < vector < int > >    R_matrix;
+    vector < vector < int > >    M_matrix;
     vector < vector < size_t > > coal_hist_mat;
-    vector < vector <size_t> > valid_coal_hist;
-    vector < vector <double> > all_w;
-    vector < vector <double> > all_d;
-    vector < vector <int> > num_enter;
-    vector < vector <int> > num_out;
-    
+    vector < vector < size_t > > valid_coal_hist;
+    vector < vector < double > > all_w;
+    vector < vector < double > > all_d;
+    vector < vector < int > >    num_enter;
+    vector < vector < int > >    num_out;    
     double probability;
+    
+    // Methods
     void prob_given_sp_tree ( CoalST & sp_tree );
     void initialize_possible_coal_hist( CoalST & sp_tree );
     void building_R_matrix();
@@ -95,6 +99,5 @@ class CoalGT: public Tree {
     
     public:
         CoalGT ( string gt_str ) : Tree ( gt_str ){ dout << "Constrcut species network: " << gt_str << endl; };
-        //Net () { this->init();}
         ~CoalGT(){};
 };

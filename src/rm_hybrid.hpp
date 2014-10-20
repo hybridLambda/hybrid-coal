@@ -22,12 +22,8 @@
 /*! \file rm_hybrid.hpp
  * \brief Header file for rm_hybrid.cpp */
 
-#include"coal.hpp"
-//#include<algorithm>
+#include "coal.hpp"
 
-//extern bool maple_bool;
-//extern bool symbolic;
-//extern bool log_file_bool;
 #ifndef RM_HYBRID
 #define RM_HYBRID
 //extern 
