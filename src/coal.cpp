@@ -22,7 +22,7 @@
 #include "coal.hpp"
 #include "net.hpp"
 
-void Net::assign_bl_to_vec(){
+void CoalST::assign_bl_to_vec(){
     assert( this->print_all_node_dout() );
 	this->brchlens_vec = vector < double > ( this->NodeContainer.back().e_num(), 0 );
 	this->max_num_brch_vec = vector < int > ( this->NodeContainer.back().e_num(),0);
@@ -51,7 +51,7 @@ void Net::assign_bl_to_vec(){
 }
 
 
-void Net::build_gijoe(){
+void CoalST::build_gijoe(){
     this->assign_bl_to_vec();
 	double v1,v2,v3,u1,u2;
 	int u,v,h,k;
@@ -102,7 +102,7 @@ void Net::build_gijoe(){
 }
 
 
-bool Net::print_gijoemat(){
+bool CoalST::print_gijoemat(){
     dout << "print_gijoemat"<<endl;
     for ( size_t branch_idx = 0; branch_idx < this->gijoemat.size(); branch_idx++ ){
         for ( size_t branch_in = 0; branch_in < this->gijoemat[branch_idx].size(); branch_in++){
@@ -117,7 +117,7 @@ bool Net::print_gijoemat(){
 }
 
 	
-void Tree::building_M_matrix( Net & sp_net ) {
+void CoalGT::building_M_matrix( CoalST & sp_net ) {
 	int sp_max_enum = sp_net.NodeContainer.back().e_num();
 	int gt_max_enum = this->NodeContainer.back().e_num();
 	
@@ -150,19 +150,14 @@ void Tree::building_M_matrix( Net & sp_net ) {
 	}
 	
     dout<<"M matrix"<<endl;
-    assert( print_matrix( M_matrix ) );
+    assert( print_2D_matrix( M_matrix ) );
 }
 
 
-void Tree::building_R_matrix( ){
+void CoalGT::building_R_matrix( ){
 	size_t gt_max_enum = this->NodeContainer.back().e_num();	
 	for ( size_t i_gt_enum=0; i_gt_enum < gt_max_enum; i_gt_enum++ ){
-		//vector <int> R_matrix_row;
-		//for (size_t j_gt_enum=0;j_gt_enum<i_gt_enum;j_gt_enum++){
-			//R_matrix_row.push_back(1);
-		//}
 		vector <int> R_matrix_row( i_gt_enum, 1 );
-		//vector <int> R_matrix_row(gt_max_enum,1);
 		this->R_matrix.push_back(R_matrix_row);
 	}
     
@@ -180,13 +175,12 @@ void Tree::building_R_matrix( ){
         }
 	}
 	dout << "R matrix" << endl;
-	assert(this->print_matrix(R_matrix));
+	assert( print_2D_matrix(R_matrix) );
 }
 
 
-void Net::building_S_matrix(){
+void CoalST::building_S_matrix(){
 	int sp_max_enum=this->NodeContainer.back().e_num();
-	//vector < vector < int > > S_matrix;
 	
 	for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
 		vector < int > S_matrix_row( sp_max_enum, 1 );
@@ -210,11 +204,11 @@ void Net::building_S_matrix(){
         }
 		
 	}
-	assert(print_matrix(S_matrix));
+	assert( print_2D_matrix(S_matrix) );
 }
 
 
-void Tree::initialize_possible_coal_hist( Net& sp_net ){
+void CoalGT::initialize_possible_coal_hist( CoalST & sp_net ){
 	size_t sp_max_enum = sp_net.NodeContainer.back().e_num();
 	size_t gt_max_enum = this->NodeContainer.back().e_num();
 	
@@ -235,11 +229,11 @@ void Tree::initialize_possible_coal_hist( Net& sp_net ){
 			this->coal_hist_mat.push_back(coal_hist_vec);
 		}
 	}
-    assert (this->print_matrix (coal_hist_mat));
+    assert ( print_2D_matrix (coal_hist_mat));
 }
 
 
-void Tree::sum_coalescent_history_prob( Net & sp_net ){
+void CoalGT::sum_coalescent_history_prob( CoalST & sp_net ){
 	this->probability = 0.0;
     double current_prob_of_hist ;
     
@@ -269,14 +263,11 @@ void Tree::sum_coalescent_history_prob( Net & sp_net ){
 }
 
 
-void Tree::enumerate_coal_events( Net & sp_net ){
+void CoalGT::enumerate_coal_events( CoalST & sp_net ){
 
     size_t sp_max_enum = sp_net.NodeContainer.back().e_num();
 
     for (size_t i_coal_hist=0;i_coal_hist<valid_coal_hist.size();i_coal_hist++){	
-        //for (size_t j_coal_hist=0;j_coal_hist<coal_hist[i_coal_hist].size();j_coal_hist++){
-            //cout<<coal_hist[i_coal_hist][j_coal_hist];
-        //}
         vector <int> num_enter_i_coal;
         vector <int> num_out_i_coal;
         vector <int> num_coal_in_branch_i_coal;
@@ -350,11 +341,11 @@ void Tree::enumerate_coal_events( Net & sp_net ){
     }	
     
     dout<<"valid_coal_hist"<<endl;	
-    assert( this->print_matrix(this->valid_coal_hist) );
+    assert( print_2D_matrix(this->valid_coal_hist) );
 }			
 
 
-vector < vector < size_t > > Tree::recur_coal_hist( vector < vector <size_t > > coal_hist, size_t  node_i ) {
+vector < vector < size_t > > CoalGT::recur_coal_hist( vector < vector <size_t > > coal_hist, size_t  node_i ) {
 	vector < vector <size_t> > new_coal_hist;
     for ( size_t  coal_hist_i = 0; coal_hist_i < coal_hist.size(); coal_hist_i++ ){
 		vector <size_t > coal_hist_dummy;
@@ -382,7 +373,7 @@ vector < vector < size_t > > Tree::recur_coal_hist( vector < vector <size_t > > 
 }
 
 
-void Tree::build_coal_hist ( ){
+void CoalGT::build_coal_hist ( ){
 	for ( size_t first_coal_mat_i = 0; first_coal_mat_i < coal_hist_mat[0].size(); first_coal_mat_i++ ){
 		vector <size_t> coal_hist_dummy;
 		coal_hist_dummy.push_back( coal_hist_mat[0][first_coal_mat_i] );
@@ -396,7 +387,7 @@ void Tree::build_coal_hist ( ){
 }
 
 
-void Tree::prob_given_sp_tree ( Net & sp_tree ){
+void CoalGT::prob_given_sp_tree ( CoalST & sp_tree ){
     this->building_R_matrix();
     this->building_M_matrix( sp_tree );
     this->initialize_possible_coal_hist( sp_tree );

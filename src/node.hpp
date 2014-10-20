@@ -47,6 +47,8 @@ enum NAMETYPE { TAXA, TIP };
 class Node {
     friend class Tree;
     friend class Net;
+    friend class CoalGT;
+    friend class CoalST;
     friend class simTree;
     friend class HybridLambda;
     friend class Figure;

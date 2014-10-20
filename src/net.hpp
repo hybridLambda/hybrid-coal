@@ -32,6 +32,8 @@ class Net;
 
 class Tree{
     friend class Net;
+    friend class CoalST;
+    friend class CoalGT;
     friend class HybridCoal;
     friend class Frequency;
     friend class Figure;
@@ -75,46 +77,17 @@ class Tree{
         vector< valarray <int> > samples_below;
         vector<string> tip_name;
 
-                
-        vector < vector < int > > R_matrix;
-        vector < vector < int > > M_matrix;
-        vector < vector < size_t > > coal_hist_mat;
-        vector < vector <size_t> > valid_coal_hist;
-        vector < vector <double> > all_w;
-        vector < vector <double> > all_d;
-        vector < vector <int> > num_enter;
-        vector < vector <int> > num_out;
-        
-        double probability;
-        void prob_given_sp_tree ( Net & sp_tree );
-        void initialize_possible_coal_hist( Net & sp_tree );
-        void building_R_matrix();
-        void building_M_matrix( Net & sp_tree ) ;
-        void sum_coalescent_history_prob( Net & sp_tree );
-        void enumerate_coal_events( Net & sp_tree );
-        vector < vector < size_t > > recur_coal_hist ( vector < vector <size_t > > coal_hist, size_t node_i);
-        void build_coal_hist( );
 
         bool is_Net_() const { return this->is_Net ; }
         string extract_label(string &in_str, size_t i);
         void print_all_node();
         bool print_all_node_dout();
     
-        template < class T > bool print_matrix( vector < vector < T > > & mat ){
-            for ( size_t i = 0; i < mat.size(); i++ ){
-                for ( size_t j = 0; j < mat[i].size(); j++){
-                    dout << mat[i][j];
-                }
-                dout << endl;
-            }
-            dout<<endl;
-            return true;
-        }
 
         //Tree (){ this->init(); }
         Tree(string Tree_str);
         ~Tree(){};
-
+                
         vector <string> tax_name;
         bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
         bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
@@ -125,20 +98,9 @@ class Tree{
 };
 
 class Net: public Tree {
-    friend class HybridCoal;
-    friend class Tree;
-        vector < double > brchlens_vec;
-        vector < int > max_num_brch_vec;
-        vector < vector < vector < double > > > gijoemat;
-        vector < vector < int > > S_matrix;
-        void assign_bl_to_vec();
-        void build_gijoe();
-        bool print_gijoemat();
-        void building_S_matrix();
         
     public:
         Net (string Net_str) : Tree ( Net_str){};
-        //Net () { this->init();}
         ~Net(){};
     };
 

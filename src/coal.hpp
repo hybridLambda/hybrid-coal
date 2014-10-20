@@ -19,11 +19,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "net.hpp"
+
 /*! \brief Compute factorial of a \return double a! */
 template < class T > T factorial ( T a ){
     if (a > 1) return (a * factorial (a-1));
     else       return (1);
 }
+
 
 /*! \brief Compute a permutations of n \return double */
 template < class T > T n_permu_a ( T n, T a ){
@@ -32,8 +35,66 @@ template < class T > T n_permu_a ( T n, T a ){
     else           return (1);
 }
 
+
 /*! \brief Compute n choose k \return double */
 template < class T > T n_choose_k ( T n, T k ){
     if ( k < ( n/2 ) ) return (n_choose_k(n,n-k));
     else               return (n_permu_a(n,k)/factorial(k));
 }
+
+
+template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
+    for ( size_t i = 0; i < mat.size(); i++ ){
+        for ( size_t j = 0; j < mat[i].size(); j++){
+            dout << mat[i][j];
+        }
+        dout << endl;
+    }
+    dout<<endl;
+    return true;
+}
+
+
+class CoalST: public Tree {
+    friend class HybridCoal;
+    friend class CoalGT;
+    vector < double > brchlens_vec;
+    vector < int > max_num_brch_vec;
+    vector < vector < vector < double > > > gijoemat;
+    vector < vector < int > > S_matrix;
+    void assign_bl_to_vec();
+    void build_gijoe();
+    bool print_gijoemat();
+    void building_S_matrix();
+    CoalST ( string sp_str ) : Tree ( sp_str ){ dout << "Constrcut species tree: " << sp_str << endl; };
+    ~CoalST(){};
+};
+
+
+class CoalGT: public Tree {
+    friend class HybridCoal;
+    //friend class Tree;
+    vector < vector < int > > R_matrix;
+    vector < vector < int > > M_matrix;
+    vector < vector < size_t > > coal_hist_mat;
+    vector < vector <size_t> > valid_coal_hist;
+    vector < vector <double> > all_w;
+    vector < vector <double> > all_d;
+    vector < vector <int> > num_enter;
+    vector < vector <int> > num_out;
+    
+    double probability;
+    void prob_given_sp_tree ( CoalST & sp_tree );
+    void initialize_possible_coal_hist( CoalST & sp_tree );
+    void building_R_matrix();
+    void building_M_matrix( CoalST & sp_tree ) ;
+    void sum_coalescent_history_prob( CoalST & sp_tree );
+    void enumerate_coal_events( CoalST & sp_tree );
+    vector < vector < size_t > > recur_coal_hist ( vector < vector <size_t > > coal_hist, size_t node_i);
+    void build_coal_hist( );
+    
+    public:
+        CoalGT ( string gt_str ) : Tree ( gt_str ){ dout << "Constrcut species network: " << gt_str << endl; };
+        //Net () { this->init();}
+        ~CoalGT(){};
+};

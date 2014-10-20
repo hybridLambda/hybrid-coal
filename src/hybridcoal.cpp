@@ -20,6 +20,8 @@
 */
 
 #include "hybridcoal.hpp"
+//#include "net.hpp"
+#include "coal.hpp"
 #include "plot/figure.hpp"
 #include "tree_topo/all_gene_topo.hpp"
 
@@ -148,15 +150,16 @@ void HybridCoal::HybridCoal_core(){
         ifstream tmp_file( gt_out.c_str() );
         if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
 
-        gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+        this->gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
         for ( size_t i = 0; i < this->gt_tree_str_s.size(); i++ )
-            gt_ofstream << this->gt_tree_str_s[i] << "\n";
-        gt_ofstream.close();
+            this->gt_ofstream << this->gt_tree_str_s[i] << "\n";
+        this->gt_ofstream.close();
+        std::clog << "Gene tree topologies are enumerated in file: " << gt_out <<endl;
         return;
     }
 
     // If there is one species tree, species tree should be built outside the loop
-    Net sp( this->sp_str );
+    CoalST sp( this->sp_str );
     sp.build_gijoe();
     sp.building_S_matrix();
 
@@ -168,7 +171,7 @@ void HybridCoal::HybridCoal_core(){
     gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
     for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
         dout << this->gt_tree_str_s[gt_i] << endl;
-        Tree gt( this->gt_tree_str_s[gt_i] );
+        CoalGT gt( this->gt_tree_str_s[gt_i] );
         gt.prob_given_sp_tree( sp );
         total_prob += gt.probability;
         gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
@@ -181,7 +184,11 @@ void HybridCoal::HybridCoal_core(){
 void HybridCoal::print(){
     Net net( this->sp_str );
     net.print_all_node();
+    
+    Net copied_net(net);
+    copied_net.print_all_node();
 }
+
 
 void print_example(){
 	cout<<"Examples:"<<endl;

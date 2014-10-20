@@ -20,6 +20,34 @@
 */
 
 #include "net.hpp"
+#include <map>
+
+
+//Tree::Tree( Tree &copied_Tree ){
+    //std::map < size_t, Node* > node_mapping;  
+    ////node_mapping[NULL] = NULL;
+    ////assert ( copied_Tree.print_all_node_dout () );
+    //for ( size_t node_i = 0; node_i < copied_Tree.NodeContainer.size(); node_i++ ) {
+        //Node *node = new Node( copied_Tree.NodeContainer[node_i] );
+        //node_mapping[node_i] = node;
+        //this->NodeContainer.push_back( *node );
+    //}
+    
+    //for ( size_t node_i = 0; node_i < copied_Tree.NodeContainer.size(); node_i++ ) {
+        ////if (!(*it)->is_root()) (*it)->set_parent(node_mapping[(*it)->parent()]);
+        
+        //if ( copied_Tree.NodeContainer[node_i].parent1 ) 
+            //this->NodeContainer[node_i].parent1 = node_mapping[ this->NodeContainer[node_i].parent1 ];
+        ////for ( size_t child_i = 0; child_i < ){
+            
+        ////}
+        ////(*it)->set_first_child(node_mapping[(*it)->first_child()]);
+        ////(*it)->set_second_child(node_mapping[(*it)->second_child()]);
+    //}
+     //assert ( this->print_all_node_dout () );   
+//}
+
+
 
 
 /*! \brief Construct Net object from a (extended) Newick string */
@@ -589,14 +617,6 @@ string remove_interior_label(string in_str/*!< input newick form string */){
 
 
 size_t end_of_label_or_bl( string &in_str, size_t i ){
-    //size_t j ;
-    //for ( j = i; j < in_str.size(); j++){
-        //char stop=in_str[j+1];
-        //if ( stop == ',' || stop==')' || stop==':' || stop==';'){
-            //break;
-        //}
-    //}
-    //return j;
     for ( size_t j = i; j < in_str.size(); j++){
         if      ( in_str[j+1] == ',' )    return j;
         else if ( in_str[j+1] == ')' )    return j;
@@ -613,8 +633,6 @@ void readNextStringto( string &readto , int& argc_i, int argc_, char * const* ar
     readto = std::string(argv_[argc_i]);
     if ( readto[0] == '-' ) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]);
 }
-
-
 
 
 //string rm_one_child_root(string in_str){
