@@ -24,7 +24,6 @@
 #include <cfloat>
 #include <cassert>
 //#include <iostream>
-#include <map>
 
 #ifndef NODECONTAINER
 #define NODECONTAINER

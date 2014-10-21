@@ -20,6 +20,8 @@
 */
 
 #include "nodeContainer.hpp"
+#include <map>
+
 
 NodeContainer::NodeContainer() {
     this->last_node_ = NULL;
@@ -41,14 +43,14 @@ NodeContainer::NodeContainer( NodeContainer &nc) {
         node_mapping[*it] = node;
         this->add(node);
     }
-    //assert( this->sorted() );
     
-    //for ( auto it = iterator(); it.good(); ++it ) {
-        //if (!(*it)->parent1) (*it)->set_parent(node_mapping[(*it)->parent()]);
+    for ( auto it = iterator(); it.good(); ++it ) {
+        if ( (*it)->parent1 != NULL ) (*it)->parent1 = node_mapping[(*it)->parent1];
+        if ( (*it)->parent2 != NULL ) (*it)->parent2 = node_mapping[(*it)->parent2];
         //(*it)->set_first_child(node_mapping[(*it)->first_child()]);
         //(*it)->set_second_child(node_mapping[(*it)->second_child()]);
-    //}
-    
+    }
+
     //unsorted_node_ = node_mapping[nc.unsorted_node_];
 }
 
@@ -77,21 +79,20 @@ void NodeContainer::add( Node* node ) {
     }
     assert( this->first() != NULL );
 
-    // Adding to the front
-    node->set_next( this->first() );
-    node->set_previous( NULL );
-    this->first()->set_previous(node);
-    this->set_first( node );
-    return;
-
     // Currently not used!
-    // Adding to the End
-    //node->set_previous(last());
-    //node->set_next(NULL);
-    //last()->set_next(node);
-    //this->set_last(node);
-    //assert( this->sorted() );
+    // Adding to the front
+    //node->set_next( this->first() );
+    //node->set_previous( NULL );
+    //this->first()->set_previous(node);
+    //this->set_first( node );
     //return;
+
+     //Adding to the End, similar to push_back
+    node->set_previous(this->back());
+    node->set_next(NULL);
+    this->back()->set_next(node);
+    this->set_last(node);
+    return;
 
 }
 

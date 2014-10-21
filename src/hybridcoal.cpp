@@ -185,8 +185,8 @@ void HybridCoal::print(){
     Net net( this->sp_str );
     net.print_all_node();
     
-    //Net copied_net(net);
-    //copied_net.print_all_node();
+    Net copied_net(net);
+    copied_net.print_all_node();
 }
 
 
