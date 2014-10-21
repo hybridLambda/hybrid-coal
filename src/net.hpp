@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "node.hpp"
+#include "nodeContainer.hpp"
 #include <valarray>
 #include <fstream>
 
@@ -39,7 +39,8 @@ class Tree{
     friend class Figure;
     private:        
         string label_interior_node(string in_str);
-        void enumerate_internal_branch( Node &node );
+        //void enumerate_internal_branch( Node &node );
+        void enumerate_internal_branch( Node *node );
         
         size_t first_coal_rank();
         size_t current_enum_;
@@ -57,16 +58,18 @@ class Tree{
         void check_labeled( string in_str );
         
         void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
-        void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
-
-        size_t first_coal_index ();
+        //void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
+        void check_isUltrametric(){}
+        //size_t first_coal_index ();
     
-        string rewrite_internal_node_content( size_t i);       
+        string rewrite_internal_node_content( size_t i );
         void connect_graph();
         void extract_tax_and_tip_names();
         
-        void init_descendant();
-        void init_node_clade();
+        //void init_descendant();
+        //void init_node_clade();
+        void init_descendant(){};
+        void init_node_clade(){};
         void rewrite_descendant();
         void rewrite_node_clade();
         
@@ -95,7 +98,7 @@ class Tree{
         NodeContainer nodes_;
     public:
         NodeContainer *nodes() { return &(this->nodes_); }
-        //vector < Node > NodeContainer;  /*!< \brief vector of nodes */
+        //vector < Node > nodes_;  /*!< \brief vector of nodes */
         void rewrite_node_content();
         string print_newick( Node * node );
 };

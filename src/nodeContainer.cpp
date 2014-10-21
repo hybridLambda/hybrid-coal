@@ -28,97 +28,71 @@ NodeContainer::NodeContainer() {
 }
 
 // Used for copy Trees
-NodeContainer::NodeContainer(const NodeContainer &nc) {
-  size_ = 0;
-  this->last_node_ = NULL;
-  this->first_node_ = NULL;
-
-  std::map<Node const*, Node*> node_mapping;  
-  node_mapping[NULL] = NULL;
-
-  for (auto it = nc.iterator(); it.good(); ++it) {
-    Node *node = new Node(**it);
-    node_mapping[*it] = node;
-    add(node);
-  }
-  assert( this->sorted() );
-
-  for (auto it = iterator(); it.good(); ++it) {
-    if (!(*it)->is_root()) (*it)->set_parent(node_mapping[(*it)->parent()]);
-    (*it)->set_first_child(node_mapping[(*it)->first_child()]);
-    (*it)->set_second_child(node_mapping[(*it)->second_child()]);
-  }
-
-  unsorted_node_ = node_mapping[nc.unsorted_node_];
+NodeContainer::NodeContainer( NodeContainer &nc) {
+    this->size_ = 0;
+    this->last_node_ = NULL;
+    this->first_node_ = NULL;
+    
+    std::map<Node const*, Node*> node_mapping;  
+    node_mapping[NULL] = NULL;
+    
+    for ( auto it = nc.iterator(); it.good(); ++it ) {
+        Node *node = new Node(**it);
+        node_mapping[*it] = node;
+        this->add(node);
+    }
+    //assert( this->sorted() );
+    
+    //for ( auto it = iterator(); it.good(); ++it ) {
+        //if (!(*it)->parent1) (*it)->set_parent(node_mapping[(*it)->parent()]);
+        //(*it)->set_first_child(node_mapping[(*it)->first_child()]);
+        //(*it)->set_second_child(node_mapping[(*it)->second_child()]);
+    //}
+    
+    //unsorted_node_ = node_mapping[nc.unsorted_node_];
 }
 
 
 Node* NodeContainer::at(size_t nr) const {
-  Node* current = first();
+    Node* current = first();
 
-  for (size_t i=0; i < nr; ++i) {
-    assert(current != NULL);
-    current = current->next();
-  }
+    for (size_t i = 0; i < nr; ++i) {
+        assert(current != NULL);
+        current = current->next();
+    }
 
-  if ( current == NULL ) throw std::out_of_range("NodeContainer out of range"); 
-  return current;
+    if ( current == NULL ) throw std::out_of_range("NodeContainer out of range"); 
+    return current;
 }
 
 
 // Adds 'node' to the container
-// If you know that the node is higher in the tree than a other node,
-// than you can specify the latter as 'after_node' to speedup the process.
 void NodeContainer::add( Node* node ) {
-  ++size_;
-assert(first() == NULL);
-  if ( this->first() == NULL ) {
-    this->set_first( node );
-    this->set_last( node );
-    return;
-  }
-  assert(first() != NULL);
-
-  // Before first node?
-  if (node->height() <= first()->height()) {
-    node->set_next(first());
-    node->set_previous(NULL);
-    first()->set_previous(node);
-    this->set_first(node);
-    assert( this->sorted() );
-    return;
-  }
-
-  // After last node?
-  if ( node->height() >= last()->height() ) {
-    node->set_previous(last());
-    node->set_next(NULL);
-    last()->set_next(node);
-    this->set_last(node);
-    assert( this->sorted() );
-    return;
-  }
-
-  assert( after_node == NULL || node->height() >= after_node->height() );
-
-
-  if (after_node == NULL) after_node = first();
-  Node* current = after_node;
-  // Find position in between
-  while ( current->height() <= node->height() ) {
-    assert( !current->is_last() );
-    if ( !current->is_root() ) {
-      if ( current->parent_height() < node->height() ) { 
-        current = current->parent();
-        continue;
-      }
+    ++size_;
+    assert( this->first() == NULL );
+    if ( this->first() == NULL ) {
+        this->set_first( node );
+        this->set_last( node );
+        return;
     }
-    current = current->next();
-  }
- 
-  // And add the node;
-  this->add_before(node, current);
-  assert( this->sorted() );
+    assert( this->first() != NULL );
+
+    // Adding to the front
+    node->set_next( this->first() );
+    node->set_previous( NULL );
+    this->first()->set_previous(node);
+    this->set_first( node );
+    return;
+
+    // Currently not used!
+    // Adding to the End
+    //node->set_previous(last());
+    //node->set_next(NULL);
+    //last()->set_next(node);
+    //this->set_last(node);
+    //assert( this->sorted() );
+    //return;
+
 }
 
 
@@ -142,7 +116,7 @@ void NodeContainer::remove( Node *node ) {
   }
   
   delete node;
-  assert( this->sorted() );
+  //assert( this->sorted() );
 }
 
 
@@ -177,24 +151,24 @@ void NodeContainer::remove( Node *node ) {
 // The loop deletes the node from the previous iteration because we still need
 // the current node for calling ++it.
 void NodeContainer::clear() {
-  Node* tmp = NULL;
-  for ( NodeIterator it = this->iterator(); it.good(); ++it ) {
-    if (tmp != NULL) delete tmp;
-    tmp = *it;
-  }
-  if (tmp != NULL) delete tmp;
-  set_first(NULL);
-  set_last(NULL);
-  this->size_ = 0;
+    Node* tmp = NULL;
+    for ( NodeIterator it = this->iterator(); it.good(); ++it ) {
+        if (tmp != NULL) delete tmp;
+        tmp = *it;
+    }
+    if ( tmp != NULL ) delete tmp;
+    this->set_first( NULL );
+    this->set_last( NULL );
+    this->size_ = 0;
 }
 
-void NodeContainer::add_before(Node* add, Node* next_node){
-  add->set_next(next_node);
-  add->set_previous(next_node->previous());
-
-  if ( add->previous() != NULL ) add->previous()->set_next(add);
-  next_node->set_previous(add);
-  if ( add->is_last() ) this->set_last(add);
+void NodeContainer::add_before(Node* add, Node* before){
+    add->set_next(before);
+    add->set_previous(before->previous());
+    
+    if ( add->previous() != NULL ) add->previous()->set_next(add);
+    before->set_previous(add);
+    if ( add->is_last() ) this->set_last(add);
 }
 
 void swap(NodeContainer& a, NodeContainer& b) {

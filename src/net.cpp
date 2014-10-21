@@ -27,17 +27,17 @@
     //std::map < size_t, Node* > node_mapping;  
     ////node_mapping[NULL] = NULL;
     ////assert ( copied_Tree.print_all_node_dout () );
-    //for ( size_t node_i = 0; node_i < copied_Tree.NodeContainer.size(); node_i++ ) {
-        //Node *node = new Node( copied_Tree.NodeContainer[node_i] );
+    //for ( size_t node_i = 0; node_i < copied_Tree.nodes_.size(); node_i++ ) {
+        //Node *node = new Node( copied_Tree.nodes_[node_i] );
         //node_mapping[node_i] = node;
-        //this->NodeContainer.push_back( *node );
+        //this->nodes_.push_back( *node );
     //}
     
-    //for ( size_t node_i = 0; node_i < copied_Tree.NodeContainer.size(); node_i++ ) {
+    //for ( size_t node_i = 0; node_i < copied_Tree.nodes_.size(); node_i++ ) {
         ////if (!(*it)->is_root()) (*it)->set_parent(node_mapping[(*it)->parent()]);
         
-        //if ( copied_Tree.NodeContainer[node_i].parent1 ) 
-            //this->NodeContainer[node_i].parent1 = node_mapping[ this->NodeContainer[node_i].parent1 ];
+        //if ( copied_Tree.nodes_[node_i].parent1 ) 
+            //this->nodes_[node_i].parent1 = node_mapping[ this->nodes_[node_i].parent1 ];
         ////for ( size_t child_i = 0; child_i < ){
             
         ////}
@@ -55,7 +55,7 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     if (old_string.size()==0){
         descndnt.clear();
         tax_name.clear();
-        NodeContainer.clear();
+        nodes_.clear();
         return;
     }
     
@@ -108,35 +108,35 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
             
         //int label_counter = brchlens.size();
         for ( size_t new_i_label=0 ; new_i_label < brchlens.size(); new_i_label++ ){
-            Node empty_node;
-            NodeContainer.push_back(empty_node);
-            NodeContainer[new_i_label].label = labels[new_i_label];
-            NodeContainer[new_i_label].node_content = node_contents[new_i_label];
-            NodeContainer[new_i_label].set_brchlen1( strtod(brchlens[new_i_label].c_str(), NULL) );
+            Node * empty_node = new Node();
+            empty_node->label = labels[new_i_label];
+            empty_node->node_content = node_contents[new_i_label];
+            empty_node->set_brchlen1( strtod(brchlens[new_i_label].c_str(), NULL) );
+            nodes_.add(empty_node);
         }
 
-        for ( size_t i = 1; i < NodeContainer.size()-1; i++ ){
+        for ( size_t i = 1; i < nodes_.size()-1; i++ ){
             size_t j;
-            for ( j = i+1; j < NodeContainer.size()-1; j++ ){
-                if ( NodeContainer[j].label==NodeContainer[i].label ){
-                    if ( NodeContainer[j].node_content[0] == '(' ){
-                        NodeContainer[i].node_content = NodeContainer[j].node_content;
+            for ( j = i+1; j < nodes_.size()-1; j++ ){
+                if ( nodes_.at(j)->label == nodes_.at(i)->label ){
+                    if ( nodes_.at(j)->node_content[0] == '(' ){
+                        nodes_.at(i)->node_content = nodes_.at(j)->node_content;
                     }
-                    NodeContainer[i].set_brchlen2 ( NodeContainer[j].brchlen1() );
+                    nodes_.at(i)->set_brchlen2 ( nodes_.at(j)->brchlen1() );
                     break;
                 }
             }
-            if ( NodeContainer[j].label == NodeContainer[i].label ) NodeContainer.erase(NodeContainer.begin()+j);            
+            if ( nodes_.at(j)->label == nodes_.at(i)->label ) nodes_.remove(nodes_.at(i));
         }
         
     this->extract_tax_and_tip_names();
 
     this->connect_graph();
-    this->NodeContainer.back().find_tip();
-    this->NodeContainer.back().find_hybrid_descndnt();
-    this->NodeContainer.back().CalculateRank();
-    this->max_rank = NodeContainer.back().rank();    
-    this->enumerate_internal_branch( this->NodeContainer.back() );
+    this->nodes_.back()->find_tip();
+    this->nodes_.back()->find_hybrid_descndnt();
+    this->nodes_.back()->CalculateRank();
+    this->max_rank = nodes_.back()->rank();    
+    this->enumerate_internal_branch( this->nodes_.back() );
     this->init_descendant();
     this->init_node_clade();
     this->rewrite_descendant();
@@ -146,46 +146,46 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
 }
 
 
-void Tree::init_descendant(){
-    for ( size_t i = 0; i < NodeContainer.size(); i++){
-        valarray <int> descndnt_dummy(0,tax_name.size());
-        descndnt.push_back(descndnt_dummy);
-        valarray <int> samples_below_dummy(0,tip_name.size());
-        samples_below.push_back(samples_below_dummy);
-        for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ) descndnt[i][tax_name_i] = this->NodeContainer[i].find_descndnt( tax_name[tax_name_i], TAXA) ? 1:0;
-        for ( size_t tip_name_i = 0; tip_name_i < tip_name.size(); tip_name_i++ ) samples_below[i][tip_name_i] = this->NodeContainer[i].find_descndnt( tip_name[tip_name_i], TIP) ? 1:0;
-        this->NodeContainer[i].num_descndnt = descndnt[i].sum();
-    }
+//void Tree::init_descendant(){
+    //for ( auto it = nodes_.iterator(); it.good(); ++it ){
+        //valarray <int> descndnt_dummy(0,tax_name.size());
+        //descndnt.push_back(descndnt_dummy);
+        //valarray <int> samples_below_dummy(0,tip_name.size());
+        //samples_below.push_back(samples_below_dummy);
+        //for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ) descndnt[i][tax_name_i] = it->find_descndnt( tax_name[tax_name_i], TAXA) ? 1:0;
+        //for ( size_t tip_name_i = 0; tip_name_i < tip_name.size(); tip_name_i++ ) samples_below[i][tip_name_i] = it->find_descndnt( tip_name[tip_name_i], TIP) ? 1:0;
+        //it->num_descndnt = descndnt[i].sum();
+    //}
 
-    for ( size_t i = 0; i < NodeContainer.size(); i++){
-        for (size_t j = 0; j < NodeContainer.size(); j++){
-            if ( i == j ) continue;
+    //for ( size_t i = 0; i < nodes_.size(); i++){
+        //for (size_t j = 0; j < nodes_.size(); j++){
+            //if ( i == j ) continue;
 
-            valarray <int> descndnt_diff=(descndnt[i]-descndnt[j]);
-            if (descndnt_diff.min() >= 0 && NodeContainer[i].rank() > NodeContainer[j].rank() && NodeContainer[j].rank() >= 2){
-                this->NodeContainer[i].num_descndnt_interior += 1 ;
-                this->NodeContainer[i].descndnt_interior_node.push_back( &this->NodeContainer[j] );
-            }                
-        }
-    }
-}
+            //valarray <int> descndnt_diff=(descndnt[i]-descndnt[j]);
+            //if (descndnt_diff.min() >= 0 && nodes_[i].rank() > nodes_[j].rank() && nodes_[j].rank() >= 2){
+                //this->nodes_[i].num_descndnt_interior += 1 ;
+                //this->nodes_[i].descndnt_interior_node.push_back( &this->nodes_[j] );
+            //}                
+        //}
+    //}
+//}
 
 
-void Tree::init_node_clade(){
-    for ( size_t i = 0; i < NodeContainer.size(); i++ ){
-        //if ( this->descndnt[i].sum() == 0 ) break;
+//void Tree::init_node_clade(){
+    //for ( auto it = nodes_.iterator(); it.good(); ++it){
+        ////if ( this->descndnt[i].sum() == 0 ) break;
 
-        this->NodeContainer[i].clade.clear();
-        for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ){
-            if ( descndnt[i][tax_name_i] != 1) continue;
+        //it->clade.clear();
+        //for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ){
+            //if ( descndnt[i][tax_name_i] != 1) continue;
 
-            NodeContainer[i].clade = ( NodeContainer[i].clade.size() == 0 ) ? tax_name[tax_name_i]:
-                                                                            NodeContainer[i].clade + tax_name[tax_name_i];                                                                                        
-            NodeContainer[i].clade.push_back('&');
-        }
-        NodeContainer[i].clade.erase(NodeContainer[i].clade.size()-1,1);
-    }
-}
+            //nodes_[i].clade = ( nodes_[i].clade.size() == 0 ) ? tax_name[tax_name_i]:
+                                                                            //nodes_[i].clade + tax_name[tax_name_i];                                                                                        
+            //nodes_[i].clade.push_back('&');
+        //}
+        //nodes_[i].clade.erase(nodes_[i].clade.size()-1,1);
+    //}
+//}
 
 string Tree::extract_label(string &in_str, size_t i){
     //size_t j=end_of_label_or_bl(in_str, i);
@@ -197,28 +197,28 @@ string Tree::extract_label(string &in_str, size_t i){
 
 
 void Tree::extract_tax_and_tip_names(){        
-    for (size_t i=0;i<NodeContainer.size();i++){
-        if(NodeContainer[i].label != NodeContainer[i].node_content) continue;
-        if ( NodeContainer[i].label.find("_") > 0 ){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->label != (*it)->node_content) continue;
+        if ( (*it)->label.find("_") > 0 ){
             //multi_label_bool=true;
-            NodeContainer[i].name = NodeContainer[i].label.substr(0,NodeContainer[i].label.find("_"));
-            //cout<<NodeContainer[i].name<<endl;
+            (*it)->name = (*it)->label.substr(0,(*it)->label.find("_"));
+            //cout<<nodes_[i].name<<endl;
             bool new_tax_bool=true;
             for ( size_t tax_i = 0; tax_i < tax_name.size(); tax_i++ ){
-                if (tax_name[tax_i]==NodeContainer[i].name){
+                if (tax_name[tax_i] == (*it)->name){
                     new_tax_bool=false;
                     break;
                 }
             }
             if ( new_tax_bool ){
-                tax_name.push_back(NodeContainer[i].name);
+                tax_name.push_back( (*it)->name);
             }
             //cout<<tax_name.back()<<endl;
         }
         else{
-            tax_name.push_back(NodeContainer[i].label);
+            tax_name.push_back( (*it)->label);
         }
-        tip_name.push_back(NodeContainer[i].label);
+        tip_name.push_back( (*it)->label);
     }
     sort(tax_name.begin(), tax_name.end());
     sort(tip_name.begin(), tip_name.end());
@@ -228,18 +228,18 @@ void Tree::extract_tax_and_tip_names(){
 
 
 void Tree::connect_graph(){
-    for ( size_t i = 0; i < NodeContainer.size(); i++ ){
-        if ( NodeContainer[i].node_content[0] != '(' ) continue;
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->node_content[0] != '(' ) continue;
         
-        char child_node1[NodeContainer[i].node_content.length()];
-        for ( size_t i_content_len = 1; i_content_len < NodeContainer[i].node_content.length(); ){
-            if (NodeContainer[i].node_content[i_content_len]=='(' ||  start_of_tax_name(NodeContainer[i].node_content,i_content_len) ){    
-                size_t j_content_len = (NodeContainer[i].node_content[i_content_len] == '(') ? Parenthesis_balance_index_forwards( NodeContainer[i].node_content, i_content_len ) + 1:
+        char child_node1[(*it)->node_content.length()];
+        for ( size_t i_content_len = 1; i_content_len < (*it)->node_content.length(); ){
+            if ((*it)->node_content[i_content_len]=='(' ||  start_of_tax_name((*it)->node_content,i_content_len) ){    
+                size_t j_content_len = ((*it)->node_content[i_content_len] == '(') ? Parenthesis_balance_index_forwards( (*it)->node_content, i_content_len ) + 1:
                                                                                                i_content_len;
                 int child1_node_content_i = 0;
-                for ( ; j_content_len < NodeContainer[i].node_content.length(); j_content_len++){
-                    child_node1[child1_node_content_i] = NodeContainer[i].node_content[j_content_len];
-                    char stop = NodeContainer[i].node_content[j_content_len+1];
+                for ( ; j_content_len < (*it)->node_content.length(); j_content_len++){
+                    child_node1[child1_node_content_i] = (*it)->node_content[j_content_len];
+                    char stop = (*it)->node_content[j_content_len+1];
                     if ( stop == ',' || stop == ')' || stop == ':'){
                         child_node1[child1_node_content_i+1]='\0';
                         break;
@@ -248,10 +248,10 @@ void Tree::connect_graph(){
                 }
                 string child_node1_str = child_node1;        
                 i_content_len = j_content_len + 2;
-                for ( size_t j = 0; j < NodeContainer.size(); j++){
-                    if (child_node1_str == NodeContainer[j].label) {
-                        this->NodeContainer.at(i).add_child( &this->NodeContainer.at(j) );
-                        //dout << "node " << &this->NodeContainer[i] << " has child "<< &this->NodeContainer[j]<<endl;
+                for ( size_t j = 0; j < nodes_.size(); j++){
+                    if (child_node1_str == this->nodes_.at(j)->label) {
+                        (*it)->add_child( this->nodes_.at(j) );
+                        //dout << "node " << &this->nodes_[i] << " has child "<< &this->nodes_[j]<<endl;
                     }
                 }
             }
@@ -273,55 +273,55 @@ void Tree::check_labeled( string in_str ){
 }
 
 
-void Tree::check_isUltrametric(){
-    vector <int> remaining_node( NodeContainer.size(), 0 );
-    for ( size_t node_i = 0; node_i < NodeContainer.size(); node_i++ ){
-        remaining_node[node_i] = node_i;
-    }
-    size_t rank_i = 1;
-    size_t remaining_node_i=0;    
-    while ( remaining_node.size() > 0 ){
-        int node_i = remaining_node[remaining_node_i];
-        if ( NodeContainer[node_i].rank() == rank_i ){
-            if (rank_i == 1) NodeContainer[node_i].path_time.push_back(0.0);
-            else{
-                for (size_t child_i = 0; child_i < NodeContainer[node_i].child.size(); child_i++ ){
+//void Tree::check_isUltrametric(){
+    //vector <int> remaining_node( nodes_.size(), 0 );
+    //for ( size_t node_i = 0; node_i < nodes_.size(); node_i++ ){
+        //remaining_node[node_i] = node_i;
+    //}
+    //size_t rank_i = 1;
+    //size_t remaining_node_i=0;    
+    //while ( remaining_node.size() > 0 ){
+        //int node_i = remaining_node[remaining_node_i];
+        //if ( nodes_[node_i].rank() == rank_i ){
+            //if (rank_i == 1) nodes_[node_i].path_time.push_back(0.0);
+            //else{
+                //for (size_t child_i = 0; child_i < nodes_[node_i].child.size(); child_i++ ){
 
-                    double current_child_time = (NodeContainer[node_i].child[child_i]->parent1->label==NodeContainer[node_i].label)?                    
-                                                NodeContainer[node_i].child[child_i]->brchlen1():
-                                                NodeContainer[node_i].child[child_i]->brchlen2();
-                    for (size_t child_i_time_i=0;child_i_time_i<NodeContainer[node_i].child[child_i]->path_time.size();child_i_time_i++){
-                        NodeContainer[node_i].path_time.push_back(current_child_time+NodeContainer[node_i].child[child_i]->path_time[child_i_time_i]);
-                    }
-                }
-            }            
-            remaining_node.erase(remaining_node.begin()+remaining_node_i);
-        }
-        else{
-            remaining_node_i++;
-        }
+                    //double current_child_time = (nodes_[node_i].child[child_i]->parent1->label==nodes_[node_i].label)?                    
+                                                //nodes_[node_i].child[child_i]->brchlen1():
+                                                //nodes_[node_i].child[child_i]->brchlen2();
+                    //for (size_t child_i_time_i=0;child_i_time_i<nodes_[node_i].child[child_i]->path_time.size();child_i_time_i++){
+                        //nodes_[node_i].path_time.push_back(current_child_time+nodes_[node_i].child[child_i]->path_time[child_i_time_i]);
+                    //}
+                //}
+            //}            
+            //remaining_node.erase(remaining_node.begin()+remaining_node_i);
+        //}
+        //else{
+            //remaining_node_i++;
+        //}
 
-        if ( remaining_node_i == remaining_node.size()-1 ){
-            rank_i++;
-            remaining_node_i=0;
-        }
-    }
+        //if ( remaining_node_i == remaining_node.size()-1 ){
+            //rank_i++;
+            //remaining_node_i=0;
+        //}
+    //}
 
-    for (size_t node_i=0;node_i<NodeContainer.size();node_i++){
-        for (size_t path_time_i=0;path_time_i<NodeContainer[node_i].path_time.size();path_time_i++){
-            if (pow((NodeContainer[node_i].path_time[path_time_i]-NodeContainer[node_i].path_time[0]),2)>0.000001){
-                this->is_ultrametric = false;
-                break;
-            }
-        }
-        NodeContainer[node_i].set_height( NodeContainer[node_i].path_time[0] );
-    }
-}
+    //for (size_t node_i=0;node_i<nodes_.size();node_i++){
+        //for (size_t path_time_i=0;path_time_i<nodes_[node_i].path_time.size();path_time_i++){
+            //if (pow((nodes_[node_i].path_time[path_time_i]-nodes_[node_i].path_time[0]),2)>0.000001){
+                //this->is_ultrametric = false;
+                //break;
+            //}
+        //}
+        //nodes_[node_i].set_height( nodes_[node_i].path_time[0] );
+    //}
+//}
 
 
 void Tree::check_isNet(){ //false stands for tree, true stands for net_work
-    for (size_t i = 0; i < this->NodeContainer.size(); i++){
-        if ( !this->NodeContainer[i].parent2 ) continue;
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( !(*it)->parent2 ) continue;
         this->is_Net = true;
         return;
     }
@@ -331,9 +331,9 @@ void Tree::check_isNet(){ //false stands for tree, true stands for net_work
 void Tree::print_all_node(){
     if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
     else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank e_num   Clade "<<endl;
-    for (size_t i = 0; i < this->NodeContainer.size(); i++ ){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
         //for (size_t j = 0; j < this->descndnt[i].size(); j++ ) {cout<<setw(3)<<this->descndnt[i][j];}
-        this->NodeContainer[i].print( this->is_Net_() );
+        (*it)->print( this->is_Net_() );
         cout<<"  ";        
         //for (size_t j=0;j<this->samples_below[i].size();j++) {cout<<this->samples_below[i][j]; }
         cout<<endl;
@@ -370,44 +370,62 @@ string Tree::label_interior_node(string in_str /*!< input newick form string */)
 
 
 size_t Tree::first_coal_rank(){
-    size_t min_rank = NodeContainer.back().rank();
-    for (size_t i = 0 ; i < NodeContainer.size(); i++){
-        if ( NodeContainer[i].tip_bool ) continue;
-        min_rank = ( NodeContainer[i].rank() < min_rank ) ?  NodeContainer[i].rank() : min_rank ;
+    size_t min_rank = nodes_.back()->rank();
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->tip_bool ) continue;
+        min_rank = ( (*it)->rank() < min_rank ) ?  (*it)->rank() : min_rank ;
     }
     return min_rank;
 }
 
 
-size_t Tree::first_coal_index (){    
-    size_t min_rank = this->first_coal_rank();
-    size_t dummy_index = this->NodeContainer.size()-1;
-    double min_coal_time = this->NodeContainer[dummy_index].height();
-    for (size_t i = 0 ; i < NodeContainer.size(); i++){
-        if ( this->NodeContainer[i].rank() == min_rank &&  this->NodeContainer[i].height() < min_coal_time ){
-            dummy_index = i;
-            min_coal_time = this->NodeContainer[dummy_index].height();
-        }        
-    }
-    return dummy_index;
-}
+//size_t Tree::first_coal_index (){    
+    //size_t min_rank = this->first_coal_rank();
+    //size_t dummy_index = this->nodes_.size()-1;
+    //double min_coal_time = this->nodes_[dummy_index].height();
+    //for (size_t i = 0 ; i < nodes_.size(); i++){
+        //if ( this->nodes_[i].rank() == min_rank &&  this->nodes_[i].height() < min_coal_time ){
+            //dummy_index = i;
+            //min_coal_time = this->nodes_[dummy_index].height();
+        //}        
+    //}
+    //return dummy_index;
+//}
 
+
+///*! \brief enumerate the internal branches */
+//void Tree::enumerate_internal_branch( Node & node ) {
+    //if ( node.tip_bool ) return;
+
+    //if ( node.visited() ){
+        //this->current_enum_ ++;
+        //node.set_enum2( current_enum_ );
+        //}
+    //else{
+        //for ( size_t i = 0; i < node.child.size(); i++ ){
+            //this->enumerate_internal_branch( *node.child[i] );
+        //}
+        //node.set_visited( true );
+        //this->current_enum_ ++;
+        //node.set_enum( current_enum_ );
+    //}
+//}
 
 /*! \brief enumerate the internal branches */
-void Tree::enumerate_internal_branch( Node & node ) {
-    if ( node.tip_bool ) return;
+void Tree::enumerate_internal_branch( Node * node ) {
+    if ( node->tip_bool ) return;
 
-    if ( node.visited() ){
+    if ( node->visited() ){
         this->current_enum_ ++;
-        node.set_enum2( current_enum_ );
+        node->set_enum2( current_enum_ );
         }
     else{
-        for ( size_t i = 0; i < node.child.size(); i++ ){
-            this->enumerate_internal_branch( *node.child[i] );
+        for ( size_t i = 0; i < node->child.size(); i++ ){
+            this->enumerate_internal_branch( node->child[i] );
         }
-        node.set_visited( true );
+        node->set_visited( true );
         this->current_enum_ ++;
-        node.set_enum( current_enum_ );
+        node->set_enum( current_enum_ );
     }
 }
 
@@ -468,19 +486,18 @@ void Tree::check_Parenthesis( string &in_str ){
 /*! \brief rewrite node content of nodes */
 void Tree::rewrite_node_content(){
     int highest_i = 0;
-    for ( size_t i = 0; i < this->NodeContainer.size(); i++ ){
-        if ( this->NodeContainer[i].num_descndnt > this->NodeContainer[highest_i].num_descndnt ){ highest_i = i;}
+    for ( size_t i = 0; i < this->nodes_.size(); i++ ){
+        if ( this->nodes_.at(i)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = i;}
     }
     
-    this->NodeContainer[highest_i].CalculateRank();
+    this->nodes_.at(highest_i)->CalculateRank();
 
-    for ( size_t rank_i = 1; rank_i <= this->NodeContainer.back().rank(); rank_i++){
-        for ( size_t i = 0 ; i < this->NodeContainer.size(); i++ ){
-            if ( this->NodeContainer[i].rank() != rank_i ) continue;
+    for ( size_t rank_i = 1; rank_i <= this->nodes_.back()->rank(); rank_i++){
+        for ( size_t i = 0; i < this->nodes_.size() ; i++ ){
+            if ( this->nodes_.at(i)->rank() != rank_i ) continue;
 
-            this->NodeContainer[i].node_content = ( this->NodeContainer[i].rank() == 1 ) ? 
-                                                    this->NodeContainer[i].label :
-                                                    this->rewrite_internal_node_content( i );
+            this->nodes_.at(i)->node_content = ( this->nodes_.at(i)->rank() == 1 ) ? this->nodes_.at(i)->label :
+                                                           this->rewrite_internal_node_content( i );
         }    
     }
 }
@@ -488,28 +505,28 @@ void Tree::rewrite_node_content(){
 
 string Tree::rewrite_internal_node_content( size_t i ){
     string new_node_content="(";
-    for (size_t child_i = 0; child_i < this->NodeContainer[i].child.size(); child_i++ ){
-        string brchlen_str1 = to_string ( this->NodeContainer[i].child[child_i]->brchlen1() );
-        if ( this->NodeContainer[i].child[child_i]->node_content == this->NodeContainer[i].child[child_i]->label ) {
-            //new_node_content += this->NodeContainer[i].child[child_i]->label+":" + to_string ( this->NodeContainer[i].child[child_i]->brchlen1() ) ;
-            new_node_content += this->NodeContainer[i].child[child_i]->label+":" +  brchlen_str1;
+    for (size_t child_i = 0; child_i < this->nodes_.at(i)->child.size(); child_i++ ){
+        string brchlen_str1 = to_string ( this->nodes_.at(i)->child[child_i]->brchlen1() );
+        if ( this->nodes_.at(i)->child[child_i]->node_content == this->nodes_.at(i)->child[child_i]->label ) {
+            //new_node_content += this->nodes_[i].child[child_i]->label+":" + to_string ( this->nodes_[i].child[child_i]->brchlen1() ) ;
+            new_node_content += this->nodes_.at(i)->child[child_i]->label+":" +  brchlen_str1;
         }
         else {            
             bool new_hybrid_node=false;
             string brchlen_str2;
             for ( size_t node_ii=0; node_ii < i; node_ii++){
-                for ( size_t node_ii_child_i = 0; node_ii_child_i < this->NodeContainer[node_ii].child.size(); node_ii_child_i++ ){
-                    if ( this->NodeContainer[node_ii].child[node_ii_child_i]->node_content == this->NodeContainer[i].child[child_i]->node_content){
+                for ( size_t node_ii_child_i = 0; node_ii_child_i < this->nodes_.at(node_ii)->child.size(); node_ii_child_i++ ){
+                    if ( this->nodes_.at(node_ii)->child[node_ii_child_i]->node_content == this->nodes_.at(i)->child[child_i]->node_content){
                         new_hybrid_node=true;
-                        brchlen_str2 = to_string(this->NodeContainer[i].child[child_i]->brchlen2() );
+                        brchlen_str2 = to_string(this->nodes_.at(i)->child[child_i]->brchlen2() );
                     break;}
                 }
                 if (new_hybrid_node){break;}
             }
-            new_node_content += new_hybrid_node ? this->NodeContainer[i].child[child_i]->label+":" + brchlen_str2 : 
-                                                  this->NodeContainer[i].child[child_i]->node_content + this->NodeContainer[i].child[child_i]->label+":" +  brchlen_str1;
+            new_node_content += new_hybrid_node ? this->nodes_.at(i)->child[child_i]->label+":" + brchlen_str2 : 
+                                                  this->nodes_.at(i)->child[child_i]->node_content + this->nodes_.at(i)->child[child_i]->label+":" +  brchlen_str1;
         }
-        if ( child_i < this->NodeContainer[i].child.size() - 1 ) new_node_content += ",";
+        if ( child_i < this->nodes_.at(i)->child.size() - 1 ) new_node_content += ",";
     }
     new_node_content += ")";
     return new_node_content;
@@ -519,10 +536,10 @@ string Tree::rewrite_internal_node_content( size_t i ){
 
 void Tree::rewrite_descendant(){    //check for coaleased tips(& sign in the tips)
     bool rewrite_descndnt=false;
-    for (size_t i=0;i<NodeContainer.size();i++){
-        if (NodeContainer[i].tip_bool ){
-            for (size_t i_str=0;i_str<NodeContainer[i].clade.size();i_str++){
-                if (NodeContainer[i].clade[i_str]=='&'){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->tip_bool ){
+            for (size_t i_str=0;i_str< (*it)->clade.size();i_str++){
+                if ((*it)->clade[i_str]=='&'){
                     rewrite_descndnt=true;
                     break;
                 }
@@ -538,36 +555,36 @@ void Tree::rewrite_descendant(){    //check for coaleased tips(& sign in the tip
     tax_name.clear();
     int tax_name_start=0;
     int tax_name_length=0;
-    for (size_t new_i_str=0;new_i_str<NodeContainer.back().clade.size();new_i_str++){
+    for (size_t new_i_str=0;new_i_str<nodes_.back()->clade.size();new_i_str++){
         tax_name_length++;
-        if (NodeContainer.back().clade[new_i_str]=='&'){
+        if (nodes_.back()->clade[new_i_str]=='&'){
             tax_name_length--;
-            tax_name.push_back(NodeContainer.back().clade.substr(tax_name_start,tax_name_length));
+            tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
             tax_name_start=new_i_str+1;
             tax_name_length=0;
         }                
-        if (new_i_str==NodeContainer.back().clade.size()-1){
-            tax_name.push_back(NodeContainer.back().clade.substr(tax_name_start,tax_name_length));
+        if (new_i_str==nodes_.back()->clade.size()-1){
+            tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
         }
     }
     sort(tax_name.begin(), tax_name.end());
     descndnt.clear();
 
-    for (size_t i=0;i<NodeContainer.size();i++){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
         vector <string> contained_tips;
         valarray <int> re_initial_descndnt(0,tax_name.size());
         int tax_name_start=0;
         int tax_name_length=0;
-        for (size_t new_i_str=0;new_i_str<NodeContainer[i].clade.size();new_i_str++){
+        for (size_t new_i_str=0;new_i_str<(*it)->clade.size();new_i_str++){
             tax_name_length++;
-            if (NodeContainer.back().clade[new_i_str]=='&'){
+            if (nodes_.back()->clade[new_i_str]=='&'){
                 tax_name_length--;
-                contained_tips.push_back(NodeContainer[i].clade.substr(tax_name_start,tax_name_length));
+                contained_tips.push_back((*it)->clade.substr(tax_name_start,tax_name_length));
                 tax_name_start=new_i_str+1;
                 tax_name_length=0;
             }                
-            if (new_i_str==NodeContainer[i].clade.size()-1){
-                contained_tips.push_back(NodeContainer[i].clade.substr(tax_name_start,tax_name_length));
+            if (new_i_str== (*it)->clade.size()-1){
+                contained_tips.push_back( (*it)->clade.substr(tax_name_start,tax_name_length));
             }
         }
         for (size_t tax_i=0;tax_i<tax_name.size();tax_i++){

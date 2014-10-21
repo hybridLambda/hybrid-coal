@@ -12,11 +12,17 @@ hybrid_coal_CXXFLAGS = -DNDEBUG $(common_flags)#options for not showing debug me
 hybrid_coal_dbg_CXXFLAGS = $(common_flags)
 hybrid_coal_prof_CXXFLAGS = $(common_flags) -DNDEBUG -pg #options for not showing debug messages. -fpermissive
 
+#shared_src = src/node.cpp \
+			 #src/net.cpp \
+			 #src/plot/figure.cpp  \
+			 #src/tree_topo/all_gene_topo.cpp \
+			 #src/coal.cpp \
+			 #src/hybridcoal.cpp 
+
 shared_src = src/node.cpp \
 			 src/net.cpp \
-			 src/plot/figure.cpp  \
 			 src/tree_topo/all_gene_topo.cpp \
-			 src/coal.cpp \
+			 src/nodeContainer.cpp \
 			 src/hybridcoal.cpp 
 			  
 hybrid_coal_SOURCES = $(shared_src) src/main.cpp  

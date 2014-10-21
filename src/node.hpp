@@ -46,6 +46,7 @@ enum NAMETYPE { TAXA, TIP };
 
 class Node {
     friend class NodeIterator;
+    friend class NodeContainer;
     friend class Tree;
     friend class Net;
     friend class CoalGT;

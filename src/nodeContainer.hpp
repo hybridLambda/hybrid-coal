@@ -26,8 +26,61 @@
 //#include <iostream>
 #include <map>
 
+#ifndef NODECONTAINER
+#define NODECONTAINER
 
-class NodeContainer;
+//class NodeContainer;
+
+class NodeIterator;
+
+class NodeContainer {
+    friend class Tree;
+    friend class NodeIterator;
+
+    //public:
+    NodeContainer();
+    ~NodeContainer() { this->clear(); };
+    
+    NodeContainer& operator=( NodeContainer nc ) {
+        swap(*this, nc);  
+        return(*this);
+    };
+    
+    NodeContainer( NodeContainer &nc );
+    
+    NodeIterator iterator(); 
+    NodeIterator iterator( Node* node );
+    
+    void add( Node* node );
+    void remove( Node *node );
+    //void move( Node *node, const double new_height );
+    void clear();
+    
+    Node* at(size_t nr) const; 
+    Node const* get(size_t nr) const { return at(nr); }; 
+    
+    Node* first() const { return first_node_; };
+    Node* back() const { return last_node_; };
+    
+    size_t size() const { return size_; };  
+    
+    //friend class ConstNodeIterator;
+    //friend class ReverseConstNodeIterator;
+    //friend std::ostream& operator<< (std::ostream& stream, const NodeContainer& nc);
+    
+    //private:
+    friend void swap( NodeContainer& a, NodeContainer& b );
+    
+    void add_before(Node* add, Node* before); // Use this when adding new nodes.
+    
+    Node* first_node_;
+    Node* last_node_;
+    
+    void set_first( Node* node) { this->first_node_ = node; }
+    void set_last ( Node* node) { this->last_node_  = node; }
+    
+    size_t size_;
+};
 
 class NodeIterator {
     Node* current_node_;
@@ -63,52 +116,7 @@ class NodeIterator {
         double height() const { return ( this->good() ? this->current_node_->height() : DBL_MAX ); }
 };
 
+inline NodeIterator NodeContainer::iterator() { return NodeIterator(*this); }
+inline NodeIterator NodeContainer::iterator(Node* node) { return NodeIterator(node); }
 
-class NodeContainer {
-    friend class Tree;
-    friend class NodeIterator;
-
-    //public:
-    NodeContainer();
-    ~NodeContainer() { this->clear(); };
-    
-    NodeContainer& operator=( NodeContainer nc ) {
-        swap(*this, nc);  
-        return(*this);
-    };
-    
-    NodeContainer( const NodeContainer &nc );
-    
-    NodeIterator iterator(); 
-    NodeIterator iterator( Node* node );
-    
-    void add( Node* node );
-    void remove( Node *node, const bool &del=true );
-    //void move( Node *node, const double new_height );
-    void clear();
-    
-    Node* at(size_t nr) const; 
-    Node const* get(size_t nr) const { return at(nr); }; 
-    
-    Node* first() const { return first_node_; };
-    Node* last() const { return last_node_; };
-    
-    size_t size() const { return size_; };  
-    
-    //friend class ConstNodeIterator;
-    //friend class ReverseConstNodeIterator;
-    //friend std::ostream& operator<< (std::ostream& stream, const NodeContainer& nc);
-    
-    //private:
-    friend void swap( NodeContainer& a, NodeContainer& b );
-    
-    //void add_before(Node* add, Node* next_node);
-    
-    Node* first_node_;
-    Node* last_node_;
-    
-    void set_first( Node* node) { this->first_node_ = node; }
-    void set_last ( Node* node) { this->last_node_  = node; }
-    
-    size_t size_;
-};
+#endif
