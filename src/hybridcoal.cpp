@@ -123,6 +123,8 @@ void HybridCoal::finalize(){
         this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
     }
     
+    if ( this->print_tree_bool || this->plot_bool ) return;
+    
     if ( this->enumerate_gt_bool ){
         Net net( this->sp_str );
         GeneTopoList topologies( net.tip_name );
@@ -183,10 +185,10 @@ void HybridCoal::HybridCoal_core(){
 
 void HybridCoal::print(){
     Net net( this->sp_str );
-    net.print_all_node();
+    net.print();
     
     Net copied_net(net);
-    copied_net.print_all_node();
+    copied_net.print();
 }
 
 

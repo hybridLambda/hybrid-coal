@@ -71,7 +71,6 @@ Node* NodeContainer::at(size_t nr) const {
 // Adds 'node' to the container
 void NodeContainer::add( Node* node ) {
     ++size_;
-    assert( this->first() == NULL );
     if ( this->first() == NULL ) {
         this->set_first( node );
         this->set_last( node );

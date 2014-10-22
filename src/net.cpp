@@ -119,14 +119,16 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
             size_t j;
             for ( j = i+1; j < nodes_.size()-1; j++ ){
                 if ( nodes_.at(j)->label == nodes_.at(i)->label ){
+                    cout << nodes_.at(j)->label <<" "<< nodes_.at(j)->node_content <<endl;
                     if ( nodes_.at(j)->node_content[0] == '(' ){
+                        
                         nodes_.at(i)->node_content = nodes_.at(j)->node_content;
                     }
                     nodes_.at(i)->set_brchlen2 ( nodes_.at(j)->brchlen1() );
                     break;
                 }
             }
-            if ( nodes_.at(j)->label == nodes_.at(i)->label ) nodes_.remove(nodes_.at(i));
+            if ( nodes_.at(j)->label == nodes_.at(i)->label ) nodes_.remove(nodes_.at(j));
         }
         
     this->extract_tax_and_tip_names();
@@ -229,6 +231,7 @@ void Tree::extract_tax_and_tip_names(){
 
 void Tree::connect_graph(){
     for ( auto it = nodes_.iterator(); it.good(); ++it){
+        dout << " node " << (*it) << ": " << (*it)->label <<"\t"<<(*it)->node_content<<endl;
         if ( (*it)->node_content[0] != '(' ) continue;
         
         char child_node1[(*it)->node_content.length()];
@@ -328,7 +331,7 @@ void Tree::check_isNet(){ //false stands for tree, true stands for net_work
 }
 
 
-void Tree::print_all_node(){
+void Tree::print(){
     if ( this->is_Net ) cout<<"           label  hybrid hyb_des non-tp parent1  abs_t brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
     else cout<<"            label non-tp   parent        abs_t brchln #child #dsndnt #id rank e_num   Clade "<<endl;
     for ( auto it = nodes_.iterator(); it.good(); ++it){

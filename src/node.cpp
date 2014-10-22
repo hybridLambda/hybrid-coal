@@ -47,7 +47,7 @@ Node::Node(){
 
 
 void Node::print( bool is_Net ){
-    //cout << setw(12) << this->label;
+    cout << setw(7) << this->label;
     cout << setw(12) << (this);
 	if ( is_Net ) cout << setw(6) << this->hybrid();
     if ( is_Net ) cout << setw(8) << descndnt_of_hybrid;

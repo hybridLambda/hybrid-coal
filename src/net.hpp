@@ -83,7 +83,7 @@ class Tree{
 
         bool is_Net_() const { return this->is_Net ; }
         string extract_label(string &in_str, size_t i);
-        void print_all_node();
+        void print();
         bool print_all_node_dout();
     
 
