@@ -158,7 +158,7 @@ class Node {
         void print( bool is_Net = false );
         bool print_dout( bool is_Net = false );
         //void find_tip();
-        void find_hybrid_descndnt();
+        //void find_hybrid_descndnt();
         //bool find_descndnt ( string &name, NAMETYPE type );
         
         double extract_hybrid_para(){

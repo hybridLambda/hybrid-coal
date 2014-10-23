@@ -81,9 +81,12 @@ class GraphBuilder{
         void check_isUltrametric();
         //size_t first_coal_index ();
     
-        string rewrite_internal_node_content( size_t i );
-
-        void extract_tax_and_tip_names();
+        string rewrite_internal_node_content( Node * node );
+        
+        void which_taxa_is_below();
+        void which_sample_is_below();
+        
+        //void extract_tax_and_tip_names();
         
         //void init_descendant();
         //void init_node_clade();

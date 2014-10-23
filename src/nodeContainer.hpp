@@ -87,10 +87,9 @@ class NodeIterator {
     Node* current_node_;
     size_t node_index_;
     public:
-    //friend class Tree;
-    //friend class NodeContainer;
+        size_t node_index() const { return this->node_index_; }
     
-        NodeIterator() { this->current_node_ = NULL; };
+        NodeIterator() { this->current_node_ = NULL; this->node_index_ = 0; };
         NodeIterator( NodeContainer& nc) { this->current_node_ = nc.first(); };
         NodeIterator( Node* node) { this->current_node_ = node; };
         ~NodeIterator() {};

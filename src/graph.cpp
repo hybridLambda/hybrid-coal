@@ -26,7 +26,7 @@ GraphReader::GraphReader ( string in_str ){
     this->check_Parenthesis( in_str );
     this->check_labeled( in_str );
 
-// Try to use string iterator for this...
+    // Try to use string iterator for this...
     size_t found_bl = this->net_str.find(':');
     for ( size_t i_str_len = 1; i_str_len < this->net_str.size(); ){
         if ( this->net_str[i_str_len]=='e' && ( this->net_str[i_str_len+1]=='-' || this->net_str[i_str_len+1]=='+' ) ){
@@ -124,7 +124,28 @@ string GraphReader::label_interior_node(string in_str /*!< input newick form str
 }
 
 
-
+void GraphReader::extract_tax_and_tip_names(){
+    for ( size_t i = 0; i < node_labels.size(); i++ ){
+        if ( node_labels[i] != node_contents[i]) continue;         // skip interior nodes
+        if ( node_labels[i].find("#") != string::npos ) continue;  // skip hybrid nodes
+        if ( node_labels[i].find("_") > 0 ){
+            string node_name = node_labels[i].substr( 0, node_labels[i].find("_"));
+            bool new_tax_bool = true;
+            for ( size_t tax_i = 0; tax_i < tax_name.size(); tax_i++ ){
+                if ( tax_name[tax_i] == node_name ){
+                    new_tax_bool = false;
+                    break;
+                }
+            }
+            if ( new_tax_bool ) tax_name.push_back( node_name );
+        } else{
+            tax_name.push_back( node_labels[i] );
+        }
+        tip_name.push_back( node_labels[i] );
+    }
+    sort(tax_name.begin(), tax_name.end());
+    sort(tip_name.begin(), tip_name.end());
+}
 
 
 /*! \brief Construct Net object from a (extended) Newick string */
@@ -189,46 +210,24 @@ void GraphBuilder::initialize_nodes( string &in_str ){
 
 
 void GraphBuilder::remove_repeated_hybrid_node(){
-    for ( size_t i = 1; i < this->nodes_.size()-1; i++ ){
-        size_t j;
-        for ( j = i+1; j < this->nodes_.size()-1; j++ ){
-            if ( this->nodes_.at(j)->label != this->nodes_.at(i)->label ) continue;
-            
-            dout << "Remove " << this->nodes_.at(j)->label <<" "<< this->nodes_.at(j)->node_content <<endl;
-            if ( this->nodes_.at(j)->node_content[0] == '(' ){                
-                this->nodes_.at(i)->node_content = this->nodes_.at(j)->node_content;
+    for ( auto it_i = nodes_.iterator(); it_i.good(); ++it_i){
+        if ( (*it_i)->next() == NULL ) break;
+        NodeIterator it_j ( (*it_i)->next() );
+        for ( ; it_j.good(); ++it_j){
+            if ( (*it_j)->next() == NULL ) break;
+            if ( (*it_i)->label != (*it_j)->label ) continue;            
+            dout << "Remove " << (*it_j)->label <<" "<< (*it_j)->node_content <<endl;
+            if ( (*it_j)->node_content[0] == '(' ){                
+                (*it_i)->node_content = (*it_j)->node_content;
             }
-            this->nodes_.at(i)->set_brchlen2 ( this->nodes_.at(j)->brchlen1() );
+            (*it_i)->set_brchlen2 ( (*it_j)->brchlen1() );
             break;
-        }
-        
-        if ( this->nodes_.at(j)->label == this->nodes_.at(i)->label ) this->nodes_.remove(this->nodes_.at(j));
+        }        
+        if ( (*it_j)->label ==(*it_i)->label ) this->nodes_.remove( (*it_j) );
     }
 }
 
 
-void GraphReader::extract_tax_and_tip_names(){
-    for ( size_t i = 0; i < node_labels.size(); i++ ){
-        if ( node_labels[i] != node_contents[i]) continue;         // skip interior nodes
-        if ( node_labels[i].find("#") != string::npos ) continue;  // skip hybrid nodes
-        if ( node_labels[i].find("_") > 0 ){
-            string node_name = node_labels[i].substr( 0, node_labels[i].find("_"));
-            bool new_tax_bool = true;
-            for ( size_t tax_i = 0; tax_i < tax_name.size(); tax_i++ ){
-                if ( tax_name[tax_i] == node_name ){
-                    new_tax_bool = false;
-                    break;
-                }
-            }
-            if ( new_tax_bool ) tax_name.push_back( node_name );
-        } else{
-            tax_name.push_back( node_labels[i] );
-        }
-        tip_name.push_back( node_labels[i] );
-    }
-    sort(tax_name.begin(), tax_name.end());
-    sort(tip_name.begin(), tip_name.end());
-}
 
 
 void GraphBuilder::connect_graph(){
@@ -253,12 +252,18 @@ void GraphBuilder::connect_graph(){
                 }
                 string child_node1_str = child_node1;        
                 i_content_len = j_content_len + 2;
-                for ( size_t j = 0; j < nodes_.size(); j++){
-                    if (child_node1_str == this->nodes_.at(j)->label) {
-                        (*it)->add_child( this->nodes_.at(j) );
+                for ( auto it_i = nodes_.iterator(); it_i.good(); ++it_i){
+                        if (child_node1_str == (*it_i)->label) {
+                        (*it)->add_child( (*it_i) );
                         //dout << "node " << &this->nodes_[i] << " has child "<< &this->nodes_[j]<<endl;
                     }
                 }
+                //for ( size_t j = 0; j < nodes_.size(); j++){
+                    //if (child_node1_str == this->nodes_.at(j)->label) {
+                        //(*it)->add_child( this->nodes_.at(j) );
+                        ////dout << "node " << &this->nodes_[i] << " has child "<< &this->nodes_[j]<<endl;
+                    //}
+                //}
             }
             else { i_content_len++;}
         }    
@@ -312,18 +317,6 @@ void GraphBuilder::enumerate_internal_branch( Node * node ) {
 }
 
 
-/*! \brief Identify if its the start of the taxon name in a newick string, should be replaced by using (isalpha() || isdigit())  */
-bool start_of_tax_name( string in_str, size_t i ){
-    //bool start_bool = false;
-    //if ( (in_str[i]!='(' && in_str[i-1]=='(') || (in_str[i-1]==',' && in_str[i]!='(') || ( (in_str[i-1]==')') && ( in_str[i]!=')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) ) {
-        //start_bool=true;    
-    //}    
-    //return     start_bool;
-    if      (  in_str[i-1] == '('  &&   in_str[i] != '(' ) return true;
-    else if (  in_str[i-1] == ','  &&   in_str[i] != '(' ) return true; 
-    else if ( (in_str[i-1] == ')') && ( in_str[i] != ')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) return true;
-    else return false;
-}
 
 
 size_t GraphReader::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
@@ -352,50 +345,85 @@ size_t GraphBuilder::Parenthesis_balance_index_forwards( string &in_str, size_t 
 }
 
 
+void GraphBuilder::which_taxa_is_below(){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        Node* current_node = (*it);
+        if ( !current_node->is_tip() ) continue;
+        
+        size_t taxa_i = 0;
+        for ( taxa_i = 0 ; taxa_i < current_node->taxa_below.size(); taxa_i++){
+            if ( current_node->taxa_below[taxa_i] == 1 ) break;
+        }        
+        
+        while ( current_node->parent1() ){
+            current_node->parent1()->taxa_below[taxa_i] = 1;
+            current_node =  current_node->parent1() ;
+        }
+    }
+}
+
+
+void GraphBuilder::which_sample_is_below(){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        Node* current_node = (*it);
+        if ( !current_node->is_tip() ) continue;
+        
+        size_t taxa_i = 0;
+        for ( taxa_i = 0 ; taxa_i < current_node->samples_below.size(); taxa_i++){
+            if ( current_node->samples_below[taxa_i] == 1 ) break;
+        }        
+        
+        while ( current_node->parent1() ){
+            current_node->parent1()->samples_below[taxa_i] = 1;
+            current_node =  current_node->parent1() ;
+        }
+    }
+}
+
 /*! \brief rewrite node content of nodes */
 void GraphBuilder::rewrite_node_content(){
-    int highest_i = 0;
-    for ( size_t i = 0; i < this->nodes_.size(); i++ ){
-        if ( this->nodes_.at(i)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = i;}
+    size_t highest_i = 0;
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->num_descndnt > this->nodes_.at(highest_i)->num_descndnt ){ highest_i = it.node_index();}
     }
     
     this->nodes_.at(highest_i)->CalculateRank();
 
     for ( size_t rank_i = 1; rank_i <= this->nodes_.back()->rank(); rank_i++){
-        for ( size_t i = 0; i < this->nodes_.size() ; i++ ){
-            if ( this->nodes_.at(i)->rank() != rank_i ) continue;
+        for ( auto it = nodes_.iterator(); it.good(); ++it){
+            if ( (*it)->rank() != rank_i ) continue;
 
-            this->nodes_.at(i)->node_content = ( this->nodes_.at(i)->rank() == 1 ) ? this->nodes_.at(i)->label :
-                                                           this->rewrite_internal_node_content( i );
-        }    
+            (*it)->node_content = ( (*it)->rank() == 1 ) ? (*it)->label :
+                                                           this->rewrite_internal_node_content( (*it) );
+        }
     }
 }
 
 
-string GraphBuilder::rewrite_internal_node_content( size_t i ){
+string GraphBuilder::rewrite_internal_node_content( Node * node ){
     string new_node_content="(";
-    for (size_t child_i = 0; child_i < this->nodes_.at(i)->child.size(); child_i++ ){
-        string brchlen_str1 = to_string ( this->nodes_.at(i)->child[child_i]->brchlen1() );
-        if ( this->nodes_.at(i)->child[child_i]->node_content == this->nodes_.at(i)->child[child_i]->label ) {
+    for (size_t child_i = 0; child_i < node->child.size(); child_i++ ){
+        string brchlen_str1 = to_string ( node->child[child_i]->brchlen1() );
+        if ( node->child[child_i]->node_content == node->child[child_i]->label ) {
             //new_node_content += this->nodes_[i].child[child_i]->label+":" + to_string ( this->nodes_[i].child[child_i]->brchlen1() ) ;
-            new_node_content += this->nodes_.at(i)->child[child_i]->label+":" +  brchlen_str1;
+            new_node_content += node->child[child_i]->label+":" +  brchlen_str1;
         }
         else {            
             bool new_hybrid_node=false;
             string brchlen_str2;
-            for ( size_t node_ii=0; node_ii < i; node_ii++){
-                for ( size_t node_ii_child_i = 0; node_ii_child_i < this->nodes_.at(node_ii)->child.size(); node_ii_child_i++ ){
-                    if ( this->nodes_.at(node_ii)->child[node_ii_child_i]->node_content == this->nodes_.at(i)->child[child_i]->node_content){
+            for ( auto it = nodes_.iterator(); it.good(); ++it){
+                for ( size_t child_ii = 0; child_ii < (*it)->child.size(); child_ii++ ){
+                    if ( (*it)->child[child_ii]->node_content == node->child[child_i]->node_content){
                         new_hybrid_node=true;
-                        brchlen_str2 = to_string(this->nodes_.at(i)->child[child_i]->brchlen2() );
+                        brchlen_str2 = to_string(node->child[child_i]->brchlen2() );
                     break;}
                 }
                 if (new_hybrid_node){break;}
             }
-            new_node_content += new_hybrid_node ? this->nodes_.at(i)->child[child_i]->label+":" + brchlen_str2 : 
-                                                  this->nodes_.at(i)->child[child_i]->node_content + this->nodes_.at(i)->child[child_i]->label+":" +  brchlen_str1;
+            new_node_content += new_hybrid_node ? node->child[child_i]->label+":" + brchlen_str2 : 
+                                                  node->child[child_i]->node_content + node->child[child_i]->label+":" +  brchlen_str1;
         }
-        if ( child_i < this->nodes_.at(i)->child.size() - 1 ) new_node_content += ",";
+        if ( child_i < node->child.size() - 1 ) new_node_content += ",";
     }
     new_node_content += ")";
     return new_node_content;
@@ -403,9 +431,9 @@ string GraphBuilder::rewrite_internal_node_content( size_t i ){
 
 
 void GraphBuilder::check_isUltrametric(){
-    vector <Node*> remaining_node( this->nodes_.size(), 0 );
-    for ( size_t node_i = 0; node_i < this->nodes_.size(); node_i++ ){
-        remaining_node[node_i] = this->nodes_.at(node_i);
+    vector <Node*> remaining_node;//( this->nodes_.size(), 0 );
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        remaining_node.push_back( (*it) );
     }
     size_t rank_i = 1;
     size_t remaining_node_i=0;    
@@ -447,6 +475,85 @@ void GraphBuilder::check_isUltrametric(){
     }
 }
 
+
+string GraphBuilder::print_newick( Node * node ){
+    string tree_str;
+    if ( node->is_tip() ) tree_str = node->label ;
+    else {
+        tree_str = "(";
+        for ( size_t i = 0 ; i < node->child.size() ; i++ ){
+            tree_str += print_newick ( node->child[i] ) + ":" + to_string (node->child[i]->brchlen1() );
+            if ( i < node->child.size()-1 ) tree_str += ",";
+        }
+        tree_str += ")";
+    }
+    return tree_str;
+}
+
+
+/*! \brief Identify if its the start of the taxon name in a newick string, should be replaced by using (isalpha() || isdigit())  */
+bool start_of_tax_name( string in_str, size_t i ){
+    //bool start_bool = false;
+    //if ( (in_str[i]!='(' && in_str[i-1]=='(') || (in_str[i-1]==',' && in_str[i]!='(') || ( (in_str[i-1]==')') && ( in_str[i]!=')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) ) {
+        //start_bool=true;    
+    //}    
+    //return     start_bool;
+    if      (  in_str[i-1] == '('  &&   in_str[i] != '(' ) return true;
+    else if (  in_str[i-1] == ','  &&   in_str[i] != '(' ) return true; 
+    else if ( (in_str[i-1] == ')') && ( in_str[i] != ')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) return true;
+    else return false;
+}
+
+
+size_t end_of_label_or_bl( string &in_str, size_t i ){
+    for ( size_t j = i; j < in_str.size(); j++){
+        if      ( in_str[j+1] == ',' )    return j;
+        else if ( in_str[j+1] == ')' )    return j;
+        else if ( in_str[j+1] == ':' )    return j;
+        else if ( in_str[j+1] == ';' )    return j;
+        else continue;
+    }
+}
+
+    
+void readNextStringto( string &readto, int& argc_i, int argc_, char * const* argv_ ){
+    argc_i++;
+    if (argc_i >= argc_) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]); 
+    readto = std::string(argv_[argc_i]);
+    if ( readto[0] == '-' ) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*! \brief Remove interior nodes label of a string */
+string remove_interior_label(string in_str/*!< input newick form string */){
+    string out_str;
+    out_str=in_str;
+    
+    size_t found_bracket=out_str.find(')');
+    while ( found_bracket<out_str.size() ){
+        if ( isalpha(out_str[found_bracket+1]) || isdigit(out_str[found_bracket+1]) ){
+            size_t char_j = end_of_label_or_bl( out_str, found_bracket+1 );
+            out_str.erase(out_str.begin()+found_bracket+1, out_str.begin()+char_j+1);
+        }
+        found_bracket = out_str.find( ")",found_bracket+1 );
+    }
+    return out_str;
+}
+
+
+//string rm_one_child_root(string in_str){
+	//string out_str=tree_topo(in_str);
+	//size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
+	//size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
+	//if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
+		//return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
+	//}
+	//else{
+		//return in_str;
+	//}
+//}
 
 
 /////////////////////////////////////////// consider for removal
@@ -517,66 +624,3 @@ void GraphBuilder::rewrite_descendant(){    //check for coaleased tips(& sign in
     ////this->rewrite_node_clade();
     //this->init_node_clade();
 }
-
-string GraphBuilder::print_newick( Node * node ){
-    string tree_str;
-    if ( node->is_tip() ) tree_str = node->label ;
-    else {
-        tree_str = "(";
-        for ( size_t i = 0 ; i < node->child.size() ; i++ ){
-            tree_str += print_newick ( node->child[i] ) + ":" + to_string (node->child[i]->brchlen1() );
-            if ( i < node->child.size()-1 ) tree_str += ",";
-        }
-        tree_str += ")";
-    }
-    return tree_str;
-}
-
-
-/*! \brief Remove interior nodes label of a string */
-string remove_interior_label(string in_str/*!< input newick form string */){
-    string out_str;
-    out_str=in_str;
-    
-    size_t found_bracket=out_str.find(')');
-    while ( found_bracket<out_str.size() ){
-        if ( isalpha(out_str[found_bracket+1]) || isdigit(out_str[found_bracket+1]) ){
-            size_t char_j = end_of_label_or_bl( out_str, found_bracket+1 );
-            out_str.erase(out_str.begin()+found_bracket+1, out_str.begin()+char_j+1);
-        }
-        found_bracket = out_str.find( ")",found_bracket+1 );
-    }
-    return out_str;
-}
-
-
-size_t end_of_label_or_bl( string &in_str, size_t i ){
-    for ( size_t j = i; j < in_str.size(); j++){
-        if      ( in_str[j+1] == ',' )    return j;
-        else if ( in_str[j+1] == ')' )    return j;
-        else if ( in_str[j+1] == ':' )    return j;
-        else if ( in_str[j+1] == ';' )    return j;
-        else continue;
-    }
-}
-
-    
-void readNextStringto( string &readto, int& argc_i, int argc_, char * const* argv_ ){
-    argc_i++;
-    if (argc_i >= argc_) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]); 
-    readto = std::string(argv_[argc_i]);
-    if ( readto[0] == '-' ) throw std::invalid_argument(std::string("Not enough parameters when parsing options: ") + argv_[argc_i-1]);
-}
-
-
-//string rm_one_child_root(string in_str){
-	//string out_str=tree_topo(in_str);
-	//size_t first_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,0);
-	//size_t second_bck_parent_idx=Parenthesis_balance_index_forwards(out_str,1);
-	//if ( (first_bck_parent_idx-1)== second_bck_parent_idx){
-		//return in_str.substr(1,Parenthesis_balance_index_forwards(in_str,1))+in_str.substr(Parenthesis_balance_index_forwards(in_str,0)+1,in_str.size()-Parenthesis_balance_index_forwards(in_str,0)-1);
-	//}
-	//else{
-		//return in_str;
-	//}
-//}

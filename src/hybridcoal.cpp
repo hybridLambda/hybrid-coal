@@ -185,6 +185,8 @@ void HybridCoal::HybridCoal_core(){
 
 void HybridCoal::print(){
     Net net( this->sp_str );
+    net.which_taxa_is_below();
+    net.which_sample_is_below();
     net.print();
     
     Net copied_net(net);

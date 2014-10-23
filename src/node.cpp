@@ -107,6 +107,10 @@ void Node::print( bool is_Net ){
     for ( size_t i = 0; i < this->samples_below.size(); i++ ){
 		cout<<this->samples_below[i];
 	}
+    cout <<" ";
+    for ( size_t i = 0; i < this->taxa_below.size(); i++ ){
+		cout<<this->taxa_below[i];
+	}
 	//cout<<endl;
 }
 
@@ -135,6 +139,9 @@ void Node::CalculateRank(){
 		this->rank_ = child_max_rank + 1;
 	}
 }
+
+
+
 
 ///*! \brief Label a node if its a descendant of a hybrid node */
 //void Node::find_hybrid_descndnt(){

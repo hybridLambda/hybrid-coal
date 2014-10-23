@@ -162,14 +162,17 @@ void CoalGT::building_R_matrix( ){
 		this->R_matrix.push_back(R_matrix_row);
 	}
     
-	for (size_t i = 0; i < this->nodes_.size()-1; i++ ){
-		if ( this->nodes_.at(i)->is_tip()) continue;
-        for ( size_t j = 0; j < i; j++){
-            if ( this->nodes_.at(j)->is_tip() ) continue;
-            for ( size_t i_des = 0; i_des < this->nodes_.at(i)->taxa_below.size(); i_des++ ){
-                int des_diff = this->nodes_.at(i)->taxa_below[i_des] - this->nodes_.at(j)->taxa_below[i_des];
+    for ( auto i = nodes_.iterator(); i.good(); ++i){
+	//for ( size_t i = 0; i < this->nodes_.size()-1; i++ ){
+		if ( (*i)->is_tip()) continue;
+        auto j = nodes_.iterator();
+        for ( ; ; ++j){
+            if ( (*j)->next() == (*i) ) break;
+            if ( (*j)->is_tip() ) continue;
+            for ( size_t i_des = 0; i_des < (*i)->taxa_below.size(); i_des++ ){
+                int des_diff = (*i)->taxa_below[i_des] - (*j)->taxa_below[i_des];
                 if ( des_diff < 0 ){
-                    this->R_matrix[this->nodes_.at(i)->e_num()-1][this->nodes_.at(j)->e_num()-1]=0;
+                    this->R_matrix[(*i)->e_num()-1][(*j)->e_num()-1]=0;
                     break;
                 }
             }
@@ -269,7 +272,7 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
 
     size_t sp_max_enum = sp_net.nodes_.back()->e_num();
 
-    for (size_t i_coal_hist=0;i_coal_hist<valid_coal_hist.size();i_coal_hist++){	
+    for (size_t i_coal_hist = 0; i_coal_hist < valid_coal_hist.size(); i_coal_hist++){
         vector <int> num_enter_i_coal;
         vector <int> num_out_i_coal;
         vector <int> num_coal_in_branch_i_coal;

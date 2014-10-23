@@ -69,9 +69,14 @@ class CoalST: public GraphBuilder {
     void build_gijoe();
     bool print_gijoemat();
     void building_S_matrix();
-    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ dout << "Constrcut species tree: " << sp_str << endl; };
+    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
+        dout << "Constrcut species tree: " << sp_str << endl; 
+        this->which_taxa_is_below();
+        this->which_sample_is_below();
+    }
     ~CoalST(){};
 };
+
 
 
 class CoalGT: public GraphBuilder {
@@ -98,6 +103,10 @@ class CoalGT: public GraphBuilder {
     void build_coal_hist( );
     
     public:
-        CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){ dout << "Constrcut species network: " << gt_str << endl; };
+        CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){ 
+            dout << "Constrcut species network: " << gt_str << endl; 
+            this->which_taxa_is_below();
+            this->which_sample_is_below();
+        }
         ~CoalGT(){};
 };
