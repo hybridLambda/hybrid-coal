@@ -20,42 +20,61 @@
 */
 
 #include "net.hpp"
-#include <map>
 
-
-//Tree::Tree( Tree &copied_Tree ){
-    //std::map < size_t, Node* > node_mapping;  
-    ////node_mapping[NULL] = NULL;
-    ////assert ( copied_Tree.print_all_node_dout () );
-    //for ( size_t node_i = 0; node_i < copied_Tree.nodes_.size(); node_i++ ) {
-        //Node *node = new Node( copied_Tree.nodes_[node_i] );
-        //node_mapping[node_i] = node;
-        //this->nodes_.push_back( *node );
-    //}
-    
-    //for ( size_t node_i = 0; node_i < copied_Tree.nodes_.size(); node_i++ ) {
-        ////if (!(*it)->is_root()) (*it)->set_parent(node_mapping[(*it)->parent()]);
-        
-        //if ( copied_Tree.nodes_[node_i].parent1 ) 
-            //this->nodes_[node_i].parent1 = node_mapping[ this->nodes_[node_i].parent1 ];
-        ////for ( size_t child_i = 0; child_i < ){
+TreeReader::TreeReader ( string net_str ){
+    size_t found_bl = net_str.find(':');
+    for ( size_t i_str_len = 1; i_str_len < net_str.size(); ){
+        if ( net_str[i_str_len]=='e' && (net_str[i_str_len+1]=='-' || net_str[i_str_len+1]=='+' ) ){
+            i_str_len++;
+        }
+        else if ( start_of_tax_name(net_str,i_str_len) ){
+            size_t str_start_index = i_str_len;
+            string label = extract_label( net_str, i_str_len );
+            this->node_labels.push_back(label);
             
-        ////}
-        ////(*it)->set_first_child(node_mapping[(*it)->first_child()]);
-        ////(*it)->set_second_child(node_mapping[(*it)->second_child()]);
-    //}
-     //assert ( this->print_all_node_dout () );   
-//}
+            string node_content = ( net_str[str_start_index-1]==')' ) ? extract_One_node_content ( net_str, str_start_index-1 )
+                                                                      : label ;
+            node_contents.push_back(node_content);
+
+            i_str_len += label.size();
+
+            string brchlen;
+            if ( found_bl != string::npos ){
+                size_t found=min(min(net_str.find(",",i_str_len+1),net_str.find(")",i_str_len+1)),net_str.size());
+                brchlen = net_str.substr(i_str_len+1,found-i_str_len-1);                    
+            }
+            found_bl = net_str.find(":", found_bl+1);
+            brchlens.push_back(brchlen);
+        }
+        else {
+            i_str_len++;
+        }
+
+    }
+    
+}
 
 
+string TreeReader::extract_label( string &in_str, size_t i ){
+    //size_t j=end_of_label_or_bl(in_str, i);
+    //cout<<"i="<<i<<", j="<<j<<endl;
+    string label( in_str.substr ( i , end_of_label_or_bl ( in_str, i ) + 1-i ) );
+    return label;
+}
+
+
+string TreeReader::extract_One_node_content( string &in_str, size_t back_parenthesis_index ){
+    size_t front_parenthesis_index = Parenthesis_balance_index_backwards( in_str, back_parenthesis_index );
+    return in_str.substr ( front_parenthesis_index, back_parenthesis_index - front_parenthesis_index + 1);
+}
 
 
 /*! \brief Construct Net object from a (extended) Newick string */
 Tree::Tree(string old_string /*! input (extended) newick form string */){
-    if (old_string.size()==0){
-        descndnt.clear();
-        tax_name.clear();
-        nodes_.clear();
+    if ( old_string.size() == 0 ){
+        //descndnt.clear();
+        //tax_name.clear();
+        //nodes_.clear();
         return;
     }
     
@@ -64,73 +83,9 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     this->check_labeled( old_string );
     // check & sign, this should be illigal for hybrid-Lambda, 
     
-        vector<string> labels;
-        vector<string> node_contents;
-        vector<string> brchlens;
-        size_t found_bl = net_str.find(':');
-        for (size_t i_str_len=1;i_str_len<net_str.size();){
-            if (net_str[i_str_len]=='e' && (net_str[i_str_len+1]=='-' || net_str[i_str_len+1]=='+')){
-                i_str_len++;
-            }
-            else{
-                if ( start_of_tax_name(net_str,i_str_len) ){
-                    size_t str_start_index = i_str_len;
-                    //string label = extract_label(net_str,i_str_len);
-                    size_t end_index = end_of_label_or_bl(net_str, i_str_len);//end_of_label_or_bl(in_str, i)
-                    string label = net_str.substr(i_str_len,end_index+1-i_str_len);
-                    labels.push_back(label);
-
-                    string node_content;
-                    if ( net_str[str_start_index-1]==')' ){
-                        size_t rev_dummy_i = Parenthesis_balance_index_backwards( net_str, str_start_index-1 );
-                        size_t substr_len = str_start_index-rev_dummy_i;
-                        node_content = net_str.substr(rev_dummy_i, substr_len );
-                    }
-                    else {
-                        node_content=label;
-                    }
-                    i_str_len += label.size();
-
-                    node_contents.push_back(node_content);
-                    string brchlen;
-                    if ( found_bl != string::npos ){
-                        size_t found=min(min(net_str.find(",",i_str_len+1),net_str.find(")",i_str_len+1)),net_str.size());
-                        brchlen = net_str.substr(i_str_len+1,found-i_str_len-1);                    
-                    }
-                    found_bl = net_str.find(":", found_bl+1);
-                    brchlens.push_back(brchlen);
-                }
-                else {
-                    i_str_len++;
-                }
-            }
-        }
-            
-        //int label_counter = brchlens.size();
-        for ( size_t new_i_label=0 ; new_i_label < brchlens.size(); new_i_label++ ){
-            Node * empty_node = new Node();
-            empty_node->label = labels[new_i_label];
-            empty_node->node_content = node_contents[new_i_label];
-            empty_node->set_brchlen1( strtod(brchlens[new_i_label].c_str(), NULL) );
-            nodes_.add(empty_node);
-        }
-
-        for ( size_t i = 1; i < nodes_.size()-1; i++ ){
-            size_t j;
-            for ( j = i+1; j < nodes_.size()-1; j++ ){
-                if ( nodes_.at(j)->label == nodes_.at(i)->label ){
-                    cout << nodes_.at(j)->label <<" "<< nodes_.at(j)->node_content <<endl;
-                    if ( nodes_.at(j)->node_content[0] == '(' ){
-                        
-                        nodes_.at(i)->node_content = nodes_.at(j)->node_content;
-                    }
-                    nodes_.at(i)->set_brchlen2 ( nodes_.at(j)->brchlen1() );
-                    break;
-                }
-            }
-            if ( nodes_.at(j)->label == nodes_.at(i)->label ) nodes_.remove(nodes_.at(j));
-        }
-        
+    this->initialize_nodes();
+    this->remove_repeated_hybrid_node();
+    
     this->extract_tax_and_tip_names();
 
     this->connect_graph();
@@ -143,9 +98,51 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     this->init_node_clade();
     this->rewrite_descendant();
     this->check_isNet();
-    this->check_isUltrametric();
+    this->check_isUltrametric(); // The ultrametric function is not very useful here. As we dont actually need it in hybrid-coal, hybridlambda yes....
     //dout<<"Net constructed"<<endl;
 }
+
+
+void Tree::init(){
+    this->current_enum_ = 0;
+    this->is_Net = false;
+    this->is_ultrametric = true;
+}
+
+
+// Try to use string iterator for this...
+void Tree::initialize_nodes(){
+
+    TreeReader Tree_info ( net_str );
+    
+    for ( size_t i = 0 ; i < Tree_info.brchlens.size(); i++ ){
+        Node * empty_node = new Node();
+        empty_node->label = Tree_info.node_labels[i];
+        empty_node->node_content = Tree_info.node_contents[i];
+        empty_node->set_brchlen1( strtod(Tree_info.brchlens[i].c_str(), NULL) );
+        nodes_.add(empty_node);
+    }
+}
+
+void Tree::remove_repeated_hybrid_node(){
+    for ( size_t i = 1; i < this->nodes_.size()-1; i++ ){
+        size_t j;
+        for ( j = i+1; j < this->nodes_.size()-1; j++ ){
+            if ( this->nodes_.at(j)->label != this->nodes_.at(i)->label ) continue;
+            
+            dout << "Remove " << this->nodes_.at(j)->label <<" "<< this->nodes_.at(j)->node_content <<endl;
+            if ( this->nodes_.at(j)->node_content[0] == '(' ){                
+                this->nodes_.at(i)->node_content = this->nodes_.at(j)->node_content;
+            }
+            this->nodes_.at(i)->set_brchlen2 ( this->nodes_.at(j)->brchlen1() );
+            break;
+        }
+        
+        if ( this->nodes_.at(j)->label == this->nodes_.at(i)->label ) this->nodes_.remove(this->nodes_.at(j));
+    }
+}
+
+
 
 
 //void Tree::init_descendant(){
@@ -188,13 +185,6 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
         //nodes_[i].clade.erase(nodes_[i].clade.size()-1,1);
     //}
 //}
-
-string Tree::extract_label(string &in_str, size_t i){
-    //size_t j=end_of_label_or_bl(in_str, i);
-    //cout<<"i="<<i<<", j="<<j<<endl;
-    string label(in_str.substr(i,end_of_label_or_bl(in_str, i)+1-i));
-    return label;
-}
 
 
 
@@ -324,7 +314,7 @@ void Tree::check_labeled( string in_str ){
 
 void Tree::check_isNet(){ //false stands for tree, true stands for net_work
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( !(*it)->parent2 ) continue;
+        if ( (*it)->parent2() == NULL ) continue;
         this->is_Net = true;
         return;
     }
@@ -434,7 +424,7 @@ void Tree::enumerate_internal_branch( Node * node ) {
 
 
 /*! \brief Identify if its the start of the taxon name in a newick string, should be replaced by using (isalpha() || isdigit())  */
-bool Tree::start_of_tax_name( string in_str, size_t i ){
+bool start_of_tax_name( string in_str, size_t i ){
     //bool start_bool = false;
     //if ( (in_str[i]!='(' && in_str[i-1]=='(') || (in_str[i-1]==',' && in_str[i]!='(') || ( (in_str[i-1]==')') && ( in_str[i]!=')' || in_str[i]!=':' || in_str[i]!=',' || in_str[i]!=';' ) ) ) {
         //start_bool=true;    
@@ -447,7 +437,7 @@ bool Tree::start_of_tax_name( string in_str, size_t i ){
 }
 
 
-size_t Tree::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
+size_t TreeReader::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
     size_t j = i;
     int num_b = 0;
     for ( ; j > 0 ; j-- ){

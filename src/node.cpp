@@ -21,14 +21,27 @@
 
 #include "node.hpp"
 
+Node::Node ( size_t max_of_descendant, // number of tip
+             string label,
+             string content,
+             double bl,
+             bool tip ){
+    
+}
+
+void Node::init(){
+    
+}
+
+
 Node::Node(){
 	label="";
 	node_content="";
 	//num_child=0;
 	num_descndnt=0;
 	num_descndnt_interior=0;
-	this->parent1 = NULL;
-	this->parent2 = NULL;
+	this->parent1_ = NULL;
+	this->parent2_ = NULL;
     this->previous_ = NULL;
     this->next_     = NULL;
 	this->brchlen1_ = 0.0;
@@ -52,12 +65,12 @@ void Node::print( bool is_Net ){
 	if ( is_Net ) cout << setw(6) << this->hybrid();
     if ( is_Net ) cout << setw(8) << descndnt_of_hybrid;
 	cout << setw(5) << tip_bool;
-    if (this->parent1) cout << setw (11) << (parent1);//if (this->parent1) cout << setw (11) << (parent1->label);
+    if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );//if (this->parent1) cout << setw (11) << (parent1->label);
     else cout << "           ";
 	cout << setw (12) << this->height();
 	cout << setw (12) << this->brchlen1();
     if (is_Net){
-        if (this->parent2) cout << setw (11) << (parent2); //if (this->parent2) cout << setw (11) << (parent2->label);
+        if ( this->parent2() != NULL) cout << setw (11) << ( this->parent2() ); //if (this->parent2) cout << setw (11) << (parent2->label);
         else cout << "           ";
         cout<<setw (12) << this->brchlen2();
     }
@@ -77,11 +90,10 @@ void Node::print( bool is_Net ){
 /*! \brief Add child node to parent node */
 void Node::add_child( Node *child_node /*! pointer to the child node*/){
     this->child.push_back(child_node);
-	if ( child_node->parent1 ){
-		child_node->parent2 = (this);
-		//child_node->hybrid = true;
+	if ( child_node->parent1() != NULL ){
+		child_node->set_parent2 ( this );
 	}
-	else child_node->parent1 = (this);
+	else child_node->set_parent1 ( this );
 } 
 
 

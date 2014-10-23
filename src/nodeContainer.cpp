@@ -41,14 +41,19 @@ NodeContainer::NodeContainer( NodeContainer &nc) {
     for ( auto it = nc.iterator(); it.good(); ++it ) {
         Node *node = new Node(**it);
         node_mapping[*it] = node;
+        node->child.clear(); // clear child nodes
         this->add(node);
     }
     
-    for ( auto it = iterator(); it.good(); ++it ) {
-        if ( (*it)->parent1 != NULL ) (*it)->parent1 = node_mapping[(*it)->parent1];
-        if ( (*it)->parent2 != NULL ) (*it)->parent2 = node_mapping[(*it)->parent2];
-        //(*it)->set_first_child(node_mapping[(*it)->first_child()]);
-        //(*it)->set_second_child(node_mapping[(*it)->second_child()]);
+    for ( auto it = iterator(); it.good(); ++it ) {       
+        if ( (*it)->parent1() != NULL ) {
+            (*it)->set_parent1 ( node_mapping[(*it)->parent1()] );
+            (*it)->parent1()->child.push_back( (*it) );
+        }
+        if ( (*it)->parent2() != NULL ) {
+            (*it)->set_parent2 ( node_mapping[(*it)->parent2()] );
+            (*it)->parent2()->child.push_back( (*it) );
+        }
     }
 
     //unsorted_node_ = node_mapping[nc.unsorted_node_];

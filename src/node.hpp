@@ -44,6 +44,9 @@ using namespace std;
 
 enum NAMETYPE { TAXA, TIP };
 
+// use ChildContainer as a new class for the child nodes? we will need to include pointers to indicate the previous child and the next child.
+//class NodeContainer;
+
 class Node {
     friend class NodeIterator;
     friend class NodeContainer;
@@ -57,8 +60,8 @@ class Node {
 	public:
         ~Node();
         // Getters and Setters
-        double height() const { return this->height_;}
-        void set_height ( double h ){ this->height_ = h; }
+        double height() const { return this->height_;} // This has no use for hybrid-coal
+        void set_height ( double h ){ this->height_ = h; }// This has no use for hybrid-coal
         
         double brchlen1() const { return this->brchlen1_;}
         void set_brchlen1 ( double bl ){ this->brchlen1_ = bl; }
@@ -69,7 +72,7 @@ class Node {
         string label; /*!< \brief String label of a node, each node has unique label */
         //size_t node_index; /*!< \brief node index in the array, \todo use this more often!!!*/
         string node_content; /*!< \brief node content, the subtree string at this node */
-        bool hybrid() const { return (this->parent2) ? true : false;} /*!< \brief Hybrid node only, indicator of a hybrid node */
+        bool hybrid() const { return ( this->parent2() != NULL ) ;} /*!< \brief Hybrid node only, indicator of a hybrid node */
         
     private:    
         // Members
@@ -81,9 +84,9 @@ class Node {
         double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
         //vector<int> descndnt;
-        vector<Node*> descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
-        vector<Node*> child; /*!< \brief list of pointers to its child nodes */	
-        Node* parent1; /*!< \brief pointer to its parent node. */
+        vector < Node* > descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
+        vector < Node* > child; /*!< \brief list of pointers to its child nodes */	
+        Node* parent1_; /*!< \brief pointer to its parent node. */
         Node* previous_;
         Node* next_;
         //Node* parent1_() const { return this->parent1; }
@@ -92,13 +95,13 @@ class Node {
         
         int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
         int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
-        vector <double> path_time; 
-        double height_; /*!< \brief distance to the bottom of the tree */
+        //vector <double> path_time; 
+        double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
             
         bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
         bool tip_bool; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
         
-        Node* parent2; /*!< \brief Hybrid node only, pointer to its second parent node. */
+        Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
         //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
         
         string name; /*!< \brief Name of a node, this is not unique for nodes. e.g. if its label is A_1, name is A */
@@ -118,6 +121,12 @@ class Node {
         size_t rank() const { return this->rank_; }
         
         bool tip() const { return this->tip_bool; }
+        
+        Node* parent1() const { return this->parent1_ ; }
+        void set_parent1 ( Node * node ) { this->parent1_ = node; }
+
+        Node* parent2() const { return this->parent2_ ; }
+        void set_parent2 ( Node * node ) { this->parent2_ = node; }
 
         // NodeIterator
         Node* previous() const { return this->previous_ ; }

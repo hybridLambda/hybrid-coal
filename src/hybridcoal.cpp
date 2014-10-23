@@ -193,49 +193,50 @@ void HybridCoal::print(){
 
 
 void print_example(){
-	cout<<"Examples:"<<endl;
-	cout<<"hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'"<<endl;	
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B);'"<<endl;	
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -maple"<<endl;	
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -maple -latex"<<endl;	
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -branch"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -label"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -dot"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
-	cout<<"hybrid-coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
-    cout<<"./hybrid-coal_dbg -sp trees/7_tax_sp_james02.tre -gt trees/7_tax_gt_james"<<endl;
-	cout<<endl;	
+    cout << "Examples:" 
+         << endl 
+         << endl;
+    cout << "hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'"<<endl;	
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B);'"<<endl;	
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -maple"<<endl;	
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -maple -latex"<<endl;	
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -plot"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -branch"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -label"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -dot"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
+	cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
+    cout << "./hybrid-coal_dbg -sp trees/7_tax_sp_james02.tre -gt trees/7_tax_gt_james"<<endl;
+	cout << endl;	
 }
 
 
 void print_option(){
-	cout<<setw(20)<<"-h or -help"<<"  --  "<<"Help. List the following content."<<endl;
-	cout<<setw(20)<<"-gt STR"<<"  --  "<<"Input the gene tree string string through command line or a file."<<endl;
-	cout<<setw(20)<<"-sp STR"<<"  --  "<<"Input the species network/tree string through command line or a file."<<endl;
-    cout<<setw(20)<<"-maple [option]"<<"  --  "<<"Generate a Maple executeable script file to calculate the gene tree probabilities given species networks."<<endl;
-    cout<<setw(20)<<"[-symb]"<<"  --  "<<"To enable the Maple script calculate the symbolic gene tree probabilities."<<endl;
-	cout<<setw(20)<<"-latex"<<"  -- Generate the coalescent history of a gene tree within a species network."<<endl;
-	cout<<setw(20)<<"-gtopo"<<"  -- To generate the gene tree topologies of a given set of taxa."<<endl;
+    cout << endl 
+         << "hybrid-coal " << VERSION 
+         << endl 
+         << endl;
+    cout << "Usage:" 
+         << endl;
+	cout << setw(20) << "-h or -help"         << "  --  " << "Help. List the following content."<<endl;
+	cout << setw(20) << "-gt STR"             << "  --  " << "Input the gene tree string string through command line or a file."<<endl;
+	cout << setw(20) << "-sp STR"             << "  --  " << "Input the species network/tree string through command line or a file."<<endl;
+    cout << setw(20) << "-maple [option]"     << "  --  " << "Generate a Maple executeable script file to calculate the gene tree probabilities given species networks."<<endl;
+    cout << setw(20) << "[-symb]"             << "  --  " << "To enable the Maple script calculate the symbolic gene tree probabilities."<<endl;
+	cout << setw(20) << "-latex"              << "  --  " << "Generate the coalescent history of a gene tree within a species network."<<endl;
+	cout << setw(20) << "-gtopo"              << "  --  " << "To generate the gene tree topologies of a given set of taxa."<<endl;
 	//cout<<"-sub -- Produce file sub_networks, which contanis all sub trees of a species network"<<endl;
 
-	cout<<setw(20)<<"-plot/-dot [option]"<<"  --  "<<"Use LaTEX(-plot) or Dot (-dot) to draw the input (defined by -spcu) network(tree)."<<endl;
-	cout<<setw(20)<<"    [-branch]"<<"  --  "<<"Branch lengths will be labelled in the figure."<<endl;
-	cout<<setw(20)<<"-o STR "<<"  --  "<<"Specify the file name prefix of the output."<<endl;
+	cout << setw(20) << "-plot/-dot [option]" << "  --  " << "Use LaTEX(-plot) or Dot (-dot) to draw the input (defined by -spcu) network(tree)."<<endl;
+	cout << setw(20) << "    [-branch]"       << "  --  " << "Branch lengths will be labelled in the figure."<<endl;
+	cout << setw(20) << "-o STR "             << "  --  " << "Specify the file name prefix of the output."<<endl;
 }
 
 
 /*! \brief hybrid-coal help file*/
 void print_help(){
-	cout<<endl;
-	cout<<endl;
-	cout<<"*****************************************************************"<<endl;
-	cout<<"*                      hybrid-coal beta 0.1                     *"<<endl;
-	cout<<"*                         Author: Joe ZHU                       *"<<endl;
-	cout<<"*****************************************************************"<<endl;
-	cout<<endl<<endl;
 	print_option();
 	print_example();
     exit (EXIT_SUCCESS);

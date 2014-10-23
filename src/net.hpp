@@ -28,7 +28,24 @@
 
 /*! \brief Network class*/
 
-class Net;
+class TreeReader{
+    friend class Tree;
+    TreeReader( string net_str );
+    ~TreeReader(){ }
+    
+    // pre-process variables, this can probabily go to a seperate class just for tree building...
+    vector < string > node_labels;
+    vector < string > node_contents;
+    vector < string > brchlens;
+    
+        size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
+        string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
+        string extract_label(string &in_str, size_t i);
+
+};
+
+bool start_of_tax_name(string in_str, size_t i);
+
 
 class Tree{
     friend class Net;
@@ -44,16 +61,10 @@ class Tree{
         
         size_t first_coal_rank();
         size_t current_enum_;
-        void init(){
-            this->current_enum_ = 0;
-            this->is_Net = false;
-            this->is_ultrametric = true;
-            }
+        void init();
 
-        bool start_of_tax_name(string in_str, size_t i);
-        size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
         size_t Parenthesis_balance_index_forwards( string &in_str, size_t i );
-        
+
         void check_Parenthesis(string &in_str);
         void check_labeled( string in_str );
         
@@ -78,27 +89,29 @@ class Tree{
         
         vector< valarray <int> > descndnt;
         vector< valarray <int> > samples_below;
-        vector<string> tip_name;
 
-
+        
         bool is_Net_() const { return this->is_Net ; }
-        string extract_label(string &in_str, size_t i);
         void print();
         bool print_all_node_dout();
     
 
-        //Tree (){ this->init(); }
-        Tree(string Tree_str);
+        Tree( string Tree_str );
+        void initialize_nodes();
+        void remove_repeated_hybrid_node();
+
+
         ~Tree(){};
-                
+        vector<string> tip_name;
         vector <string> tax_name;
+        
         bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
         bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
         
         NodeContainer nodes_;
+        
     public:
-        NodeContainer *nodes() { return &(this->nodes_); }
-        //vector < Node > nodes_;  /*!< \brief vector of nodes */
+        NodeContainer *nodes() { return &(this->nodes_); } /*!< \brief array of nodes */
         void rewrite_node_content();
         string print_newick( Node * node );
 };

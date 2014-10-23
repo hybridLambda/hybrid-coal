@@ -29,12 +29,12 @@ bool Node::print_dout( bool is_Net ){
 	dout << setw(5) << tip_bool;
     //if (this->parent1) dout << setw (11) << (parent1->label);
     //else dout << "           ";
-    if (this->parent1) dout << setw (11) << (parent1); //if (this->parent1) dout << setw (11) << (this->parent1_());
+    if ( this->parent1() != NULL ) dout << setw (11) << ( this->parent1() ); //if (this->parent1) dout << setw (11) << (this->parent1_());
     else dout << "           ";
 	dout << setw (6) << this->height();
 	dout << setw (12) << this->brchlen1();
     if (is_Net){
-        if (this->parent2) dout << setw (11) << (parent2->label);
+        if ( this->parent2() != NULL ) dout << setw (11) << ( this->parent2()->label );
         else dout << "           ";
         dout<<setw (12) << this->brchlen2();
     }
