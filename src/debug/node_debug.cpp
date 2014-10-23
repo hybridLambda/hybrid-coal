@@ -26,7 +26,7 @@ bool Node::print_dout( bool is_Net ){
     dout << setw(12) << this;
 	if ( is_Net ) dout << setw(6) << this->hybrid();
     if ( is_Net ) dout << setw(8) << descndnt_of_hybrid;
-	dout << setw(5) << tip_bool;
+	dout << setw(5) << this->is_tip();
     //if (this->parent1) dout << setw (11) << (parent1->label);
     //else dout << "           ";
     if ( this->parent1() != NULL ) dout << setw (11) << ( this->parent1() ); //if (this->parent1) dout << setw (11) << (this->parent1_());

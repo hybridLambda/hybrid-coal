@@ -38,10 +38,13 @@ class TreeReader{
     vector < string > node_contents;
     vector < string > brchlens;
     
-        size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
-        string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
-        string extract_label(string &in_str, size_t i);
+    vector <string> tip_name; 
+    vector <string> tax_name;
 
+    size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
+    string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
+    string extract_label(string &in_str, size_t i);
+    void extract_tax_and_tip_names();
 };
 
 bool start_of_tax_name(string in_str, size_t i);
@@ -54,7 +57,8 @@ class Tree{
     friend class HybridCoal;
     friend class Frequency;
     friend class Figure;
-    private:        
+    private:
+        TreeReader * Tree_info;
         string label_interior_node(string in_str);
         //void enumerate_internal_branch( Node &node );
         void enumerate_internal_branch( Node *node );
@@ -87,8 +91,8 @@ class Tree{
         string net_str; /*!< \brief species network string \todo this is new!!!*/
         size_t max_rank;
         
-        vector< valarray <int> > descndnt;
-        vector< valarray <int> > samples_below;
+        //vector< valarray <int> > descndnt;
+        //vector< valarray <int> > samples_below;
 
         
         bool is_Net_() const { return this->is_Net ; }
@@ -102,7 +106,7 @@ class Tree{
 
 
         ~Tree(){};
-        vector<string> tip_name;
+        vector <string> tip_name;
         vector <string> tax_name;
         
         bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */

@@ -25,6 +25,7 @@
 #include <string>
 #include <cassert>
 #include <stdexcept>
+#include <valarray>
 
 using namespace std;
 
@@ -84,6 +85,7 @@ class Node {
         double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
         //vector<int> descndnt;
+        valarray <int> descendant;
         vector < Node* > descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
         vector < Node* > child; /*!< \brief list of pointers to its child nodes */	
         Node* parent1_; /*!< \brief pointer to its parent node. */
@@ -99,7 +101,8 @@ class Node {
         double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
             
         bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-        bool tip_bool; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
+        bool tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
+        bool is_tip() const { return this->tip_ ;}
         
         Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
         //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
@@ -120,7 +123,7 @@ class Node {
 
         size_t rank() const { return this->rank_; }
         
-        bool tip() const { return this->tip_bool; }
+        //bool tip() const { return this->tip_bool; }
         
         Node* parent1() const { return this->parent1_ ; }
         void set_parent1 ( Node * node ) { this->parent1_ = node; }
@@ -139,13 +142,20 @@ class Node {
         bool is_last()  const { return( this->next_ == NULL ); }
         
         // Methods    
-        Node(); /*!< \brief Initialize Node class*/
-        
+        //Node (); /*!< \brief Initialize Node class*/
+        Node ( size_t max_of_descendant, // number of tip
+             string label,
+             string content,
+             double bl,
+             bool tip );
+             
+             
+        void init();
         void add_child( Node *child_node /*! pointer to the child node*/);
         void CalculateRank();
         void print( bool is_Net = false );
         bool print_dout( bool is_Net = false );
-        void find_tip();
+        //void find_tip();
         void find_hybrid_descndnt();
         bool find_descndnt ( string &name, NAMETYPE type );
         

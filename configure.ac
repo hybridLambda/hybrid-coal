@@ -1,4 +1,4 @@
-AC_INIT([hybrid-coal],[beta],[sha.joe.zhu@gmail.com])
+AC_INIT([hybrid-coal],[beta.v0.1],[sha.joe.zhu@gmail.com])
 #AC_INIT([hybrid_sim],esyscmd([sh -c "date \"+%Y%m%d\" | tr -d '\n'"]),[joe.zhu@pg.canterbury.ac.nz])
 dnl AC_CONFIG_SRCDIR([simu.c])
 

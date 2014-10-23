@@ -49,9 +49,9 @@ TreeReader::TreeReader ( string net_str ){
         else {
             i_str_len++;
         }
-
     }
     
+    this->extract_tax_and_tip_names();
 }
 
 
@@ -85,11 +85,10 @@ Tree::Tree(string old_string /*! input (extended) newick form string */){
     
     this->initialize_nodes();
     this->remove_repeated_hybrid_node();
-    
-    this->extract_tax_and_tip_names();
+    //this->extract_tax_and_tip_names();
 
     this->connect_graph();
-    this->nodes_.back()->find_tip();
+    //this->nodes_.back()->find_tip();
     this->nodes_.back()->find_hybrid_descndnt();
     this->nodes_.back()->CalculateRank();
     this->max_rank = nodes_.back()->rank();    
@@ -113,16 +112,21 @@ void Tree::init(){
 // Try to use string iterator for this...
 void Tree::initialize_nodes(){
 
-    TreeReader Tree_info ( net_str );
+    this->Tree_info = new TreeReader ( net_str );
     
-    for ( size_t i = 0 ; i < Tree_info.brchlens.size(); i++ ){
-        Node * empty_node = new Node();
-        empty_node->label = Tree_info.node_labels[i];
-        empty_node->node_content = Tree_info.node_contents[i];
-        empty_node->set_brchlen1( strtod(Tree_info.brchlens[i].c_str(), NULL) );
-        nodes_.add(empty_node);
+    for ( size_t i = 0 ; i < Tree_info->brchlens.size(); i++ ){
+        Node * node = new Node ( Tree_info->tip_name.size(),
+             Tree_info->node_labels[i],
+             Tree_info->node_contents[i],
+             strtod( Tree_info->brchlens[i].c_str(), NULL),
+             Tree_info->node_labels[i] == Tree_info->node_contents[i] );
+        this->nodes_.add ( node );
     }
+    this->tax_name = Tree_info->tax_name;
+    this->tip_name = Tree_info->tip_name;
+    delete Tree_info;
 }
+
 
 void Tree::remove_repeated_hybrid_node(){
     for ( size_t i = 1; i < this->nodes_.size()-1; i++ ){
@@ -187,36 +191,58 @@ void Tree::remove_repeated_hybrid_node(){
 //}
 
 
-
-void Tree::extract_tax_and_tip_names(){        
-    for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->label != (*it)->node_content) continue;
-        if ( (*it)->label.find("_") > 0 ){
-            //multi_label_bool=true;
-            (*it)->name = (*it)->label.substr(0,(*it)->label.find("_"));
-            //cout<<nodes_[i].name<<endl;
-            bool new_tax_bool=true;
+void TreeReader::extract_tax_and_tip_names(){
+    for ( size_t i = 0; i < node_labels.size(); i++ ){
+        if ( node_labels[i] != node_contents[i]) continue;         // skip interior nodes
+        if ( node_labels[i].find("#") != string::npos ) continue;  // skip hybrid nodes
+        if ( node_labels[i].find("_") > 0 ){
+            string node_name = node_labels[i].substr( 0, node_labels[i].find("_"));
+            bool new_tax_bool = true;
             for ( size_t tax_i = 0; tax_i < tax_name.size(); tax_i++ ){
-                if (tax_name[tax_i] == (*it)->name){
+                if ( tax_name[tax_i] == node_name ){
                     new_tax_bool=false;
                     break;
                 }
             }
-            if ( new_tax_bool ){
-                tax_name.push_back( (*it)->name);
-            }
-            //cout<<tax_name.back()<<endl;
+            if ( new_tax_bool ) tax_name.push_back( node_name );
+        } else{
+            tax_name.push_back( node_labels[i] );
         }
-        else{
-            tax_name.push_back( (*it)->label);
-        }
-        tip_name.push_back( (*it)->label);
+        tip_name.push_back( node_labels[i] );
     }
     sort(tax_name.begin(), tax_name.end());
     sort(tip_name.begin(), tip_name.end());
-    //cout << " tax_name.size() = "<<tax_name.size()<<endl;
-    //cout << " tip_name.size() = "<<tax_name.size()<<endl;
 }
+
+//void Tree::extract_tax_and_tip_names(){        
+    //for ( auto it = nodes_.iterator(); it.good(); ++it){
+        //if ( (*it)->label != (*it)->node_content) continue;
+        //if ( (*it)->label.find("_") > 0 ){
+            ////multi_label_bool=true;
+            //(*it)->name = (*it)->label.substr(0,(*it)->label.find("_"));
+            ////cout<<nodes_[i].name<<endl;
+            //bool new_tax_bool=true;
+            //for ( size_t tax_i = 0; tax_i < tax_name.size(); tax_i++ ){
+                //if (tax_name[tax_i] == (*it)->name){
+                    //new_tax_bool=false;
+                    //break;
+                //}
+            //}
+            //if ( new_tax_bool ){
+                //tax_name.push_back( (*it)->name);
+            //}
+            ////cout<<tax_name.back()<<endl;
+        //}
+        //else{
+            //tax_name.push_back( (*it)->label);
+        //}
+        //tip_name.push_back( (*it)->label);
+    //}
+    //sort(tax_name.begin(), tax_name.end());
+    //sort(tip_name.begin(), tip_name.end());
+    ////cout << " tax_name.size() = "<<tax_name.size()<<endl;
+    ////cout << " tip_name.size() = "<<tax_name.size()<<endl;
+//}
 
 
 void Tree::connect_graph(){
@@ -365,7 +391,7 @@ string Tree::label_interior_node(string in_str /*!< input newick form string */)
 size_t Tree::first_coal_rank(){
     size_t min_rank = nodes_.back()->rank();
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->tip_bool ) continue;
+        if ( (*it)->is_tip() ) continue;
         min_rank = ( (*it)->rank() < min_rank ) ?  (*it)->rank() : min_rank ;
     }
     return min_rank;
@@ -388,7 +414,7 @@ size_t Tree::first_coal_rank(){
 
 ///*! \brief enumerate the internal branches */
 //void Tree::enumerate_internal_branch( Node & node ) {
-    //if ( node.tip_bool ) return;
+    //if ( node.this->is_tip() ) return;
 
     //if ( node.visited() ){
         //this->current_enum_ ++;
@@ -406,7 +432,7 @@ size_t Tree::first_coal_rank(){
 
 /*! \brief enumerate the internal branches */
 void Tree::enumerate_internal_branch( Node * node ) {
-    if ( node->tip_bool ) return;
+    if ( node->is_tip() ) return;
 
     if ( node->visited() ){
         this->current_enum_ ++;
@@ -530,7 +556,7 @@ string Tree::rewrite_internal_node_content( size_t i ){
 void Tree::rewrite_descendant(){    //check for coaleased tips(& sign in the tips)
     bool rewrite_descndnt=false;
     for ( auto it = nodes_.iterator(); it.good(); ++it){
-        if ( (*it)->tip_bool ){
+        if ( (*it)->is_tip() ){
             for (size_t i_str=0;i_str< (*it)->clade.size();i_str++){
                 if ((*it)->clade[i_str]=='&'){
                     rewrite_descndnt=true;
@@ -545,58 +571,58 @@ void Tree::rewrite_descendant(){    //check for coaleased tips(& sign in the tip
         
     if ( !rewrite_descndnt ) return;
 
-    tax_name.clear();
-    int tax_name_start=0;
-    int tax_name_length=0;
-    for (size_t new_i_str=0;new_i_str<nodes_.back()->clade.size();new_i_str++){
-        tax_name_length++;
-        if (nodes_.back()->clade[new_i_str]=='&'){
-            tax_name_length--;
-            tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
-            tax_name_start=new_i_str+1;
-            tax_name_length=0;
-        }                
-        if (new_i_str==nodes_.back()->clade.size()-1){
-            tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
-        }
-    }
-    sort(tax_name.begin(), tax_name.end());
-    descndnt.clear();
+    //tax_name.clear();
+    //int tax_name_start=0;
+    //int tax_name_length=0;
+    //for (size_t new_i_str=0;new_i_str<nodes_.back()->clade.size();new_i_str++){
+        //tax_name_length++;
+        //if (nodes_.back()->clade[new_i_str]=='&'){
+            //tax_name_length--;
+            //tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
+            //tax_name_start=new_i_str+1;
+            //tax_name_length=0;
+        //}                
+        //if (new_i_str==nodes_.back()->clade.size()-1){
+            //tax_name.push_back(nodes_.back()->clade.substr(tax_name_start,tax_name_length));
+        //}
+    //}
+    //sort(tax_name.begin(), tax_name.end());
+    //descndnt.clear();
 
-    for ( auto it = nodes_.iterator(); it.good(); ++it){
-        vector <string> contained_tips;
-        valarray <int> re_initial_descndnt(0,tax_name.size());
-        int tax_name_start=0;
-        int tax_name_length=0;
-        for (size_t new_i_str=0;new_i_str<(*it)->clade.size();new_i_str++){
-            tax_name_length++;
-            if (nodes_.back()->clade[new_i_str]=='&'){
-                tax_name_length--;
-                contained_tips.push_back((*it)->clade.substr(tax_name_start,tax_name_length));
-                tax_name_start=new_i_str+1;
-                tax_name_length=0;
-            }                
-            if (new_i_str== (*it)->clade.size()-1){
-                contained_tips.push_back( (*it)->clade.substr(tax_name_start,tax_name_length));
-            }
-        }
-        for (size_t tax_i=0;tax_i<tax_name.size();tax_i++){
-            for (size_t contained_tax_i=0;contained_tax_i<contained_tips.size();contained_tax_i++){
-                if (tax_name[tax_i]==contained_tips[contained_tax_i]){
-                    //descndnt[i][tax_i]=1;
-                    re_initial_descndnt[tax_i]=1;
-                }
-            }
-        }    
-        descndnt.push_back(re_initial_descndnt);
-    }            
-    //this->rewrite_node_clade();
-    this->init_node_clade();
+    //for ( auto it = nodes_.iterator(); it.good(); ++it){
+        //vector <string> contained_tips;
+        //valarray <int> re_initial_descndnt(0,tax_name.size());
+        //int tax_name_start=0;
+        //int tax_name_length=0;
+        //for (size_t new_i_str=0;new_i_str<(*it)->clade.size();new_i_str++){
+            //tax_name_length++;
+            //if (nodes_.back()->clade[new_i_str]=='&'){
+                //tax_name_length--;
+                //contained_tips.push_back((*it)->clade.substr(tax_name_start,tax_name_length));
+                //tax_name_start=new_i_str+1;
+                //tax_name_length=0;
+            //}                
+            //if (new_i_str== (*it)->clade.size()-1){
+                //contained_tips.push_back( (*it)->clade.substr(tax_name_start,tax_name_length));
+            //}
+        //}
+        //for (size_t tax_i=0;tax_i<tax_name.size();tax_i++){
+            //for (size_t contained_tax_i=0;contained_tax_i<contained_tips.size();contained_tax_i++){
+                //if (tax_name[tax_i]==contained_tips[contained_tax_i]){
+                    ////descndnt[i][tax_i]=1;
+                    //re_initial_descndnt[tax_i]=1;
+                //}
+            //}
+        //}    
+        //descndnt.push_back(re_initial_descndnt);
+    //}            
+    ////this->rewrite_node_clade();
+    //this->init_node_clade();
 }
 
 string Tree::print_newick( Node * node ){
     string tree_str;
-    if ( node->tip_bool ) tree_str = node->label ;
+    if ( node->is_tip() ) tree_str = node->label ;
     else {
         tree_str = "(";
         for ( size_t i = 0 ; i < node->child.size() ; i++ ){
