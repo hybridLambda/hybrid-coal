@@ -33,7 +33,7 @@
 class NodeIterator;
 
 class NodeContainer {
-    friend class Tree;
+    friend class GraphBuilder;
     friend class NodeIterator;
 
     //public:

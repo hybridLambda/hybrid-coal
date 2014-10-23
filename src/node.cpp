@@ -29,12 +29,11 @@ Node::Node ( size_t max_of_descendant, // number of tip
 	this->init();
     this->label = label;
 	this->node_content = content;
-	//num_child=0;
 	this->brchlen1_ = bl;    
-    this->tip_ = tip;
+    this->is_tip_ = tip;
 	//clade=" ";
     
-    this->descendant = valarray <int> ( 0, max_of_descendant );
+    this->descendant = valarray < size_t > ( (size_t)0, max_of_descendant );
 }
 
 void Node::init(){
@@ -49,7 +48,7 @@ void Node::init(){
 	this->height_ = 1.0/0.0;
 	//prob_to_hybrid_left=1.0;
 	this->visited_ = false;    
-	this->descndnt_of_hybrid=false;
+    this->is_below_hybrid_ = false;
 	num_descndnt=0;
 	num_descndnt_interior=0;
 }
@@ -84,7 +83,7 @@ void Node::print( bool is_Net ){
     cout << setw(7) << this->label;
     cout << setw(12) << (this);
 	if ( is_Net ) cout << setw(6) << this->hybrid();
-    if ( is_Net ) cout << setw(8) << descndnt_of_hybrid;
+    if ( is_Net ) cout << setw(8) << this->is_below_hybrid();
 	cout << setw(5) << this->is_tip();
     if ( this->parent1() != NULL ) cout << setw (11) << ( this->parent1() );//if (this->parent1) cout << setw (11) << (parent1->label);
     else cout << "           ";
@@ -135,45 +134,14 @@ void Node::CalculateRank(){
 	}
 }
 
-
-bool Node::find_descndnt ( string &name, NAMETYPE type ){	
-	if ( this->is_tip() ) {
-        string tmp = ( type == TAXA ) ? this->name : this->label;
-        return ( tmp == name ) ? true : false;
-    }
-	else {
-        bool descndnt_found = false;
-		for (size_t i = 0; i < this->child.size(); i++ ){
-            descndnt_found = this->child[i]->find_descndnt( name, type );
-            if ( descndnt_found ) break;
-		}
-        return descndnt_found;
-	}	
-}
-
-
-///*! \brief label a node if its a tip node */
-//void Node::find_tip(){
-	//if ( this->child.size() == 0) this->tip_ = true;
-	//else {
-		//for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++ ){
-			//(*this->child[ith_child]).find_tip();
-            ////this->child[ith_child]->find_tip();
-		//}
-	//}
+///*! \brief Label a node if its a descendant of a hybrid node */
+//void Node::find_hybrid_descndnt(){
+	//if ( this->is_tip() ) return;
+    //for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++){
+        //if ( this->hybrid() || this->descndnt_of_hybrid ) this->child[ith_child]->descndnt_of_hybrid = true;
+        //this->child[ith_child]->find_hybrid_descndnt();
+    //}
 //}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////// consider removed
-
-/*! \brief Label a node if its a descendant of a hybrid node */
-void Node::find_hybrid_descndnt(){
-	if ( this->is_tip() ) return;
-    for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++){
-        if ( this->hybrid() || this->descndnt_of_hybrid ) this->child[ith_child]->descndnt_of_hybrid = true;
-        this->child[ith_child]->find_hybrid_descndnt();
-    }
-}
 
 
 Node::~Node(){}

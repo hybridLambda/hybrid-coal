@@ -20,7 +20,7 @@
 */
 
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
-#include <net.hpp>
+#include <graph.hpp>
 #include <sstream>      // std::stringstream
 
 #ifndef HYBRDRIDCOAL_PARAM_INCLUDED
@@ -30,6 +30,12 @@ using namespace std;
 void print_example();
 void print_help();
 void print_option();
+
+class Net: public GraphBuilder {        
+    public:
+        Net (string Net_str) : GraphBuilder ( Net_str ){};
+        ~Net(){};
+};
 
 class HybridCoal{
     public:	

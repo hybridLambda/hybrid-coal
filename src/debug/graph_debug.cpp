@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../net.hpp"
+#include "../graph.hpp"
 
-bool Tree::print_all_node_dout(){
+bool GraphBuilder::print_all_node_dout(){
 
     if ( is_Net ) dout<<"           label  hybrid hyb_des non-tp parent1  height brchln1 parent2 brchln2 #child #dsndnt #id rank   e_num   Clade "<<endl;
     else dout<<"       label non-tp   parent  height brchln #child #dsndnt #id rank e_num   Clade "<<endl;

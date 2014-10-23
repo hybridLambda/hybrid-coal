@@ -23,25 +23,30 @@
 #include <valarray>
 #include <fstream>
 
-#ifndef NETWORK
-#define NETWORK
+#ifndef GRAPH
+#define GRAPH
 
 /*! \brief Network class*/
 
-class TreeReader{
-    friend class Tree;
-    TreeReader( string net_str );
-    ~TreeReader(){ }
-    
-    // pre-process variables, this can probabily go to a seperate class just for tree building...
+class GraphReader{
+    friend class GraphBuilder;
+    // Members
+    string net_str;
     vector < string > node_labels;
     vector < string > node_contents;
     vector < string > brchlens;
     
     vector <string> tip_name; 
     vector <string> tax_name;
+    
+    // Methods
+    GraphReader( string net_str );
+    ~GraphReader(){ }
 
+    void check_Parenthesis(string &in_str);
+    void check_labeled( string in_str );
     size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
+    string label_interior_node(string in_str);
     string extract_One_node_content( string &in_str, size_t back_parenthesis_index );
     string extract_label(string &in_str, size_t i);
     void extract_tax_and_tip_names();
@@ -50,7 +55,7 @@ class TreeReader{
 bool start_of_tax_name(string in_str, size_t i);
 
 
-class Tree{
+class GraphBuilder{
     friend class Net;
     friend class CoalST;
     friend class CoalGT;
@@ -58,8 +63,8 @@ class Tree{
     friend class Frequency;
     friend class Figure;
     private:
-        TreeReader * Tree_info;
-        string label_interior_node(string in_str);
+        GraphReader * Tree_info;
+
         //void enumerate_internal_branch( Node &node );
         void enumerate_internal_branch( Node *node );
         
@@ -69,8 +74,6 @@ class Tree{
 
         size_t Parenthesis_balance_index_forwards( string &in_str, size_t i );
 
-        void check_Parenthesis(string &in_str);
-        void check_labeled( string in_str );
         
         void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
         //void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
@@ -78,7 +81,7 @@ class Tree{
         //size_t first_coal_index ();
     
         string rewrite_internal_node_content( size_t i );
-        void connect_graph();
+
         void extract_tax_and_tip_names();
         
         //void init_descendant();
@@ -88,7 +91,7 @@ class Tree{
         void rewrite_descendant();
         void rewrite_node_clade();
         
-        string net_str; /*!< \brief species network string \todo this is new!!!*/
+        //string net_str; /*!< \brief species network string \todo this is new!!!*/
         size_t max_rank;
         
         //vector< valarray <int> > descndnt;
@@ -99,13 +102,12 @@ class Tree{
         void print();
         bool print_all_node_dout();
     
-
-        Tree( string Tree_str );
-        void initialize_nodes();
+        GraphBuilder( string &net_str );
+        void initialize_nodes( string &net_str );
         void remove_repeated_hybrid_node();
+        void connect_graph();
 
-
-        ~Tree(){};
+        ~GraphBuilder(){};
         vector <string> tip_name;
         vector <string> tax_name;
         
@@ -120,12 +122,7 @@ class Tree{
         string print_newick( Node * node );
 };
 
-class Net: public Tree {
-        
-    public:
-        Net (string Net_str) : Tree ( Net_str){};
-        ~Net(){};
-    };
+
 
 string remove_interior_label(string in_str);
 size_t end_of_label_or_bl( string &in_str, size_t i);

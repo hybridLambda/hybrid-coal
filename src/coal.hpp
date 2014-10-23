@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "net.hpp"
+#include "graph.hpp"
 
 /*! \brief Compute factorial of a \return double a! */
 template < class T > T factorial ( T a ){
@@ -55,7 +55,7 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
 }
 
 
-class CoalST: public Tree {
+class CoalST: public GraphBuilder {
     friend class HybridCoal;
     friend class CoalGT;
     // Members
@@ -69,12 +69,12 @@ class CoalST: public Tree {
     void build_gijoe();
     bool print_gijoemat();
     void building_S_matrix();
-    CoalST ( string sp_str ) : Tree ( sp_str ){ dout << "Constrcut species tree: " << sp_str << endl; };
+    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ dout << "Constrcut species tree: " << sp_str << endl; };
     ~CoalST(){};
 };
 
 
-class CoalGT: public Tree {
+class CoalGT: public GraphBuilder {
     friend class HybridCoal;
     // Members
     vector < vector < int > >    R_matrix;
@@ -98,6 +98,6 @@ class CoalGT: public Tree {
     void build_coal_hist( );
     
     public:
-        CoalGT ( string gt_str ) : Tree ( gt_str ){ dout << "Constrcut species network: " << gt_str << endl; };
+        CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){ dout << "Constrcut species network: " << gt_str << endl; };
         ~CoalGT(){};
 };

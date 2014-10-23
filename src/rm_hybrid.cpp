@@ -1026,18 +1026,18 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 
 			/////////				
 								////cout<<gt_node_i<<" gt_tree.Net_nodes[gt_node_i].label "<<gt_tree.Net_nodes[gt_node_i].label<<endl;
-								////cout<<"gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()"<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()<<endl;	
+								////cout<<"gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()"<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()<<endl;	
 								////cout<<"gt_tree.Net_nodes[gt_node_i].num_descndnt_interior"<<gt_tree.Net_nodes[gt_node_i].num_descndnt_interior<<endl;	
-								//if (gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()>1){
-									//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
+								//if (gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()>1){
+									//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size();interior_i++){
 								////if (gt_tree.Net_nodes[gt_node_i].num_descndnt_interior>0){
 									////for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].num_descndnt_interior;interior_i++){
 									
-										////cout<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior<<endl;
-										//Node * dummy=gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i];
+										////cout<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->num_descndnt_interior<<endl;
+										//Node * dummy=gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i];
 										//double num_int_des=double(dummy->num_descndnt_interior);
 										////cout<<"hea"<<endl;
-										//cout<<gt_tree.Net_nodes[gt_node_i].label<<"  "<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->label<<"  "  <<num_int_des<<endl;
+										//cout<<gt_tree.Net_nodes[gt_node_i].label<<"  "<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->label<<"  "  <<num_int_des<<endl;
 										//num_int_des=num_int_des+1.0;
 										//new_omega_prob=new_omega_prob/(1.0*(num_int_des));
 									//}
@@ -1046,8 +1046,8 @@ vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p ne
 								
 
 							//}
-							////for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
-								////new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior)));
+							////for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size();interior_i++){
+								////new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->num_descndnt_interior)));
 								
 							////}
 							
@@ -1304,18 +1304,18 @@ double compute_rm_S_omega(int n_child,int k_clade,vector < valarray < int > > br
 
 ///////				
 					//cout<<gt_node_i<<" gt_tree.Net_nodes[gt_node_i].label "<<gt_tree.Net_nodes[gt_node_i].label<<endl;
-					//cout<<"gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()"<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()<<endl;	
+					//cout<<"gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()"<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()<<endl;	
 					//cout<<"gt_tree.Net_nodes[gt_node_i].num_descndnt_interior"<<gt_tree.Net_nodes[gt_node_i].num_descndnt_interior<<endl;	
-					if (gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size()>1){
-						for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
+					if (gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size()>1){
+						for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size();interior_i++){
 					//if (gt_tree.Net_nodes[gt_node_i].num_descndnt_interior>0){
 						//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].num_descndnt_interior;interior_i++){
 						
-							//cout<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior<<endl;
-							Node * dummy=gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i];
+							//cout<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->num_descndnt_interior<<endl;
+							Node * dummy=gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i];
 							double num_int_des=double(dummy->num_descndnt_interior);
 							//cout<<"hea"<<endl;
-							//cout<<gt_tree.Net_nodes[gt_node_i].label<<"  "<<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->label<<"  "  <<num_int_des<<endl;
+							//cout<<gt_tree.Net_nodes[gt_node_i].label<<"  "<<gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->label<<"  "  <<num_int_des<<endl;
 							num_int_des=num_int_des+1.0;
 							new_omega_prob=new_omega_prob/(1.0*(num_int_des));
 						}
@@ -1324,8 +1324,8 @@ double compute_rm_S_omega(int n_child,int k_clade,vector < valarray < int > > br
 					
 
 				}
-				//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].descndnt_interior_node.size();interior_i++){
-					//new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].descndnt_interior_node[interior_i]->num_descndnt_interior)));
+				//for (size_t interior_i=0;interior_i<gt_tree.Net_nodes[gt_node_i].interior_nodes_below.size();interior_i++){
+					//new_omega_prob=new_omega_prob/(1.0*(1+(gt_tree.Net_nodes[gt_node_i].interior_nodes_below[interior_i]->num_descndnt_interior)));
 					
 				//}
 				

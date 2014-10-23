@@ -1,3 +1,149 @@
+size_t Tree::first_coal_rank(){
+    size_t min_rank = nodes_.back()->rank();
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        if ( (*it)->is_tip() ) continue;
+        min_rank = ( (*it)->rank() < min_rank ) ?  (*it)->rank() : min_rank ;
+    }
+    return min_rank;
+}
+
+
+//size_t Tree::first_coal_index (){    
+    //size_t min_rank = this->first_coal_rank();
+    //size_t dummy_index = this->nodes_.size()-1;
+    //double min_coal_time = this->nodes_[dummy_index].height();
+    //for (size_t i = 0 ; i < nodes_.size(); i++){
+        //if ( this->nodes_[i].rank() == min_rank &&  this->nodes_[i].height() < min_coal_time ){
+            //dummy_index = i;
+            //min_coal_time = this->nodes_[dummy_index].height();
+        //}        
+    //}
+    //return dummy_index;
+//}
+
+
+bool Node::find_descndnt ( string &name, NAMETYPE type ){	
+	if ( this->is_tip() ) {
+        string tmp = ( type == TAXA ) ? this->name : this->label;
+        return ( tmp == name ) ? true : false;
+    }
+	else {
+        bool descndnt_found = false;
+		for (size_t i = 0; i < this->child.size(); i++ ){
+            descndnt_found = this->child[i]->find_descndnt( name, type );
+            if ( descndnt_found ) break;
+		}
+        return descndnt_found;
+	}	
+}
+
+
+///*! \brief label a node if its a tip node */
+//void Node::find_tip(){
+	//if ( this->child.size() == 0) this->tip_ = true;
+	//else {
+		//for ( size_t ith_child = 0; ith_child < this->child.size(); ith_child++ ){
+			//(*this->child[ith_child]).find_tip();
+            ////this->child[ith_child]->find_tip();
+		//}
+	//}
+//}
+
+
+//void Tree::check_isUltrametric(){
+    //vector <int> remaining_node( nodes_.size(), 0 );
+    //for ( size_t node_i = 0; node_i < nodes_.size(); node_i++ ){
+        //remaining_node[node_i] = node_i;
+    //}
+    //size_t rank_i = 1;
+    //size_t remaining_node_i=0;    
+    //while ( remaining_node.size() > 0 ){
+        //int node_i = remaining_node[remaining_node_i];
+        //if ( nodes_[node_i].rank() == rank_i ){
+            //if (rank_i == 1) nodes_[node_i].path_time.push_back(0.0);
+            //else{
+                //for (size_t child_i = 0; child_i < nodes_[node_i].child.size(); child_i++ ){
+
+                    //double current_child_time = (nodes_[node_i].child[child_i]->parent1->label==nodes_[node_i].label)?                    
+                                                //nodes_[node_i].child[child_i]->brchlen1():
+                                                //nodes_[node_i].child[child_i]->brchlen2();
+                    //for (size_t child_i_time_i=0;child_i_time_i<nodes_[node_i].child[child_i]->path_time.size();child_i_time_i++){
+                        //nodes_[node_i].path_time.push_back(current_child_time+nodes_[node_i].child[child_i]->path_time[child_i_time_i]);
+                    //}
+                //}
+            //}            
+            //remaining_node.erase(remaining_node.begin()+remaining_node_i);
+        //}
+        //else{
+            //remaining_node_i++;
+        //}
+
+        //if ( remaining_node_i == remaining_node.size()-1 ){
+            //rank_i++;
+            //remaining_node_i=0;
+        //}
+    //}
+
+    //for (size_t node_i=0;node_i<nodes_.size();node_i++){
+        //for (size_t path_time_i=0;path_time_i<nodes_[node_i].path_time.size();path_time_i++){
+            //if (pow((nodes_[node_i].path_time[path_time_i]-nodes_[node_i].path_time[0]),2)>0.000001){
+                //this->is_ultrametric = false;
+                //break;
+            //}
+        //}
+        //nodes_[node_i].set_height( nodes_[node_i].path_time[0] );
+    //}
+//}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////// consider removed
+
+
+
+void Tree::init_descendant(){
+    for ( auto it = nodes_.iterator(); it.good(); ++it ){
+        valarray <int> descndnt_dummy(0,tax_name.size());
+        descndnt.push_back(descndnt_dummy);
+        valarray <int> samples_below_dummy(0,tip_name.size());
+        samples_below.push_back(samples_below_dummy);
+        for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ) descndnt[i][tax_name_i] = it->find_descndnt( tax_name[tax_name_i], TAXA) ? 1:0;
+        for ( size_t tip_name_i = 0; tip_name_i < tip_name.size(); tip_name_i++ ) samples_below[i][tip_name_i] = it->find_descndnt( tip_name[tip_name_i], TIP) ? 1:0;
+        it->num_descndnt = descndnt[i].sum();
+    }
+
+    for ( size_t i = 0; i < nodes_.size(); i++){
+        for (size_t j = 0; j < nodes_.size(); j++){
+            if ( i == j ) continue;
+
+            valarray <int> descndnt_diff=(descndnt[i]-descndnt[j]);
+            if (descndnt_diff.min() >= 0 && nodes_[i].rank() > nodes_[j].rank() && nodes_[j].rank() >= 2){
+                this->nodes_[i].num_descndnt_interior += 1 ;
+                this->nodes_[i].interior_nodes_below.push_back( &this->nodes_[j] );
+            }                
+        }
+    }
+}
+
+
+
+void Tree::init_node_clade(){
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        //if ( this->descndnt[i].sum() == 0 ) break;
+
+        it->clade.clear();
+        for ( size_t tax_name_i = 0; tax_name_i < tax_name.size(); tax_name_i++ ){
+            if ( descndnt[i][tax_name_i] != 1) continue;
+
+            nodes_[i].clade = ( nodes_[i].clade.size() == 0 ) ? tax_name[tax_name_i]:
+                                                                            nodes_[i].clade + tax_name[tax_name_i];                                                                                        
+            nodes_[i].clade.push_back('&');
+        }
+        nodes_[i].clade.erase(nodes_[i].clade.size()-1,1);
+    }
+}
+
+
 	check_and_remove("log_file");
 	
 	//debug_bool=false;

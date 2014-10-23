@@ -51,7 +51,7 @@ enum NAMETYPE { TAXA, TIP };
 class Node {
     friend class NodeIterator;
     friend class NodeContainer;
-    friend class Tree;
+    friend class GraphBuilder;
     friend class Net;
     friend class CoalGT;
     friend class CoalST;
@@ -85,8 +85,8 @@ class Node {
         double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
         //vector<int> descndnt;
-        valarray <int> descendant;
-        vector < Node* > descndnt_interior_node; /*!< \brief list of pointers to its descndent interior nodes */
+        valarray < size_t > descendant;
+        vector < Node* > interior_nodes_below; /*!< \brief list of pointers to its descndent interior nodes */
         vector < Node* > child; /*!< \brief list of pointers to its child nodes */	
         Node* parent1_; /*!< \brief pointer to its parent node. */
         Node* previous_;
@@ -96,13 +96,16 @@ class Node {
         string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
         
         int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
-        int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by descndnt_interior_node.size()? */
+        int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by interior_nodes_below.size()? */
+        size_t NumberOfInteriorNodesBelow() const { return this->interior_nodes_below.size(); }
         //vector <double> path_time; 
         double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
             
-        bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
-        bool tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
-        bool is_tip() const { return this->tip_ ;}
+        
+        bool is_tip_; /*!< \brief Indicator of tip nodes. It's true, if it is a tip node, otherwise it is false. */
+        bool is_tip() const { return this->is_tip_ ;}
+        bool is_below_hybrid_; //bool descndnt_of_hybrid; /*!< \brief Indicator of descendant of hybrid nodes. It's true, if it is a descendant of hybrid nodes; false, otherwise. */
+        bool is_below_hybrid() const { return this->is_below_hybrid_; }        
         
         Node* parent2_; /*!< \brief Hybrid node only, pointer to its second parent node. */
         //double prob_to_hybrid_left; /*!< \brief Hybrid node only, the probability that a lineage goes to the left */
@@ -157,7 +160,7 @@ class Node {
         bool print_dout( bool is_Net = false );
         //void find_tip();
         void find_hybrid_descndnt();
-        bool find_descndnt ( string &name, NAMETYPE type );
+        //bool find_descndnt ( string &name, NAMETYPE type );
         
         double extract_hybrid_para(){
             size_t hash_index = this->label.find('#');
