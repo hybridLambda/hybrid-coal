@@ -146,40 +146,40 @@ void HybridCoal::HybridCoal_core(){
         return;
     }
         
-    //if ( this->print_gene_topo_bool ){
-        //string gt_out = this->prefix+".topo";
+    if ( this->print_gene_topo_bool ){
+        string gt_out = this->prefix+".topo";
 
-        //ifstream tmp_file( gt_out.c_str() );
-        //if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
+        ifstream tmp_file( gt_out.c_str() );
+        if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
 
-        //this->gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
-        //for ( size_t i = 0; i < this->gt_tree_str_s.size(); i++ )
-            //this->gt_ofstream << this->gt_tree_str_s[i] << "\n";
-        //this->gt_ofstream.close();
-        //std::clog << "Gene tree topologies are enumerated in file: " << gt_out <<endl;
-        //return;
-    //}
+        this->gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+        for ( size_t i = 0; i < this->gt_tree_str_s.size(); i++ )
+            this->gt_ofstream << this->gt_tree_str_s[i] << "\n";
+        this->gt_ofstream.close();
+        std::clog << "Gene tree topologies are enumerated in file: " << gt_out <<endl;
+        return;
+    }
 
-    //// If there is one species tree, species tree should be built outside the loop
-    //CoalST sp( this->sp_str );
-    //sp.build_gijoe();
-    //sp.building_S_matrix();
+    // If there is one species tree, species tree should be built outside the loop
+    CoalST sp( this->sp_str );
+    sp.build_gijoe();
+    sp.building_S_matrix();
 
-    //double total_prob = 0;
-    //string gt_out = this->prefix+".prob";
-    //ifstream tmp_file( gt_out.c_str() );
-    //if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
+    double total_prob = 0;
+    string gt_out = this->prefix+".prob";
+    ifstream tmp_file( gt_out.c_str() );
+    if ( tmp_file.good() ) 	{  remove(gt_out.c_str()); }
 
-    //gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
-    //for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
-        //dout << this->gt_tree_str_s[gt_i] << endl;
-        //CoalGT gt( this->gt_tree_str_s[gt_i] );
-        //gt.prob_given_sp_tree( sp );
-        //total_prob += gt.probability;
-        //gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
-    //}
-    //std::clog << "Total probability = " << total_prob <<endl;
-    //gt_ofstream.close();
+    gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+    for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
+        dout << this->gt_tree_str_s[gt_i] << endl;
+        CoalGT gt( this->gt_tree_str_s[gt_i] );
+        gt.prob_given_sp_tree( sp );
+        total_prob += gt.probability;
+        gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
+    }
+    std::clog << "Total probability = " << total_prob <<endl;
+    gt_ofstream.close();
 }
 
 

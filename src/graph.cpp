@@ -162,7 +162,8 @@ void GraphBuilder::initialize_nodes( string &in_str ){
     this->Tree_info = new GraphReader ( in_str );
     for ( size_t i = 0 ; i < Tree_info->brchlens.size(); i++ ){
         bool is_tip = ( Tree_info->node_labels[i] == Tree_info->node_contents[i]);
-        Node * node = new Node ( Tree_info->tip_name.size(),
+        Node * node = new Node ( Tree_info->tax_name.size(),
+                                 Tree_info->tip_name.size(),
                                  Tree_info->node_labels[i],
                                  Tree_info->node_contents[i],
                                  strtod( Tree_info->brchlens[i].c_str(), NULL),
@@ -173,7 +174,13 @@ void GraphBuilder::initialize_nodes( string &in_str ){
         for ( tip_i = 0 ; tip_i < Tree_info->tip_name.size(); tip_i++ ){
             if ( Tree_info->tip_name[tip_i] == Tree_info->node_labels[i] ) break;
         }
-        this->nodes_.back()->descendant[tip_i] = 1;
+        this->nodes_.back()->samples_below[tip_i] = 1;
+        
+        size_t taxa_i;
+        for ( taxa_i = 0 ; taxa_i < Tree_info->tax_name.size(); taxa_i++ ){
+            if ( Tree_info->tax_name[taxa_i] == Tree_info->node_labels[i] ) break;
+        }
+        this->nodes_.back()->taxa_below[taxa_i] = 1;
     }
     this->tax_name = Tree_info->tax_name;
     this->tip_name = Tree_info->tip_name;

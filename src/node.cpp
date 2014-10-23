@@ -21,11 +21,12 @@
 
 #include "node.hpp"
 
-Node::Node ( size_t max_of_descendant, // number of tip
+Node::Node ( size_t max_of_taxa,
+             size_t max_of_sample, // number of tip
              string label,
              string content,
              double bl,
-             bool tip ){
+             bool tip  ){
 	this->init();
     this->label = label;
 	this->node_content = content;
@@ -33,7 +34,8 @@ Node::Node ( size_t max_of_descendant, // number of tip
     this->is_tip_ = tip;
 	//clade=" ";
     
-    this->descendant = valarray < size_t > ( (size_t)0, max_of_descendant );
+    this->taxa_below = valarray < size_t > ( (size_t)0, max_of_taxa );
+    this->samples_below = valarray < size_t > ( (size_t)0, max_of_sample );
 }
 
 void Node::init(){
@@ -102,8 +104,8 @@ void Node::print( bool is_Net ){
 	cout << setw(2)<<this->e_num();
 	if ( is_Net ) cout << setw(3) << this->e_num2();
 	cout << "    " << this->clade;
-    for ( size_t i = 0; i < this->descendant.size(); i++ ){
-		cout<<this->descendant[i];
+    for ( size_t i = 0; i < this->samples_below.size(); i++ ){
+		cout<<this->samples_below[i];
 	}
 	//cout<<endl;
 }

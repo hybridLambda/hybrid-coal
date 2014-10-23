@@ -84,15 +84,14 @@ class Node {
         double brchlen1_; /*!< \brief Branch length */
         double brchlen2_;/*!< \brief Hybrid node only, Branch length to the second parent*/
 
-        //vector<int> descndnt;
-        valarray < size_t > descendant;
+        valarray < size_t > taxa_below;
+        valarray < size_t > samples_below; // tips_below
         vector < Node* > interior_nodes_below; /*!< \brief list of pointers to its descndent interior nodes */
         vector < Node* > child; /*!< \brief list of pointers to its child nodes */	
         Node* parent1_; /*!< \brief pointer to its parent node. */
         Node* previous_;
         Node* next_;
-        //Node* parent1_() const { return this->parent1; }
-        //void set_parent1 ( Node * node ) 
+
         string clade; /*!< \brief clade at this node, \todo this should be modified to a vector <string> */
         
         int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
@@ -146,13 +145,13 @@ class Node {
         
         // Methods    
         //Node (); /*!< \brief Initialize Node class*/
-        Node ( size_t max_of_descendant, // number of tip
-             string label,
-             string content,
-             double bl,
-             bool tip );
-             
-             
+        Node ( size_t max_of_taxa,
+               size_t max_of_sample, // number of tip
+               string label,
+               string content,
+               double bl,
+               bool tip );
+                          
         void init();
         void add_child( Node *child_node /*! pointer to the child node*/);
         void CalculateRank();

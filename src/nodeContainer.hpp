@@ -35,6 +35,8 @@ class NodeIterator;
 class NodeContainer {
     friend class GraphBuilder;
     friend class NodeIterator;
+    friend class CoalGT;
+    friend class CoalST;
     friend class Figure;
     //public:
     NodeContainer();
@@ -83,7 +85,7 @@ class NodeContainer {
 
 class NodeIterator {
     Node* current_node_;
-
+    size_t node_index_;
     public:
     //friend class Tree;
     //friend class NodeContainer;
@@ -101,12 +103,14 @@ class NodeIterator {
         Node* operator++() {
             if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
             this->current_node_ = ( this->current_node_->is_last() ) ? NULL : this->current_node_->next();
+            node_index_++;
             return this->current_node_;
         }
         
         Node* operator--() {
             if ( this->current_node_ == NULL ) throw std::out_of_range( "Node iterator out of range" );
             this->current_node_ = ( this->current_node_->is_first() ) ? NULL : this->current_node_->previous();
+            node_index_--;
             return this->current_node_;
         }
                 
