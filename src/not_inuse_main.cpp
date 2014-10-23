@@ -50,50 +50,6 @@ bool Node::find_descndnt ( string &name, NAMETYPE type ){
 //}
 
 
-//void Tree::check_isUltrametric(){
-    //vector <int> remaining_node( nodes_.size(), 0 );
-    //for ( size_t node_i = 0; node_i < nodes_.size(); node_i++ ){
-        //remaining_node[node_i] = node_i;
-    //}
-    //size_t rank_i = 1;
-    //size_t remaining_node_i=0;    
-    //while ( remaining_node.size() > 0 ){
-        //int node_i = remaining_node[remaining_node_i];
-        //if ( nodes_[node_i].rank() == rank_i ){
-            //if (rank_i == 1) nodes_[node_i].path_time.push_back(0.0);
-            //else{
-                //for (size_t child_i = 0; child_i < nodes_[node_i].child.size(); child_i++ ){
-
-                    //double current_child_time = (nodes_[node_i].child[child_i]->parent1->label==nodes_[node_i].label)?                    
-                                                //nodes_[node_i].child[child_i]->brchlen1():
-                                                //nodes_[node_i].child[child_i]->brchlen2();
-                    //for (size_t child_i_time_i=0;child_i_time_i<nodes_[node_i].child[child_i]->path_time.size();child_i_time_i++){
-                        //nodes_[node_i].path_time.push_back(current_child_time+nodes_[node_i].child[child_i]->path_time[child_i_time_i]);
-                    //}
-                //}
-            //}            
-            //remaining_node.erase(remaining_node.begin()+remaining_node_i);
-        //}
-        //else{
-            //remaining_node_i++;
-        //}
-
-        //if ( remaining_node_i == remaining_node.size()-1 ){
-            //rank_i++;
-            //remaining_node_i=0;
-        //}
-    //}
-
-    //for (size_t node_i=0;node_i<nodes_.size();node_i++){
-        //for (size_t path_time_i=0;path_time_i<nodes_[node_i].path_time.size();path_time_i++){
-            //if (pow((nodes_[node_i].path_time[path_time_i]-nodes_[node_i].path_time[0]),2)>0.000001){
-                //this->is_ultrametric = false;
-                //break;
-            //}
-        //}
-        //nodes_[node_i].set_height( nodes_[node_i].path_time[0] );
-    //}
-//}
 
 
 

@@ -35,7 +35,7 @@ class NodeIterator;
 class NodeContainer {
     friend class GraphBuilder;
     friend class NodeIterator;
-
+    friend class Figure;
     //public:
     NodeContainer();
     ~NodeContainer() { this->clear(); };

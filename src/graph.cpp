@@ -146,7 +146,7 @@ GraphBuilder::GraphBuilder(string &in_str /*! input (extended) newick form strin
     //this->init_node_clade();
     //this->rewrite_descendant();
     this->check_isNet();
-    this->check_isUltrametric(); // The ultrametric function is not very useful here. As we dont actually need it in hybrid-coal, hybridlambda yes....
+    //this->check_isUltrametric(); // The ultrametric function is not very useful here. As we dont actually need it in hybrid-coal, hybridlambda yes....
     //dout<<"Net constructed"<<endl;
 }
 
@@ -161,12 +161,19 @@ void GraphBuilder::init(){
 void GraphBuilder::initialize_nodes( string &in_str ){
     this->Tree_info = new GraphReader ( in_str );
     for ( size_t i = 0 ; i < Tree_info->brchlens.size(); i++ ){
+        bool is_tip = ( Tree_info->node_labels[i] == Tree_info->node_contents[i]);
         Node * node = new Node ( Tree_info->tip_name.size(),
                                  Tree_info->node_labels[i],
                                  Tree_info->node_contents[i],
                                  strtod( Tree_info->brchlens[i].c_str(), NULL),
-                                 Tree_info->node_labels[i] == Tree_info->node_contents[i] );
+                                 is_tip );
         this->nodes_.add ( node );
+        if ( !is_tip ) continue;
+        size_t tip_i;
+        for ( tip_i = 0 ; tip_i < Tree_info->tip_name.size(); tip_i++ ){
+            if ( Tree_info->tip_name[tip_i] == Tree_info->node_labels[i] ) break;
+        }
+        this->nodes_.back()->descendant[tip_i] = 1;
     }
     this->tax_name = Tree_info->tax_name;
     this->tip_name = Tree_info->tip_name;
@@ -386,6 +393,54 @@ string GraphBuilder::rewrite_internal_node_content( size_t i ){
     new_node_content += ")";
     return new_node_content;
 }
+
+
+void GraphBuilder::check_isUltrametric(){
+    vector <Node*> remaining_node( this->nodes_.size(), 0 );
+    for ( size_t node_i = 0; node_i < this->nodes_.size(); node_i++ ){
+        remaining_node[node_i] = this->nodes_.at(node_i);
+    }
+    size_t rank_i = 1;
+    size_t remaining_node_i=0;    
+    while ( remaining_node.size() > 0 ){
+        //int node_i = remaining_node[remaining_node_i];
+        Node * current_node = remaining_node[remaining_node_i];
+        if ( current_node->rank() == rank_i ){
+            if (rank_i == 1) current_node->path_time.push_back(0.0);
+            else{
+                for (size_t child_i = 0; child_i < current_node->child.size(); child_i++ ){
+                    double current_child_time = (current_node->child[child_i]->parent1() == current_node) ?
+                                                current_node->child[child_i]->brchlen1():
+                                                current_node->child[child_i]->brchlen2();
+                    for ( size_t i = 0;i < current_node->child[child_i]->path_time.size(); i++){
+                        current_node->path_time.push_back( current_child_time + current_node->child[child_i]->path_time[i] );
+                    }
+                }
+            }            
+            remaining_node.erase( remaining_node.begin() + remaining_node_i );
+        }
+        else{
+            remaining_node_i++;
+        }
+
+        if ( remaining_node_i == remaining_node.size()-1 ){
+            rank_i++;
+            remaining_node_i=0;
+        }
+    }
+
+    for ( auto it = nodes_.iterator(); it.good(); ++it){
+        for ( size_t i = 0; i < (*it)->path_time.size(); i++){
+            if ( pow( ( (*it)->path_time[i] - (*it)->path_time[0] ) , 2 ) > 0.000001 ){
+                this->is_ultrametric = false;
+                break;
+            }
+        }
+        (*it)->set_height( (*it)->path_time[0] );
+    }
+}
+
+
 
 /////////////////////////////////////////// consider for removal
 

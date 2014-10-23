@@ -98,7 +98,7 @@ class Node {
         int num_descndnt; /*!< \brief number of the tip nodes, that are descendant from this node */
         int num_descndnt_interior; /*!< \brief number of the interior nodes, that are descendant from this node \todo to be replaced by interior_nodes_below.size()? */
         size_t NumberOfInteriorNodesBelow() const { return this->interior_nodes_below.size(); }
-        //vector <double> path_time; 
+        vector <double> path_time; 
         double height_; /*!< \brief distance to the bottom of the tree */  // This has no use for hybrid-coal
             
         

@@ -138,13 +138,13 @@ void HybridCoal::HybridCoal_core(){
         return;
     }
    
-    //if ( this->plot_bool ){
-        //Figure figure_para ( this->argc_, this->argv_ );
-        //figure_para.figure_file_prefix = this->prefix;
-        //figure_para.finalize();
-        //figure_para.plot( this->sp_str );
-        //return;
-    //}
+    if ( this->plot_bool ){
+        Figure figure_para ( this->argc_, this->argv_ );
+        figure_para.figure_file_prefix = this->prefix;
+        figure_para.finalize();
+        figure_para.plot( this->sp_str );
+        return;
+    }
         
     //if ( this->print_gene_topo_bool ){
         //string gt_out = this->prefix+".topo";

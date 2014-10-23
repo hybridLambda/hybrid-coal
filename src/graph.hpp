@@ -76,8 +76,9 @@ class GraphBuilder{
 
         
         void check_isNet(); /*!< \brief To determin if a Net is network or not. \return is_Net */
+
         //void check_isUltrametric(); /*!< \brief To determin if a Net is ultrametric or not. \return is_ultrametric */
-        void check_isUltrametric(){}
+        void check_isUltrametric();
         //size_t first_coal_index ();
     
         string rewrite_internal_node_content( size_t i );
@@ -111,6 +112,7 @@ class GraphBuilder{
         vector <string> tip_name;
         vector <string> tax_name;
         
+        // This is used in Figure
         bool is_ultrametric; /*!< \brief true if the distances between tips and root are equal; false, otherwise */
         bool is_Net; /*!< \brief true if Net is a network; false if it's a tree */
         
