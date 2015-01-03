@@ -154,3 +154,37 @@ void Node::CalculateRank(){
 
 
 Node::~Node(){}
+
+#ifndef NDEBUG
+
+bool Node::print_dout( bool is_Net ){
+    dout << setw(12) << this;
+	if ( is_Net ) dout << setw(6) << this->hybrid();
+    if ( is_Net ) dout << setw(8) << this->is_below_hybrid();
+	dout << setw(5) << this->is_tip();
+    //if (this->parent1) dout << setw (11) << (parent1->label);
+    //else dout << "           ";
+    if ( this->parent1() != NULL ) dout << setw (11) << ( this->parent1() ); //if (this->parent1) dout << setw (11) << (this->parent1_());
+    else dout << "           ";
+	dout << setw (6) << this->height();
+	dout << setw (12) << this->brchlen1();
+    if (is_Net){
+        if ( this->parent2() != NULL ) dout << setw (11) << ( this->parent2()->label );
+        else dout << "           ";
+        dout<<setw (12) << this->brchlen2();
+    }
+	dout << setw (7) << this->child.size();
+	dout << setw (8) << num_descndnt;
+	dout << setw(4) << num_descndnt_interior;
+	dout << setw(6) << this->rank() << "   ";
+	//for (size_t i=0;i<descndnt.size();i++){
+		//dout<<setw (1)<<descndnt[i];
+	//}
+	dout << setw(2)<<this->e_num();
+	if ( is_Net ) dout << setw(3) << this->e_num2();
+	dout << "    " << this->clade;
+	//dout<<endl;
+    return true;
+}
+
+#endif
