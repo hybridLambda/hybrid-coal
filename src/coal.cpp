@@ -23,81 +23,81 @@
 
 void CoalST::assign_bl_to_vec(){
     assert( this->print_all_node_dout() );
-	this->brchlens_vec = vector < double > ( this->nodes_.back()->e_num(), 0 );
-	this->max_num_brch_vec = vector < int > ( this->nodes_.back()->e_num(),0);
+    this->brchlens_vec = vector < double > ( this->nodes_.back()->e_num(), 0 );
+    this->max_num_brch_vec = vector < int > ( this->nodes_.back()->e_num(),0);
 
     for ( auto it = nodes_.iterator(); it.good(); ++it ){
-	//for ( size_t node_i = 0; node_i < this->NodeContainer.size(); node_i++){
-		//Node * (*it) = &this->NodeContainer[node_i];
-		size_t index_enum = (*it)->e_num();
+    //for ( size_t node_i = 0; node_i < this->NodeContainer.size(); node_i++){
+        //Node * (*it) = &this->NodeContainer[node_i];
+        size_t index_enum = (*it)->e_num();
 
-		if ( index_enum != 0 ){
-			brchlens_vec[index_enum-1] = (*it)->brchlen1();
-			//cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
-			max_num_brch_vec[index_enum-1] = (*it)->samples_below.sum();
-			//cout<<index_enum<<" "<<brchlens_vec[index_enum-1]<<" "<<max_num_brch_vec[index_enum-1]<<endl;
-		}
-		dout << " Node " << (*it) <<"  "<<index_enum <<" "<<(*it)->brchlen1()<<endl;
-		
-		if ( (*it)->parent2() ){
-			index_enum = (*it)->e_num2();
-			brchlens_vec[index_enum-1] = (*it)->brchlen2();
-			//cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
-			max_num_brch_vec[index_enum-1] =  (*it)->samples_below.sum();
-			dout<<index_enum <<" "<<(*it)->brchlen2()<<endl;
-		}
-	}
+        if ( index_enum != 0 ){
+            brchlens_vec[index_enum-1] = (*it)->brchlen1();
+            //cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
+            max_num_brch_vec[index_enum-1] = (*it)->samples_below.sum();
+            //cout<<index_enum<<" "<<brchlens_vec[index_enum-1]<<" "<<max_num_brch_vec[index_enum-1]<<endl;
+        }
+        dout << " Node " << (*it) <<"  "<<index_enum <<" "<<(*it)->brchlen1()<<endl;
+        
+        if ( (*it)->parent2() ){
+            index_enum = (*it)->e_num2();
+            brchlens_vec[index_enum-1] = (*it)->brchlen2();
+            //cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
+            max_num_brch_vec[index_enum-1] =  (*it)->samples_below.sum();
+            dout<<index_enum <<" "<<(*it)->brchlen2()<<endl;
+        }
+    }
     dout << "assign_bl_to_vec() finished" << endl;
 }
 
 
 void CoalST::build_gijoe(){
     this->assign_bl_to_vec();
-	double v1,v2,v3,u1,u2;
-	int u,v,h,k;
-	for ( size_t b = 0; b < this->brchlens_vec.size(); b++){
-		vector < vector < double > > gijoe_matrix_b;
-		vector < double > empty_gijoe_matrix_b_1;
-		gijoe_matrix_b.push_back(empty_gijoe_matrix_b_1);
-		for ( u = 2; u <= this->max_num_brch_vec[b]; u++){
-			vector < double > gijoe_matrix_b_u;
-				for ( v = 1; v <= u; v++){
-					double gi_joe_buv;
-					//if (brchlens_vec[b]==0){
-					if (b == brchlens_vec.size() - 1 ){
-						gi_joe_buv = 1;
+    double v1,v2,v3,u1,u2;
+    int u,v,h,k;
+    for ( size_t b = 0; b < this->brchlens_vec.size(); b++){
+        vector < vector < double > > gijoe_matrix_b;
+        vector < double > empty_gijoe_matrix_b_1;
+        gijoe_matrix_b.push_back(empty_gijoe_matrix_b_1);
+        for ( u = 2; u <= this->max_num_brch_vec[b]; u++){
+            vector < double > gijoe_matrix_b_u;
+                for ( v = 1; v <= u; v++){
+                    double gi_joe_buv;
+                    //if (brchlens_vec[b]==0){
+                    if (b == brchlens_vec.size() - 1 ){
+                        gi_joe_buv = 1;
                     } else{
-						gi_joe_buv=0;
-						for( k = v; k <= u; k++) {
-							v1 = 1.0;
-							for( h = v; h <= v+k-2; h++ ){ v1 *= h; }
-							v2 = 1.0; 
-							for( h = v; h > 1; h-- ){ v2 *= h; }
-							v3 = 1.0;
-							for( h = k-v; h > 1; h-- ){ v3 *= h; }
-							u1 = 1.0;
-							for( h = u; h >= u - k + 1; h--){ u1 *= h; }
-							u2 = 1.0;
-							for( h = u; h <= u+k-1; h++){ u2 *= h; }
-							gi_joe_buv += exp(.5*k*(1.0-k)*brchlens_vec[b])*(2.0*k-1.0)*pow(-1.0,(k-v)*1.0)*v1*u1/(v2*v3*u2);
-						}
-					}
-					
-					//cout<<"b:"<<b+1<<" u:"<<u<<" v:"<<v<<endl;
-					//cout<<gi_joe_buv<<"  "<<gijoe(u,v,brchlens_vec[b])<<endl;
-					//if (gi_joe_buv==gijoe(u,v,brchlens_vec[b])){cout<<"yes"<<endl;}
-					//else{cout<<"no"<<endl;}
-					//cout<<"g_["<<u<<","<<v<<"]("<<brchlens_vec[b]<<")="<<gi_joe_buv<<"  ";
-					gijoe_matrix_b_u.push_back(gi_joe_buv);
-					//cout<<"      "<<gijoe_matrix_b_u.size()<<endl;
-				}
-				//cout<<endl;
-			gijoe_matrix_b.push_back(gijoe_matrix_b_u);
-			//cout<<"  "<<gijoe_matrix_b.size()<<endl;
-		}
-		//cout<<endl<<endl;
-		this->gijoemat.push_back(gijoe_matrix_b);
-	}
+                        gi_joe_buv=0;
+                        for( k = v; k <= u; k++) {
+                            v1 = 1.0;
+                            for( h = v; h <= v+k-2; h++ ){ v1 *= h; }
+                            v2 = 1.0; 
+                            for( h = v; h > 1; h-- ){ v2 *= h; }
+                            v3 = 1.0;
+                            for( h = k-v; h > 1; h-- ){ v3 *= h; }
+                            u1 = 1.0;
+                            for( h = u; h >= u - k + 1; h--){ u1 *= h; }
+                            u2 = 1.0;
+                            for( h = u; h <= u+k-1; h++){ u2 *= h; }
+                            gi_joe_buv += exp(.5*k*(1.0-k)*brchlens_vec[b])*(2.0*k-1.0)*pow(-1.0,(k-v)*1.0)*v1*u1/(v2*v3*u2);
+                        }
+                    }
+                    
+                    //cout<<"b:"<<b+1<<" u:"<<u<<" v:"<<v<<endl;
+                    //cout<<gi_joe_buv<<"  "<<gijoe(u,v,brchlens_vec[b])<<endl;
+                    //if (gi_joe_buv==gijoe(u,v,brchlens_vec[b])){cout<<"yes"<<endl;}
+                    //else{cout<<"no"<<endl;}
+                    //cout<<"g_["<<u<<","<<v<<"]("<<brchlens_vec[b]<<")="<<gi_joe_buv<<"  ";
+                    gijoe_matrix_b_u.push_back(gi_joe_buv);
+                    //cout<<"      "<<gijoe_matrix_b_u.size()<<endl;
+                }
+                //cout<<endl;
+            gijoe_matrix_b.push_back(gijoe_matrix_b_u);
+            //cout<<"  "<<gijoe_matrix_b.size()<<endl;
+        }
+        //cout<<endl<<endl;
+        this->gijoemat.push_back(gijoe_matrix_b);
+    }
     assert( print_gijoemat() );
 }
 
@@ -116,19 +116,19 @@ bool CoalST::print_gijoemat(){
     return true;
 }
 
-	
+    
 void CoalGT::building_M_matrix( CoalST & sp_net ) {
-	int sp_max_enum = sp_net.nodes_.back()->e_num();
-	int gt_max_enum = this->nodes_.back()->e_num();
-	
-	for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
-		vector < int > M_matrix_row( ( gt_max_enum - 1 ), 1 );
-		this->M_matrix.push_back( M_matrix_row );
-	}
+    int sp_max_enum = sp_net.nodes_.back()->e_num();
+    int gt_max_enum = this->nodes_.back()->e_num();
+    
+    for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
+        vector < int > M_matrix_row( ( gt_max_enum - 1 ), 1 );
+        this->M_matrix.push_back( M_matrix_row );
+    }
     
     for ( auto sp_it = sp_net.nodes_.iterator(); sp_it.good(); ++sp_it ){
-	//for ( size_t i = 0; i < sp_net.NodeContainer.size() - 1; i++ ){
-		if ( (*sp_it)->is_tip() || (*sp_it)->parent1() == NULL ) continue;
+    //for ( size_t i = 0; i < sp_net.NodeContainer.size() - 1; i++ ){
+        if ( (*sp_it)->is_tip() || (*sp_it)->parent1() == NULL ) continue;
         for ( auto gt_it = this->nodes_.iterator(); gt_it.good(); ++gt_it){
             if ( (*gt_it)->is_tip() || (*gt_it)->parent1() == NULL ) continue;
             int des_diff_prod = 1;
@@ -148,23 +148,23 @@ void CoalGT::building_M_matrix( CoalST & sp_net ) {
                 M_matrix[ (*sp_it)->e_num()-1][(*gt_it)->e_num()-1] = 1;
             }
         }
-	}
-	
+    }
+    
     dout<<"M matrix"<<endl;
     assert( print_2D_matrix( M_matrix ) );
 }
 
 
 void CoalGT::building_R_matrix( ){
-	size_t gt_max_enum = this->nodes_.back()->e_num();	
-	for ( size_t i_gt_enum=0; i_gt_enum < gt_max_enum; i_gt_enum++ ){
-		vector <int> R_matrix_row( i_gt_enum, 1 );
-		this->R_matrix.push_back(R_matrix_row);
-	}
+    size_t gt_max_enum = this->nodes_.back()->e_num();    
+    for ( size_t i_gt_enum=0; i_gt_enum < gt_max_enum; i_gt_enum++ ){
+        vector <int> R_matrix_row( i_gt_enum, 1 );
+        this->R_matrix.push_back(R_matrix_row);
+    }
     
     for ( auto i = nodes_.iterator(); i.good(); ++i){
-	//for ( size_t i = 0; i < this->nodes_.size()-1; i++ ){
-		if ( (*i)->is_tip()) continue;
+    //for ( size_t i = 0; i < this->nodes_.size()-1; i++ ){
+        if ( (*i)->is_tip()) continue;
         auto j = nodes_.iterator();
         for ( ; ; ++j){
             if ( (*j)->next() == (*i) ) break;
@@ -177,24 +177,24 @@ void CoalGT::building_R_matrix( ){
                 }
             }
         }
-	}
-	dout << "R matrix" << endl;
-	assert( print_2D_matrix(R_matrix) );
+    }
+    dout << "R matrix" << endl;
+    assert( print_2D_matrix(R_matrix) );
 }
 
 
 void CoalST::building_S_matrix(){
-	int sp_max_enum=this->nodes_.back()->e_num();
-	
-	for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
-		vector < int > S_matrix_row( sp_max_enum, 1 );
-		S_matrix_row[i_sp_enum] = 0;
-		this->S_matrix.push_back( S_matrix_row );
-	}
+    int sp_max_enum=this->nodes_.back()->e_num();
+    
+    for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
+        vector < int > S_matrix_row( sp_max_enum, 1 );
+        S_matrix_row[i_sp_enum] = 0;
+        this->S_matrix.push_back( S_matrix_row );
+    }
         //for ( auto it = nodes_.iterator(); it.good(); ++it){
 
-	for ( auto i = nodes_.iterator(); i.good(); ++i ){
-		if ( (*i)->is_tip() || (*i)->parent1() == NULL ) continue;
+    for ( auto i = nodes_.iterator(); i.good(); ++i ){
+        if ( (*i)->is_tip() || (*i)->parent1() == NULL ) continue;
             
         for ( auto j = nodes_.iterator(); j.good(); ++j){
             if ( (*j)->is_tip() || (*j)->parent1() == NULL) continue;
@@ -207,64 +207,64 @@ void CoalST::building_S_matrix(){
                 }
             }
         }
-		
-	}
-	assert( print_2D_matrix(S_matrix) );
+        
+    }
+    assert( print_2D_matrix(S_matrix) );
 }
 
 
 void CoalGT::initialize_possible_coal_hist( CoalST & sp_net ){
-	size_t sp_max_enum = sp_net.nodes_.back()->e_num();
-	size_t gt_max_enum = this->nodes_.back()->e_num();
-	
-	if ( gt_max_enum == 1 ){
-		vector <size_t> coal_hist_vec;
-		coal_hist_vec.push_back(1);
-		coal_hist_mat.push_back(coal_hist_vec);
-	} else{
-		int max_coal_hist_num = 1;
-		for ( size_t i_gt_enum = 0; i_gt_enum < gt_max_enum-1; i_gt_enum++ ){
-			vector <size_t> coal_hist_vec;
-			for ( size_t i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++){
-				if ( M_matrix[i_sp_enum][i_gt_enum] == 1 ){
-					coal_hist_vec.push_back(i_sp_enum+1);
-				}
-			}
-			max_coal_hist_num *= (coal_hist_vec.size());
-			this->coal_hist_mat.push_back(coal_hist_vec);
-		}
-	}
+    size_t sp_max_enum = sp_net.nodes_.back()->e_num();
+    size_t gt_max_enum = this->nodes_.back()->e_num();
+    
+    if ( gt_max_enum == 1 ){
+        vector <size_t> coal_hist_vec;
+        coal_hist_vec.push_back(1);
+        coal_hist_mat.push_back(coal_hist_vec);
+    } else{
+        int max_coal_hist_num = 1;
+        for ( size_t i_gt_enum = 0; i_gt_enum < gt_max_enum-1; i_gt_enum++ ){
+            vector <size_t> coal_hist_vec;
+            for ( size_t i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++){
+                if ( M_matrix[i_sp_enum][i_gt_enum] == 1 ){
+                    coal_hist_vec.push_back(i_sp_enum+1);
+                }
+            }
+            max_coal_hist_num *= (coal_hist_vec.size());
+            this->coal_hist_mat.push_back(coal_hist_vec);
+        }
+    }
     assert ( print_2D_matrix (coal_hist_mat));
 }
 
 
 void CoalGT::sum_coalescent_history_prob( CoalST & sp_net ){
-	this->probability = 0.0;
+    this->probability = 0.0;
     double current_prob_of_hist ;
     
-	for ( size_t hist_i = 0; hist_i < this->valid_coal_hist.size(); hist_i++ ){
-		dout << "The "<<hist_i<<"th history"<<endl;
+    for ( size_t hist_i = 0; hist_i < this->valid_coal_hist.size(); hist_i++ ){
+        dout << "The "<<hist_i<<"th history"<<endl;
         current_prob_of_hist = 1.0;
-		for ( size_t i = 0; i < all_w[hist_i].size(); i++ ) {
+        for ( size_t i = 0; i < all_w[hist_i].size(); i++ ) {
             //cout << "all_w[hist_i].size()"<<all_w[hist_i].size()<<endl;
-			size_t current_enum;
+            size_t current_enum;
             for ( auto it = sp_net.nodes_.iterator(); it.good(); ++it){
-				//Node * current_node = &sp_net.NodeContainer[node_i];
-				if ( (*it)->e_num() == ( i + 1 ) ){
-					//current_branch_lengths=my_sp_net.NodeContainer[node_i].brchlen1;
-					current_enum = (*it)->e_num();
-					break;
-				}
-			}	
-			double current_gijoe = ( (i+1) == sp_net.nodes_.back()->e_num() ) ? 1 :
+                //Node * current_node = &sp_net.NodeContainer[node_i];
+                if ( (*it)->e_num() == ( i + 1 ) ){
+                    //current_branch_lengths=my_sp_net.NodeContainer[node_i].brchlen1;
+                    current_enum = (*it)->e_num();
+                    break;
+                }
+            }    
+            double current_gijoe = ( (i+1) == sp_net.nodes_.back()->e_num() ) ? 1 :
                                                                               sp_net.gijoemat[current_enum-1][num_enter[hist_i][i]-1][num_out[hist_i][i]-1];
             dout << " current_gijoe ["<<num_enter[hist_i][i]<<"]["<<num_out[hist_i][i]<<"]" <<current_gijoe << " all_w[hist_i][i] " <<all_w[hist_i][i] <<" all_d[hist_i][i] "<<all_d[hist_i][i] << endl;
-			current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
-		}
+            current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
+        }
         dout<<current_prob_of_hist<<endl;
-		this->probability += current_prob_of_hist;
-		//dout<<"gt prob = "<<probability<<endl;
-	}
+        this->probability += current_prob_of_hist;
+        //dout<<"gt prob = "<<probability<<endl;
+    }
 }
 
 
@@ -285,7 +285,7 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
                     num_enter_i_coal.push_back( (*it)->samples_below.sum() );
                 }
             }
-        }	
+        }    
         for ( size_t i = 0; i < sp_max_enum; i++ ){
             vector < int > clades_coal_in_branch;
             int num_coal_in_branch_i_coal_dummy = 0;
@@ -296,7 +296,7 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
                 for ( size_t i_S_mat = i; i_S_mat < (sp_max_enum); i_S_mat++ ){
                     if ( sp_net.S_matrix[i_S_mat][i] != 1 ) continue;
                     num_enter_i_coal[i_S_mat]--;
-                }	
+                }    
             }
             num_coal_in_branch_i_coal.push_back( num_coal_in_branch_i_coal_dummy );
             num_out_i_coal.push_back( num_enter_i_coal[i] - num_coal_in_branch_i_coal[i] );
@@ -326,14 +326,14 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
                     }
                     w_dummy /= sum_r; //w_dummy=w_dummy/sum_r;
                 }
-            }	
+            }    
             
             w_i_coal.push_back( w_dummy );
             //if (w_dummy/d_dummy!=1){
                 //cout<<w_dummy<<"/"<<d_dummy;
             //}
             //if (i<sp_max_enum-1){
-                //cout<<"p_{"<<num_enter_i_coal[i]<<num_out_i_coal[i]<<"}(lambda_{"<<i+1<<"})";	
+                //cout<<"p_{"<<num_enter_i_coal[i]<<num_out_i_coal[i]<<"}(lambda_{"<<i+1<<"})";    
             //}
         }
         //cout<<endl;
@@ -343,52 +343,52 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         all_w.push_back( w_i_coal );
         all_d.push_back( d_i_coal );
         valid_coal_hist[i_coal_hist].push_back( sp_max_enum );
-    }	
+    }    
     
-    dout<<"valid_coal_hist"<<endl;	
+    dout<<"valid_coal_hist"<<endl;    
     assert( print_2D_matrix(this->valid_coal_hist) );
-}			
+}            
 
 
 vector < vector < size_t > > CoalGT::recur_coal_hist( vector < vector <size_t > > coal_hist, size_t  node_i ) {
-	vector < vector <size_t> > new_coal_hist;
+    vector < vector <size_t> > new_coal_hist;
     for ( size_t  coal_hist_i = 0; coal_hist_i < coal_hist.size(); coal_hist_i++ ){
-		vector <size_t > coal_hist_dummy;
-		coal_hist_dummy = coal_hist[coal_hist_i];
-		int  coal_hist_mat_node_i_i=0;
-		for ( size_t j_R_mat = 0; j_R_mat < node_i; j_R_mat++ ){
-			while ( R_matrix[node_i][j_R_mat] == 1 && coal_hist_mat[node_i][coal_hist_mat_node_i_i] < coal_hist_dummy[j_R_mat] ){
-				coal_hist_mat_node_i_i++;
-			}
-		}
-		for ( ; coal_hist_mat_node_i_i < coal_hist_mat[node_i].size(); coal_hist_mat_node_i_i++ ){
-			vector <size_t> coal_hist_dummy_dummy;
-			coal_hist_dummy_dummy = coal_hist_dummy;
-			coal_hist_dummy_dummy.push_back( coal_hist_mat[node_i][coal_hist_mat_node_i_i] );
-			new_coal_hist.push_back( coal_hist_dummy_dummy );
-		}
-	}
-		
-	if ( node_i < coal_hist_mat.size() - 1 ){
-		node_i++;
-		new_coal_hist = recur_coal_hist( new_coal_hist, node_i );
-	}
+        vector <size_t > coal_hist_dummy;
+        coal_hist_dummy = coal_hist[coal_hist_i];
+        int  coal_hist_mat_node_i_i=0;
+        for ( size_t j_R_mat = 0; j_R_mat < node_i; j_R_mat++ ){
+            while ( R_matrix[node_i][j_R_mat] == 1 && coal_hist_mat[node_i][coal_hist_mat_node_i_i] < coal_hist_dummy[j_R_mat] ){
+                coal_hist_mat_node_i_i++;
+            }
+        }
+        for ( ; coal_hist_mat_node_i_i < coal_hist_mat[node_i].size(); coal_hist_mat_node_i_i++ ){
+            vector <size_t> coal_hist_dummy_dummy;
+            coal_hist_dummy_dummy = coal_hist_dummy;
+            coal_hist_dummy_dummy.push_back( coal_hist_mat[node_i][coal_hist_mat_node_i_i] );
+            new_coal_hist.push_back( coal_hist_dummy_dummy );
+        }
+    }
+        
+    if ( node_i < coal_hist_mat.size() - 1 ){
+        node_i++;
+        new_coal_hist = recur_coal_hist( new_coal_hist, node_i );
+    }
 
-	return new_coal_hist;
+    return new_coal_hist;
 }
 
 
 void CoalGT::build_coal_hist ( ){
-	for ( size_t first_coal_mat_i = 0; first_coal_mat_i < coal_hist_mat[0].size(); first_coal_mat_i++ ){
-		vector <size_t> coal_hist_dummy;
-		coal_hist_dummy.push_back( coal_hist_mat[0][first_coal_mat_i] );
-		valid_coal_hist.push_back( coal_hist_dummy );
-	}
+    for ( size_t first_coal_mat_i = 0; first_coal_mat_i < coal_hist_mat[0].size(); first_coal_mat_i++ ){
+        vector <size_t> coal_hist_dummy;
+        coal_hist_dummy.push_back( coal_hist_mat[0][first_coal_mat_i] );
+        valid_coal_hist.push_back( coal_hist_dummy );
+    }
     
-	int gt_max_enum = this->nodes_.back()->e_num();	
-	if ( gt_max_enum-1 > 1){
+    int gt_max_enum = this->nodes_.back()->e_num();    
+    if ( gt_max_enum-1 > 1){
         valid_coal_hist = recur_coal_hist( valid_coal_hist, (size_t)1 );
-	}
+    }
 }
 
 

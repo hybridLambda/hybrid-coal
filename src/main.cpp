@@ -33,8 +33,8 @@ using namespace std;
  * \brief Main function for hybrid-coal 
  * */
 int main(int argc, char *argv[]){
-	if ( argc == 1 ) 
-        print_help(); 	//else, proceed
+    if ( argc == 1 ) 
+        print_help();     //else, proceed
     
     try {
         HybridCoal run_hybridcoal ( argc, argv );

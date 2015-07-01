@@ -38,7 +38,7 @@ class Net: public GraphBuilder {
 };
 
 class HybridCoal{
-    public:	
+    public:    
         /*! Constructors and Destructors */  
         HybridCoal(int argc, char *argv[]) : argc_(argc), argv_(argv) { this->init(); this->parse(); }        
         ~HybridCoal(){ dout << "~HybridCoal()" <<endl;};
@@ -55,7 +55,7 @@ class HybridCoal{
 
         bool print_tree_bool;
         bool plot_bool;
-        bool symb_bool;        			
+        bool symb_bool;                    
         bool latex_bool;
         bool print_gene_topo_bool;
         bool enumerate_gt_bool;

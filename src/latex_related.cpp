@@ -21,69 +21,69 @@
 
 
 void latex_header(const char* file_name){
-	check_and_remove(file_name);
-	ofstream latex_file;
-	latex_file.open (file_name, ios::out | ios::app | ios::binary); 
-	latex_file <<"\\documentclass[9pt]{article}\n";
-	latex_file <<"\\usepackage{tikz,graphics,graphicx,lscape,fullpage,multicol,setspace}\n \\singlespacing\n \\begin{document}\n ";	
-	latex_file<<"\\ifx\\du\\undefined\\newlength{\\du}\\fi\\setlength{\\du}{35\\unitlength}\n";
-	latex_file.close();
-	if (export_debug_bool){
-		cout<<"latex_header END"<<endl;
-	}
+    check_and_remove(file_name);
+    ofstream latex_file;
+    latex_file.open (file_name, ios::out | ios::app | ios::binary); 
+    latex_file <<"\\documentclass[9pt]{article}\n";
+    latex_file <<"\\usepackage{tikz,graphics,graphicx,lscape,fullpage,multicol,setspace}\n \\singlespacing\n \\begin{document}\n ";    
+    latex_file<<"\\ifx\\du\\undefined\\newlength{\\du}\\fi\\setlength{\\du}{35\\unitlength}\n";
+    latex_file.close();
+    if (export_debug_bool){
+        cout<<"latex_header END"<<endl;
+    }
 }
 
 void latex_nt_body1(const char* file_name,size_t topo_idx,string gt_topo){
-	ofstream latex_file;
-	latex_file.open (file_name, ios::out | ios::app | ios::binary);
-	latex_file<<"\\noindent ********************   "<<topo_idx<<"   **********************\\\\"<<endl;
-	latex_file<<"\\begin{verbatim}GT: "<<gt_topo<<"\\end{verbatim}"<<endl;
-	latex_file.close();	
-	if (export_debug_bool){
-		cout<<"latex_nt_body1 END"<<endl;
-	}
+    ofstream latex_file;
+    latex_file.open (file_name, ios::out | ios::app | ios::binary);
+    latex_file<<"\\noindent ********************   "<<topo_idx<<"   **********************\\\\"<<endl;
+    latex_file<<"\\begin{verbatim}GT: "<<gt_topo<<"\\end{verbatim}"<<endl;
+    latex_file.close();    
+    if (export_debug_bool){
+        cout<<"latex_nt_body1 END"<<endl;
+    }
 }
 
 //void latex_nt_body2(const char* file_name,vec_Net_wiz_prior_p net_str_s,size_t i){
-	//ofstream latex_file;
-	//latex_file.open (file_name, ios::out | ios::app | ios::binary);
-	
-	//latex_file<<"\\begin{verbatim}ST: "<<tree_topo(net_str_s.Net_vec[i].s_net_string)<<"\\end{verbatim} "<<endl;
-	//latex_file<<"$"<<net_str_s.Net_vec[i].omega_string<<"$\\\\"<<endl;
-	//latex_file<<"$\\omega="<<net_str_s.Net_vec[i].omega<<"$\\\\"<<endl;
-	//latex_file.close();
-	//////plot_enum_in_latex("latex_prob.tex",net_str_s.Net_vec[i]);
-	//plot_in_latex(file_name, net_str_s.Net_vec[i].s_net_string_enum,2);		
-	//////plot_in_latex("latex_prob.tex", net_str_s.Net_vec[i].s_net_string,1);		
+    //ofstream latex_file;
+    //latex_file.open (file_name, ios::out | ios::app | ios::binary);
+    
+    //latex_file<<"\\begin{verbatim}ST: "<<tree_topo(net_str_s.Net_vec[i].s_net_string)<<"\\end{verbatim} "<<endl;
+    //latex_file<<"$"<<net_str_s.Net_vec[i].omega_string<<"$\\\\"<<endl;
+    //latex_file<<"$\\omega="<<net_str_s.Net_vec[i].omega<<"$\\\\"<<endl;
+    //latex_file.close();
+    //////plot_enum_in_latex("latex_prob.tex",net_str_s.Net_vec[i]);
+    //plot_in_latex(file_name, net_str_s.Net_vec[i].s_net_string_enum,2);        
+    //////plot_in_latex("latex_prob.tex", net_str_s.Net_vec[i].s_net_string,1);        
 
-	//if (export_debug_bool){
-		//cout<<"latex_nt_body2 END"<<endl;
-	//}
+    //if (export_debug_bool){
+        //cout<<"latex_nt_body2 END"<<endl;
+    //}
 //}
 
 void latex_tre_body(const char* file_name,string gt_str,string sp_str){
-	ofstream latex_file;
-	latex_file.open (file_name, ios::out | ios::app | ios::binary);
-	latex_file<<"\\noindent ****************************************************\\\\"<<endl;
-	latex_file<<"\\begin{verbatim}Load in GT: "<<gt_str<<"\\end{verbatim}"<<endl;
-	latex_file<<"\\begin{verbatim}ST: "<<tree_topo(sp_str)<<"\\end{verbatim}"<<endl;
-	latex_file.close();
-	if (export_debug_bool){
-		cout<<"latex_tre_body END"<<endl;
-	}
+    ofstream latex_file;
+    latex_file.open (file_name, ios::out | ios::app | ios::binary);
+    latex_file<<"\\noindent ****************************************************\\\\"<<endl;
+    latex_file<<"\\begin{verbatim}Load in GT: "<<gt_str<<"\\end{verbatim}"<<endl;
+    latex_file<<"\\begin{verbatim}ST: "<<tree_topo(sp_str)<<"\\end{verbatim}"<<endl;
+    latex_file.close();
+    if (export_debug_bool){
+        cout<<"latex_tre_body END"<<endl;
+    }
 }
 
 void latex_tail(const char* file_name){
-	ofstream latex_file;
-	latex_file.open (file_name, ios::out | ios::app | ios::binary);
-	latex_file <<"\\end{document}\n";
-	latex_file.close();
-	string file_str(file_name);
-	string appending_log_str="Coalescent history generated in file: "+file_str;
-	appending_log_file(appending_log_str);
-	if (export_debug_bool){
-		cout<<"latex_tail END"<<endl;
-	}	
+    ofstream latex_file;
+    latex_file.open (file_name, ios::out | ios::app | ios::binary);
+    latex_file <<"\\end{document}\n";
+    latex_file.close();
+    string file_str(file_name);
+    string appending_log_str="Coalescent history generated in file: "+file_str;
+    appending_log_file(appending_log_str);
+    if (export_debug_bool){
+        cout<<"latex_tail END"<<endl;
+    }    
 }
 
 

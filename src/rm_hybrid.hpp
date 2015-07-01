@@ -31,45 +31,45 @@
 //bool debug_bool=rm_debug_bool;
 
 class vec_Net_wiz_prior_p{
-	public:
-	vector <Net_wiz_prior_p> Net_vec;
-	void clear(){Net_vec.clear();};
-	
-	vec_Net_wiz_prior_p(){
-		vector <Net_wiz_prior_p> Net_vec;
-	}
+    public:
+    vector <Net_wiz_prior_p> Net_vec;
+    void clear(){Net_vec.clear();};
+    
+    vec_Net_wiz_prior_p(){
+        vector <Net_wiz_prior_p> Net_vec;
+    }
 };
 
 class rm_H_node{
-	private:
-		//bool maple_bool_local;
-		string current_removing_net_string;
-		string current_removing_net_string_enum;
-		string left_hybrid_parameter;
-		string right_hybrid_parameter;
-		string left_hybrid_parameter_str;
-		string right_hybrid_parameter_str;		
-		string hybrid_parameter;
-		string new_node_name; //remove this
-		string prior_omega_string;
-		string current_omega_string;
-		class vec_Net_wiz_prior_p nchild_gt_one(int rm_node_index,bool maple_bool_local,int n_child);
-		class vec_Net_wiz_prior_p nchild_eq_one(int rm_node_index,bool maple_bool_local);
-		size_t new_node_name_i;
-		//int rm_node_index; // remove this
-		int current_root_enum;
-		//int n_child; //remove this
-		vector < vector <int> > current_lambda_sum;
-		vector <int> current_prior_coal_hist;
-		vector < valarray < int > > current_prior_coal_list;
-		double left_hybrid_parameter_num;
-		double right_hybrid_parameter_num;
-		double current_omega;
-		double prior_omega;		
-		//vector < vector <int> > current_e_num_vec;
-	public:
-		class vec_Net_wiz_prior_p block_rm_H;
-		rm_H_node(int rm_node_index_in,Net_wiz_prior_p new_Net_wiz_prior_p,bool maple_bool_local_in);
+    private:
+        //bool maple_bool_local;
+        string current_removing_net_string;
+        string current_removing_net_string_enum;
+        string left_hybrid_parameter;
+        string right_hybrid_parameter;
+        string left_hybrid_parameter_str;
+        string right_hybrid_parameter_str;        
+        string hybrid_parameter;
+        string new_node_name; //remove this
+        string prior_omega_string;
+        string current_omega_string;
+        class vec_Net_wiz_prior_p nchild_gt_one(int rm_node_index,bool maple_bool_local,int n_child);
+        class vec_Net_wiz_prior_p nchild_eq_one(int rm_node_index,bool maple_bool_local);
+        size_t new_node_name_i;
+        //int rm_node_index; // remove this
+        int current_root_enum;
+        //int n_child; //remove this
+        vector < vector <int> > current_lambda_sum;
+        vector <int> current_prior_coal_hist;
+        vector < valarray < int > > current_prior_coal_list;
+        double left_hybrid_parameter_num;
+        double right_hybrid_parameter_num;
+        double current_omega;
+        double prior_omega;        
+        //vector < vector <int> > current_e_num_vec;
+    public:
+        class vec_Net_wiz_prior_p block_rm_H;
+        rm_H_node(int rm_node_index_in,Net_wiz_prior_p new_Net_wiz_prior_p,bool maple_bool_local_in);
 };
 
 string nchild_eq_one_core(string in_str,int rm_node_index,size_t i_one_hybrid_child);

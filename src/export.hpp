@@ -25,8 +25,6 @@
 #include"utility.hpp"
 #include"net.hpp"
 
-
-
 //#include"rm_hybrid.hpp"
 
 #ifndef EXPORT
