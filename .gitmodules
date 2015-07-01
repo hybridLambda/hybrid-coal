@@ -3,7 +3,7 @@
 	url = git@github.com:hybridLambda/tree_topo.git
 [submodule "src/plot"]
 	path = src/plot
-	url = git@github.com:shajoezhu/plot.git
+	url = git@github.com:hybridLambda/plot.git
 [submodule "src/graph"]
 	path = src/graph
 	url = git@github.com:hybridLambda/graph.git

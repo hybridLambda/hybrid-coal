@@ -1,6 +1,6 @@
 [submodule "plot"]
       path = plot
-      url = https://github.com/shajoezhu/plot
+      url = https://github.com/hybridLambda/plot
       
 [submodule "tree_topo"]
       path = tree_topo
