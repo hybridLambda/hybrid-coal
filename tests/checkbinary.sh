@@ -38,6 +38,7 @@ echo "Testing Examples"
 	#test_hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -label || exit 1
 	#test_hybrid-coal -sp trees/4_tax_sp_nt1_para -dot || exit 1
 	#test_hybrid-coal -sp trees/4_tax_sp_nt1_para -print || exit 1
+  test_hybrid-coal
   
   # Not OK
   test_hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;' || exit 1

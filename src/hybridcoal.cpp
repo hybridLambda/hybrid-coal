@@ -1,7 +1,7 @@
 /* 
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
  * 
- * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
+ * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  * 
  * This file is part of hybrid-coal
  * 
@@ -20,28 +20,30 @@
 */
 
 #include "hybridcoal.hpp"
-//#include "net.hpp"
 #include "coal.hpp"
 #include "plot/figure.hpp"
 #include "tree_topo/all_gene_topo.hpp"
 
 void HybridCoal::init(){
     this->prefix    = "OUT";    
+    this->argc_i = 1;
+    this->helpBool = false;
     this->symb_bool = false;
     this->print_tree_bool = false;
     this->print_gene_topo_bool = false; 
     this->plot_bool       = false;
     this->latex_bool = false;
-    this->argc_i = 1;
     this->maple_bool = false;
     this->all_gt_tree_bool = true;
     this->enumerate_gt_bool = true;
 }
 
+
 void HybridCoal::read_sp_str( string & argv_i ){
     readNextStringto( this->tmp_input_str , this->argc_i, this->argc_,  this->argv_ );
     this->sp_str = read_input_line( tmp_input_str.c_str() );
 }
+
 
 void HybridCoal::read_input_lines(const char inchar[], vector <string> & out_vec){
     ifstream in_file( inchar );
@@ -64,6 +66,7 @@ void HybridCoal::read_input_lines(const char inchar[], vector <string> & out_vec
     in_file.close();
 }
 
+
 void HybridCoal::check_gt_str_and_sign( string &gt_str ){
     if ( gt_str.find('&') != string::npos ){
         throw std::invalid_argument ( "Error: gene tree " + gt_str + " can not be a gene tree string" );
@@ -71,18 +74,19 @@ void HybridCoal::check_gt_str_and_sign( string &gt_str ){
 }
 
 
-
 void HybridCoal::parse(){
+    if ( argc_ == 1 )
+        helpBool = true;
     while (argc_i < argc_){    
         std::string argv_i(argv_[argc_i]);
-        if      ( argv_i == "-h" || argv_i == "-help" ){ print_help(); }        
-        else if ( argv_i == "-gt" ){ readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ ); this->enumerate_gt_bool = false; }
-        else if ( argv_i == "-latex"){  this->latex_bool=true;    }
-        else if ( argv_i == "-sp"){ this->read_sp_str(argv_i); }
-        else if ( argv_i == "-o" ) readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );
+        if      ( argv_i == "-h" || argv_i == "-help" ){ helpBool = true; }
+        else if ( argv_i == "-gt"    ){ readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ ); this->enumerate_gt_bool = false; }
+        else if ( argv_i == "-latex" ){  this->latex_bool=true;    }
+        else if ( argv_i == "-sp"    ){ this->read_sp_str(argv_i); }
+        else if ( argv_i == "-o"     ){ readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );}
         else if ( argv_i == "-maple" ){ this->maple_bool=true; }
-        else if ( argv_i == "-symb" ){ this->symb_bool=true; }
-        else if ( argv_i == "-plot" || argv_i == "-dot" ){ this->plot_bool = true; }
+        else if ( argv_i == "-symb"  ){ this->symb_bool=true; }
+        else if ( argv_i == "-plot"  || argv_i == "-dot" ){ this->plot_bool = true; }
         else if ( argv_i == "-label" || argv_i == "-branch" ){ argc_i++; continue; }        
         else if ( argv_i == "-print" ){ this->print_tree_bool = true; }
         else if ( argv_i == "-gtopo" ){ this->print_gene_topo_bool = true; }
@@ -119,6 +123,8 @@ string HybridCoal::read_input_line(const char *inchar){
 
 
 void HybridCoal::finalize(){
+    if ( this->helpBool ) return;
+
     if ( this->gt_file_name.size() > 0 ) {
         this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
     }
@@ -133,6 +139,11 @@ void HybridCoal::finalize(){
 }
 
 void HybridCoal::HybridCoal_core(){
+    if ( helpBool ){
+        this->print_help();
+        return;
+    }
+    
     if ( this->print_tree_bool ) {
         this->print();
         return;
@@ -194,7 +205,7 @@ void HybridCoal::print(){
 }
 
 
-void print_example(){
+void HybridCoal::print_example(){
     cout << "Examples:" 
          << endl 
          << endl;
@@ -215,7 +226,7 @@ void print_example(){
 }
 
 
-void print_option(){
+void HybridCoal::print_option(){
     cout << endl 
          << "hybrid-coal " << VERSION 
          << endl 
@@ -238,9 +249,7 @@ void print_option(){
 
 
 /*! \brief hybrid-coal help file*/
-void print_help(){
-    print_option();
-    print_example();
-    exit (EXIT_SUCCESS);
+void HybridCoal::print_help(){
+    this->print_option();
+    this->print_example();
 }
-

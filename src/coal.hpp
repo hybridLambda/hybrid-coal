@@ -1,7 +1,7 @@
 /* 
  * hybrid-coal is used to compute gene tree probabilities given species network under coalescent process.
  * 
- * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
+ * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
  * 
  * This file is part of hybrid-coal
  * 
@@ -102,11 +102,11 @@ class CoalGT: public GraphBuilder {
     vector < vector < size_t > > recur_coal_hist ( vector < vector <size_t > > coal_hist, size_t node_i);
     void build_coal_hist( );
     
-    public:
-        CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){ 
-            dout << "Constrcut species network: " << gt_str << endl; 
-            this->which_taxa_is_below();
-            this->which_sample_is_below();
-        }
-        ~CoalGT(){};
+  public:
+    CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){
+        dout << "Constrcut species network: " << gt_str << endl;
+        this->which_taxa_is_below();
+        this->which_sample_is_below();
+    }
+    ~CoalGT(){};
 };
