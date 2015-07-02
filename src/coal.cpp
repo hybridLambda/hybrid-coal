@@ -24,28 +24,27 @@
 void CoalST::assign_bl_to_vec(){
     CoalSTdout << " Start of assign_bl_to_vec()" << endl;
     assert( this->print_all_node_dout() );
-    this->brchlens_vec = vector < double > ( this->nodes_.back()->edge(), 0 );
-    this->max_num_brch_vec = vector < int > ( this->nodes_.back()->edge(),0);
+    size_t numberOfInternalBranches = this->nodes_.back()->edge1.name();
+    this->brchlens_vec = vector < double > ( numberOfInternalBranches, 0.0 );
+    this->max_num_brch_vec = vector < int > ( numberOfInternalBranches,0);
 
     for ( auto it = nodes_.iterator(); it.good(); ++it ){
-    //for ( size_t node_i = 0; node_i < this->NodeContainer.size(); node_i++){
         //Node * (*it) = &this->NodeContainer[node_i];
-        size_t index_enum = (*it)->edge();
+        size_t tmpEdge = (*it)->edge1.name();
 
-        if ( index_enum != 0 ){
-            brchlens_vec[index_enum-1] = (*it)->brchlen1();
-            //cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
-            max_num_brch_vec[index_enum-1] = (*it)->samples_below.sum();
-            //cout<<index_enum<<" "<<brchlens_vec[index_enum-1]<<" "<<max_num_brch_vec[index_enum-1]<<endl;
+        if ( tmpEdge != 0 ){
+            size_t edgeIndex = tmpEdge - 1;
+            brchlens_vec[edgeIndex]     = (*it)->edge1.bl();
+            max_num_brch_vec[edgeIndex] = (*it)->samples_below.sum();
         }
-        CoalSTdout << " Node " << (*it) <<"  "<<index_enum <<" "<<(*it)->brchlen1()<<endl;
+        CoalSTdout << " Node " << (*it) << "  " << tmpEdge << " " <<(*it)->edge1.bl()<<endl;
         
         if ( (*it)->parent2() ){
-            index_enum = (*it)->edge2();
-            brchlens_vec[index_enum-1] = (*it)->brchlen2();
-            //cout<<(*it)->label<<"  "<<(*it)->brchlen1<<endl;
-            max_num_brch_vec[index_enum-1] =  (*it)->samples_below.sum();
-            dout << index_enum <<" "<<(*it)->brchlen2()<<endl;
+            tmpEdge = (*it)->edge2.name();
+            size_t edgeIndex = tmpEdge - 1;
+            brchlens_vec[edgeIndex]     = (*it)->edge2.bl();
+            max_num_brch_vec[edgeIndex] = (*it)->samples_below.sum();
+            dout << edgeIndex << " " << (*it)->edge2.bl() <<endl;
         }
     }
     CoalSTdout << "assign_bl_to_vec() finished" << endl;
@@ -83,7 +82,7 @@ void CoalST::build_gijoe(){
                             gi_joe_buv += exp(.5*k*(1.0-k)*brchlens_vec[b])*(2.0*k-1.0)*pow(-1.0,(k-v)*1.0)*v1*u1/(v2*v3*u2);
                         }
                     }
-                    
+
                     //cout<<"b:"<<b+1<<" u:"<<u<<" v:"<<v<<endl;
                     //cout<<gi_joe_buv<<"  "<<gijoe(u,v,brchlens_vec[b])<<endl;
                     //if (gi_joe_buv==gijoe(u,v,brchlens_vec[b])){cout<<"yes"<<endl;}
@@ -120,14 +119,14 @@ bool CoalST::print_gijoemat(){
 
     
 void CoalGT::building_M_matrix( CoalST & sp_net ) {
-    int sp_max_enum = sp_net.nodes_.back()->edge();
-    int gt_max_enum = this->nodes_.back()->edge();
-    
-    for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
-        vector < int > M_matrix_row( ( gt_max_enum - 1 ), 1 );
+    size_t spNumberOfInternalBranches = sp_net.nodes_.back()->edge1.name();
+    size_t gtNumberOfInteriorNode = this->nodes_.back()->edge1.name();
+
+    for ( int i_sp_enum = 0; i_sp_enum < spNumberOfInternalBranches; i_sp_enum++ ){
+        vector < int > M_matrix_row( ( gtNumberOfInteriorNode - 1 ), 1 );
         this->M_matrix.push_back( M_matrix_row );
     }
-    
+
     for ( auto sp_it = sp_net.nodes_.iterator(); sp_it.good(); ++sp_it ){
     //for ( size_t i = 0; i < sp_net.NodeContainer.size() - 1; i++ ){
         if ( (*sp_it)->is_tip() || (*sp_it)->parent1() == NULL ) continue;
@@ -138,16 +137,16 @@ void CoalGT::building_M_matrix( CoalST & sp_net ) {
                 int des_diff = (*sp_it)->taxa_below[i_des] - (*gt_it)->taxa_below[i_des]; /*! \todo this may not be right for multiple lineages per species*/
                 if ( des_diff < 0 ){
                     des_diff_prod = 0;
-                    M_matrix[ (*sp_it)->edge()-1][(*gt_it)->edge()-1] = 0;
+                    M_matrix[ (*sp_it)->edge1.name()-1][(*gt_it)->edge1.name()-1] = 0;
                     break;
                 } else{  /*! \todo check this else!!! dont think this is needed */
                     if (des_diff>0){
                         des_diff_prod=0;}
                 }
             }
-            
+
             if ( des_diff_prod == 1 ){
-                M_matrix[ (*sp_it)->edge()-1][(*gt_it)->edge()-1] = 1;
+                M_matrix[ (*sp_it)->edge1.name()-1][(*gt_it)->edge1.name()-1] = 1;
             }
         }
     }
@@ -158,8 +157,8 @@ void CoalGT::building_M_matrix( CoalST & sp_net ) {
 
 
 void CoalGT::building_R_matrix( ){
-    size_t gt_max_enum = this->nodes_.back()->edge();    
-    for ( size_t i_gt_enum=0; i_gt_enum < gt_max_enum; i_gt_enum++ ){
+    size_t gtNumberOfInteriorNode = this->nodes_.back()->edge1.name();
+    for ( size_t i_gt_enum=0; i_gt_enum < gtNumberOfInteriorNode; i_gt_enum++ ){
         vector <int> R_matrix_row( i_gt_enum, 1 );
         this->R_matrix.push_back(R_matrix_row);
     }
@@ -174,7 +173,7 @@ void CoalGT::building_R_matrix( ){
             for ( size_t i_des = 0; i_des < (*i)->taxa_below.size(); i_des++ ){
                 int des_diff = (*i)->taxa_below[i_des] - (*j)->taxa_below[i_des];
                 if ( des_diff < 0 ){
-                    this->R_matrix[(*i)->edge()-1][(*j)->edge()-1]=0;
+                    this->R_matrix[(*i)->edge1.name()-1][(*j)->edge1.name()-1]=0;
                     break;
                 }
             }
@@ -186,10 +185,10 @@ void CoalGT::building_R_matrix( ){
 
 
 void CoalST::building_S_matrix(){
-    int sp_max_enum=this->nodes_.back()->edge();
+    int spNumberOfInternalBranches = this->nodes_.back()->edge1.name();
     
-    for ( int i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++ ){
-        vector < int > S_matrix_row( sp_max_enum, 1 );
+    for ( int i_sp_enum = 0; i_sp_enum < spNumberOfInternalBranches; i_sp_enum++ ){
+        vector < int > S_matrix_row( spNumberOfInternalBranches, 1 );
         S_matrix_row[i_sp_enum] = 0;
         this->S_matrix.push_back( S_matrix_row );
     }
@@ -204,7 +203,7 @@ void CoalST::building_S_matrix(){
             for ( size_t i_des = 0; i_des < (*i)->taxa_below.size(); i_des++ ){
                 int des_diff = (*i)->taxa_below[i_des] - (*j)->taxa_below[i_des];
                 if ( des_diff < 0 ){
-                    S_matrix[(*i)->edge()-1][(*j)->edge()-1] = 0;
+                    S_matrix[(*i)->edge1.name()-1][(*j)->edge1.name()-1] = 0;
                     break;
                 }
             }
@@ -216,18 +215,18 @@ void CoalST::building_S_matrix(){
 
 
 void CoalGT::initialize_possible_coal_hist( CoalST & sp_net ){
-    size_t sp_max_enum = sp_net.nodes_.back()->edge();
-    size_t gt_max_enum = this->nodes_.back()->edge();
+    size_t spNumberOfInternalBranches = sp_net.nodes_.back()->edge1.name();
+    size_t gtNumberOfInteriorNode = this->nodes_.back()->edge1.name();
     
-    if ( gt_max_enum == 1 ){
+    if ( gtNumberOfInteriorNode == 1 ){
         vector <size_t> coal_hist_vec;
         coal_hist_vec.push_back(1);
         coal_hist_mat.push_back(coal_hist_vec);
     } else{
         int max_coal_hist_num = 1;
-        for ( size_t i_gt_enum = 0; i_gt_enum < gt_max_enum-1; i_gt_enum++ ){
+        for ( size_t i_gt_enum = 0; i_gt_enum < gtNumberOfInteriorNode-1; i_gt_enum++ ){
             vector <size_t> coal_hist_vec;
-            for ( size_t i_sp_enum = 0; i_sp_enum < sp_max_enum; i_sp_enum++){
+            for ( size_t i_sp_enum = 0; i_sp_enum < spNumberOfInternalBranches; i_sp_enum++){
                 if ( M_matrix[i_sp_enum][i_gt_enum] == 1 ){
                     coal_hist_vec.push_back(i_sp_enum+1);
                 }
@@ -252,13 +251,13 @@ void CoalGT::sum_coalescent_history_prob( CoalST & sp_net ){
             size_t current_enum;
             for ( auto it = sp_net.nodes_.iterator(); it.good(); ++it){
                 //Node * current_node = &sp_net.NodeContainer[node_i];
-                if ( (*it)->edge() == ( i + 1 ) ){
+                if ( (*it)->edge1.name() == ( i + 1 ) ){
                     //current_branch_lengths=my_sp_net.NodeContainer[node_i].brchlen1;
-                    current_enum = (*it)->edge();
+                    current_enum = (*it)->edge1.name();
                     break;
                 }
             }    
-            double current_gijoe = ( (i+1) == sp_net.nodes_.back()->edge() ) ? 1 :
+            double current_gijoe = ( (i+1) == sp_net.nodes_.back()->edge1.name() ) ? 1 :
                                                                               sp_net.gijoemat[current_enum-1][num_enter[hist_i][i]-1][num_out[hist_i][i]-1];
             dout << " current_gijoe ["<<num_enter[hist_i][i]<<"]["<<num_out[hist_i][i]<<"]" <<current_gijoe << " all_w[hist_i][i] " <<all_w[hist_i][i] <<" all_d[hist_i][i] "<<all_d[hist_i][i] << endl;
             current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
@@ -271,8 +270,9 @@ void CoalGT::sum_coalescent_history_prob( CoalST & sp_net ){
 
 
 void CoalGT::enumerate_coal_events( CoalST & sp_net ){
+    size_t spNumberOfInternalBranches = sp_net.nodes_.back()->edge1.name();
 
-    size_t sp_max_enum = sp_net.nodes_.back()->edge();
+    //size_t spNumberOfInternalBranches = sp_net.nodes_.back()->edge();
 
     for (size_t i_coal_hist = 0; i_coal_hist < valid_coal_hist.size(); i_coal_hist++){
         vector <int> num_enter_i_coal;
@@ -281,21 +281,21 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         vector <double> w_i_coal;
         vector <double> d_i_coal;
     
-        for ( size_t i = 0; i < sp_max_enum; i++ ){
+        for ( size_t i = 0; i < spNumberOfInternalBranches; i++ ){
             for ( auto it = sp_net.nodes_.iterator(); it.good(); ++it){
-                if ( !(*it)->is_tip() && (*it)->edge() == i + 1 ){
+                if ( !(*it)->is_tip() && (*it)->edge1.name() == i + 1 ){
                     num_enter_i_coal.push_back( (*it)->samples_below.sum() );
                 }
             }
         }    
-        for ( size_t i = 0; i < sp_max_enum; i++ ){
+        for ( size_t i = 0; i < spNumberOfInternalBranches; i++ ){
             vector < int > clades_coal_in_branch;
             int num_coal_in_branch_i_coal_dummy = 0;
             for ( size_t coal_hist_position=0; coal_hist_position < valid_coal_hist[i_coal_hist].size(); coal_hist_position++ ){
                 if ( valid_coal_hist[i_coal_hist][coal_hist_position] != i+1 ) continue;
                 num_coal_in_branch_i_coal_dummy++;
                 clades_coal_in_branch.push_back( coal_hist_position );
-                for ( size_t i_S_mat = i; i_S_mat < (sp_max_enum); i_S_mat++ ){
+                for ( size_t i_S_mat = i; i_S_mat < (spNumberOfInternalBranches); i_S_mat++ ){
                     if ( sp_net.S_matrix[i_S_mat][i] != 1 ) continue;
                     num_enter_i_coal[i_S_mat]--;
                 }    
@@ -344,7 +344,7 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         //num_coal_in_branch.push_back(num_coal_in_branch_i_coal);
         all_w.push_back( w_i_coal );
         all_d.push_back( d_i_coal );
-        valid_coal_hist[i_coal_hist].push_back( sp_max_enum );
+        valid_coal_hist[i_coal_hist].push_back( spNumberOfInternalBranches );
     }    
     
     dout<<"valid_coal_hist"<<endl;    
@@ -387,7 +387,7 @@ void CoalGT::build_coal_hist ( ){
         valid_coal_hist.push_back( coal_hist_dummy );
     }
     
-    int gt_max_enum = this->nodes_.back()->edge();    
+    int gt_max_enum = this->nodes_.back()->edge1.name();
     if ( gt_max_enum-1 > 1){
         valid_coal_hist = recur_coal_hist( valid_coal_hist, (size_t)1 );
     }
