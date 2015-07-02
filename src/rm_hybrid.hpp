@@ -66,7 +66,7 @@ class rm_H_node{
         double right_hybrid_parameter_num;
         double current_omega;
         double prior_omega;        
-        //vector < vector <int> > current_e_num_vec;
+        //vector < vector <int> > current_edge_vec;
     public:
         class vec_Net_wiz_prior_p block_rm_H;
         rm_H_node(int rm_node_index_in,Net_wiz_prior_p new_Net_wiz_prior_p,bool maple_bool_local_in);

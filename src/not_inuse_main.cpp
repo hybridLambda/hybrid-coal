@@ -291,7 +291,7 @@ void Tree::init_node_clade(){
 	coaled_sp_wiz_prior.omega=1; // fix this!!!!!!!!!!!!!!!
 	coaled_sp_wiz_prior.lambda_sum=initialize_lambda_sum(old_net_enum);
 	coaled_sp_wiz_prior.s_net_string_enum=construct_adding_new_Net_str(old_net_enum);
-	coaled_sp_wiz_prior.root_enum=old_net_enum.Net_nodes.back().e_num;
+	coaled_sp_wiz_prior.root_enum=old_net_enum.Net_nodes.back().edge;
 	coaled_sp_wiz_prior.prior_clade_list=prior_coal_clades_dummy;//=initial_prior_clade_list;
 	coaled_sp_wiz_prior.prior_coal_hist=prior_coal_hist;//=initial_prior_coal_hist;
 				

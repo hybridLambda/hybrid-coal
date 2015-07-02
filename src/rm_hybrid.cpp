@@ -26,20 +26,20 @@
 #include"rm_hybrid.hpp"
 bool rm_debug_bool=false;
 
-Net sub_brchlen_by_enum(string old_net_string, vector < vector <int> > e_num_vec_dummy){
-//string sub_brchlen_by_enum(string old_net_string, vector < vector <int> > e_num_vec_dummy){
+Net sub_brchlen_by_enum(string old_net_string, vector < vector <int> > edge_vec_dummy){
+//string sub_brchlen_by_enum(string old_net_string, vector < vector <int> > edge_vec_dummy){
     Net old_Net(old_net_string);
-    if (e_num_vec_dummy.size()!=old_Net.Net_nodes.size()){
-        cout<<"sub_brchlen_by_enum!!!!"<<old_Net.Net_nodes.size()<<"  "<<e_num_vec_dummy.size() <<endl;
+    if (edge_vec_dummy.size()!=old_Net.Net_nodes.size()){
+        cout<<"sub_brchlen_by_enum!!!!"<<old_Net.Net_nodes.size()<<"  "<<edge_vec_dummy.size() <<endl;
     }
     vector <Node*> old_Net_node_ptr;
     for (size_t i=0;i<old_Net.Net_nodes.size();i++){
         Node* new_node_ptr=NULL;
         old_Net_node_ptr.push_back(new_node_ptr);
         old_Net_node_ptr[i]=&old_Net.Net_nodes[i];    
-        old_Net_node_ptr[i]->brchlen1=e_num_vec_dummy[i][0];
+        old_Net_node_ptr[i]->brchlen1=edge_vec_dummy[i][0];
         if (old_Net_node_ptr[i]->parent2){
-            old_Net_node_ptr[i]->brchlen2=e_num_vec_dummy[i][1];
+            old_Net_node_ptr[i]->brchlen2=edge_vec_dummy[i][1];
         }
     
     }    
@@ -313,7 +313,7 @@ vector < vector <int> > rm_one_child_interior_lambda_sum(string old_net_string, 
 
 
 
-string rm_one_child_interior_node(string old_net_string,bool e_num_bool){
+string rm_one_child_interior_node(string old_net_string,bool edge_bool){
     Net old_Net(old_net_string);
     vector <Node*> sp_nodes_ptr;
     for (size_t i=0;i<old_Net.Net_nodes.size();i++){
@@ -335,7 +335,7 @@ string rm_one_child_interior_node(string old_net_string,bool e_num_bool){
             rm_one_parent_dummy->child.erase(rm_one_parent_dummy->child.begin()+which_one_child_parent);
             sp_nodes_ptr[sp_nodes_ptr_i]->child[0]->parent1=NULL;
             add_node(rm_one_parent_dummy,sp_nodes_ptr[sp_nodes_ptr_i]->child[0]);
-            if (!e_num_bool){
+            if (!edge_bool){
                 sp_nodes_ptr[sp_nodes_ptr_i]->child[0]->brchlen1=sp_nodes_ptr[sp_nodes_ptr_i]->child[0]->brchlen1+sp_nodes_ptr[sp_nodes_ptr_i]->brchlen1;
             }
             sp_nodes_ptr[sp_nodes_ptr_i]->clear();
@@ -1166,9 +1166,9 @@ Net initialize_enum_net(string in_str){
         Node* new_node_ptr=NULL;
         enum_net_ptr.push_back(new_node_ptr);
         enum_net_ptr[node_i]=&enum_net.Net_nodes[node_i];    
-        enum_net_ptr[node_i]->brchlen1=enum_net_ptr[node_i]->e_num;
+        enum_net_ptr[node_i]->brchlen1=enum_net_ptr[node_i]->edge;
         if (enum_net_ptr[node_i]->parent2){
-            enum_net_ptr[node_i]->brchlen2=enum_net_ptr[node_i]->e_num2;
+            enum_net_ptr[node_i]->brchlen2=enum_net_ptr[node_i]->edge2;
         }
     }
     rewrite_node_content(enum_net_ptr);
@@ -1177,7 +1177,7 @@ Net initialize_enum_net(string in_str){
 
 vector < vector <int> > initialize_lambda_sum(Net enum_net){
     vector < vector <int> > lambda_sum_initial;
-    for (size_t enum_i=0;enum_i<enum_net.Net_nodes.back().e_num;enum_i++){
+    for (size_t enum_i=0;enum_i<enum_net.Net_nodes.back().edge;enum_i++){
         vector <int> lambda_sum_dummy;
         lambda_sum_initial.push_back(lambda_sum_dummy);
     }
@@ -1192,7 +1192,7 @@ vec_Net_wiz_prior_p build_initial_Networks(string in_str){
     initial_Networks.omega=1;
     initial_Networks.lambda_sum=initialize_lambda_sum(old_net_enum);
     initial_Networks.s_net_string_enum=construct_adding_new_Net_str(old_net_enum);
-    initial_Networks.root_enum=old_net_enum.Net_nodes.back().e_num;
+    initial_Networks.root_enum=old_net_enum.Net_nodes.back().edge;
     //vector < valarray < int > > initial_prior_clade_list;
     //vector <int> initial_prior_coal_hist;
     //vector < vector < int > > initial_lambda_sum;

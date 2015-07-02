@@ -42,9 +42,9 @@ void symb_maple(const char* file_name,string in_str){
     
     //for (size_t i=0;i<net_dummy->Net_nodes.size()-1;i++){
         //if (!net_dummy->Net_nodes[i]->tip()){
-            //maple_file<<"lambda["<<net_dummy->Net_nodes[i].e_num<<"]:="<<net_dummy->Net_nodes[i].brchlen1<<";"<<endl;
+            //maple_file<<"lambda["<<net_dummy->Net_nodes[i].edge<<"]:="<<net_dummy->Net_nodes[i].brchlen1<<";"<<endl;
             //if (net_dummy->Net_nodes[i].hybrid){
-                //maple_file<<"lambda["<<net_dummy->Net_nodes[i].e_num2<<"]:="<<net_dummy->Net_nodes[i].brchlen2<<";"<<endl;        
+                //maple_file<<"lambda["<<net_dummy->Net_nodes[i].edge2<<"]:="<<net_dummy->Net_nodes[i].brchlen2<<";"<<endl;        
                 //size_t new_node_name_i=net_dummy->Net_nodes[i].label.find("#");
                 ////for (new_node_name_i=0;new_node_name_i<net_dummy->Net_nodes[i].label.size();new_node_name_i++){
                     ////if (net_dummy->Net_nodes[i].label[new_node_name_i]=='#'){

@@ -21,6 +21,14 @@
 
 #include "graph.hpp"
 
+#ifndef NDEBUG
+#define CoalSTdout (std::cout << "      CoalST ")
+#else
+#pragma GCC diagnostic ignored "-Wunused-value"
+#define CoalSTdout 0 && (std::cout << "      CoalST ")
+#endif
+
+
 /*! \brief Compute factorial of a \return double a! */
 template < class T > T factorial ( T a ){
     if (a > 1) return (a * factorial (a-1));
@@ -45,6 +53,7 @@ template < class T > T n_choose_k ( T n, T k ){
 
 template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
     for ( size_t i = 0; i < mat.size(); i++ ){
+        CoalSTdout << " " ;
         for ( size_t j = 0; j < mat[i].size(); j++){
             dout << mat[i][j];
         }
@@ -70,7 +79,7 @@ class CoalST: public GraphBuilder {
     bool print_gijoemat();
     void building_S_matrix();
     CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
-        dout << "Constrcut species tree: " << sp_str << endl; 
+        CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
         this->which_taxa_is_below();
         this->which_sample_is_below();
     }
@@ -104,7 +113,7 @@ class CoalGT: public GraphBuilder {
     
   public:
     CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){
-        dout << "Constrcut species network: " << gt_str << endl;
+        CoalSTdout << "Constrcut gene tree: " << gt_str << endl;
         this->which_taxa_is_below();
         this->which_sample_is_below();
     }
