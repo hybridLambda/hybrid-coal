@@ -27,3 +27,11 @@ html/
 hybrid-coal_dbg
 hybrid-coal_prof
 *gmon.out
+
+# unittest
+test-driver
+test-suite.log
+unittest
+unittest.log
+unittest.trs
+

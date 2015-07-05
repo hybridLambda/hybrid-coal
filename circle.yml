@@ -20,4 +20,5 @@ test:
   override:
     - ./bootstrap
     - make 
+    - make check
     - tests/checkbinary.sh 

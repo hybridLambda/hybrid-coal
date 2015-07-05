@@ -67,6 +67,7 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
 class CoalST: public GraphBuilder {
     friend class HybridCoal;
     friend class CoalGT;
+    friend class TestCoal;
     // Members
     vector < double > brchlens_vec;
     vector < int > max_num_brch_vec;
@@ -82,6 +83,8 @@ class CoalST: public GraphBuilder {
         CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
         this->which_taxa_is_below();
         this->which_sample_is_below();
+        this->build_gijoe();
+        this->building_S_matrix();
     }
     ~CoalST(){};
 };
@@ -90,6 +93,7 @@ class CoalST: public GraphBuilder {
 
 class CoalGT: public GraphBuilder {
     friend class HybridCoal;
+    friend class TestCoal;
     // Members
     vector < vector < int > >    R_matrix;
     vector < vector < int > >    M_matrix;

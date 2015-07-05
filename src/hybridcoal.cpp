@@ -173,21 +173,25 @@ void HybridCoal::HybridCoal_core(){
 
     // If there is one species tree, species tree should be built outside the loop
     CoalST sp( this->sp_str );
-    sp.build_gijoe();
-    sp.building_S_matrix();
 
     double total_prob = 0;
-    string gt_out = this->prefix+".prob";
-    ifstream tmp_file( gt_out.c_str() );
-    if ( tmp_file.good() )     {  remove(gt_out.c_str()); }
-
-    gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
-    for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
-        dout << this->gt_tree_str_s[gt_i] << endl;
-        CoalGT gt( this->gt_tree_str_s[gt_i] );
-        gt.prob_given_sp_tree( sp );
-        total_prob += gt.probability;
-        gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
+    
+    if ( sp.isNet() ){
+        cout << "Not implemented yet!" << endl;
+    }
+    else{
+        string gt_out = this->prefix+".prob";
+        ifstream tmp_file( gt_out.c_str() );
+        if ( tmp_file.good() )     {  remove(gt_out.c_str()); }
+    
+        gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+        for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
+            dout << this->gt_tree_str_s[gt_i] << endl;
+            CoalGT gt( this->gt_tree_str_s[gt_i] );
+            gt.prob_given_sp_tree( sp );
+            total_prob += gt.probability;
+            gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gt.probability << "\n";
+        }
     }
     std::clog << "Total probability = " << total_prob <<endl;
     gt_ofstream.close();
