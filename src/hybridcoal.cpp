@@ -172,14 +172,19 @@ void HybridCoal::HybridCoal_core(){
     }
 
     // If there is one species tree, species tree should be built outside the loop
-    CoalST sp( this->sp_str );
+    CoalSN spNet( this->sp_str );
 
     double total_prob = 0;
     
-    if ( sp.isNet() ){
+    if ( spNet.isNet() ){
+        // TODO: only working on the first tree at the moment
+        //for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
+        for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
+        }
         cout << "Not implemented yet!" << endl;
     }
     else{
+        CoalST sp ( spNet );
         string gt_out = this->prefix+".prob";
         ifstream tmp_file( gt_out.c_str() );
         if ( tmp_file.good() )     {  remove(gt_out.c_str()); }

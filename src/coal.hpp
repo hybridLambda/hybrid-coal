@@ -63,34 +63,8 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
     return true;
 }
 
-
-class CoalST: public GraphBuilder {
-    friend class HybridCoal;
-    friend class CoalGT;
-    friend class TestCoal;
-    // Members
-    vector < double > brchlens_vec;
-    vector < int > max_num_brch_vec;
-    vector < vector < int > > S_matrix;
-    vector < vector < vector < double > > > gijoemat;
-    
-    // Methods
-    void assign_bl_to_vec();
-    void build_gijoe();
-    bool print_gijoemat();
-    void building_S_matrix();
-    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
-        CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
-        this->which_taxa_is_below();
-        this->which_sample_is_below();
-        this->build_gijoe();
-        this->building_S_matrix();
-    }
-    ~CoalST(){};
-};
-
-
-
+class CoalST;
+class CoalSN;
 class CoalGT: public GraphBuilder {
     friend class HybridCoal;
     friend class TestCoal;
@@ -123,3 +97,103 @@ class CoalGT: public GraphBuilder {
     }
     ~CoalGT(){};
 };
+
+
+class CoalST: public GraphBuilder {
+  friend class HybridCoal;
+  friend class CoalGT;
+  friend class TestCoal;
+  friend class CoalSN;
+    // Members
+    vector < double > brchlens_vec;
+    vector < int > max_num_brch_vec;
+    vector < vector < int > > S_matrix;
+    vector < vector < vector < double > > > gijoemat;
+    
+    // Methods
+    void assign_bl_to_vec();
+    void build_gijoe();
+    bool print_gijoemat();
+    void building_S_matrix();
+    
+    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
+        CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
+        this->which_taxa_is_below();
+        this->which_sample_is_below();
+        // TODO: consider, should these be done here??!!
+        this->build_gijoe();
+        this->building_S_matrix();
+    }
+    
+    CoalST ( const CoalST & spIn ) : GraphBuilder ( spIn ) {
+        this->brchlens_vec = spIn.brchlens_vec;
+        this->max_num_brch_vec = spIn.max_num_brch_vec;
+        this->S_matrix = spIn.S_matrix;
+        this->gijoemat = spIn.gijoemat;
+    }
+    ~CoalST(){}
+};
+
+
+class CoalSN: public CoalST {
+  friend class CoalST;
+  friend class HybridCoal;
+    CoalSN ( string sp_str ) : CoalST ( sp_str ){
+    }
+    ~CoalSN(){}
+};
+
+//class Net_wiz_prior_p{
+    //public:
+    //string s_net_string; /*!< species network string */
+    //string s_net_string_enum;
+    //int root_enum; //! \todo try remove this!, as enum of the root can be expressed in the expressions /
+    //vector < valarray < int > > prior_clade_list;
+    //vector <int> prior_coal_hist;
+    //vector < vector < int > > lambda_sum;
+    ////vector < vector <int> > e_num_vec;
+////    vector <int> prior_number_coal_list;
+    ////string prior_prob_string;
+    ////double prior_prob_num;
+    //string omega_string;
+    //double omega;
+
+    
+    
+    
+    //Net_wiz_prior_p(){
+        //vector < valarray < int > > prior_clade_list;
+        //vector <int> prior_coal_hist;
+        //vector < vector < int > > lambda_sum;
+        ////vector < vector <int> > e_num_vec;
+        ////prior_prob_num=1;
+        ////prior_prob_string="";
+        //omega=1;
+        //omega_string="";
+        //s_net_string="";
+        //root_enum=0;
+    //}
+    
+    //void clear(){
+        //prior_clade_list.clear();
+        //prior_coal_hist.clear();
+        //lambda_sum.clear();
+        ////omega_string.clear();
+        //omega=1.0;
+        //omega_string="";
+        //s_net_string="";
+        //s_net_string_enum="";
+        //root_enum=0;
+        ////string s_net_string; /*!< species network string */
+    ////string s_net_string_enum;
+    ////int root_enum; //! \todo try remove this!, as enum of the root can be expressed in the expressions /
+    ////vector < valarray < int > > prior_clade_list;
+    ////vector <int> prior_coal_hist;
+    ////vector < vector < int > > lambda_sum;
+    ////string omega_string;
+    ////double omega;
+        
+    //}
+    
+//};
+

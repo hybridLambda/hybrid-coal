@@ -83,12 +83,16 @@ class HybridCoal{
 
     template < class T > T readNextInput() {
         ++argc_i;    
-        if (argc_i >= argc_) throw std::invalid_argument( std::string( "Not enough parameters when parsing options: ") + argv_[argc_i-1]);
-    
+        if (argc_i >= argc_) {
+        // TODO: add unit test for this
+            throw NotEnoughArg( argv_[argc_i-1] );
+        }
+
         char c;
         T input;
         std::stringstream ss(argv_[argc_i]);
         ss >> input;
+        // TODO: add unit test for this
         if (ss.fail() || ss.get(c)) throw std::invalid_argument( std::string( "Failed to parse option: ") + argv_[argc_i]); 
         return input;
     }
