@@ -28,6 +28,10 @@
 #define CoalSTdout 0 && (std::cout << "      CoalST ")
 #endif
 
+#ifndef COAL
+#define COAL
+
+enum SYMBOLIC_MODE { NONE, MAPLE, SYMB_LATEX };
 
 /*! \brief Compute factorial of a \return double a! */
 template < class T > T factorial ( T a ){
@@ -64,7 +68,6 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
 }
 
 class CoalST;
-class CoalSN;
 class CoalGT: public GraphBuilder {
     friend class HybridCoal;
     friend class TestCoal;
@@ -90,11 +93,7 @@ class CoalGT: public GraphBuilder {
     void build_coal_hist( );
     
   public:
-    CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){
-        CoalSTdout << "Constrcut gene tree: " << gt_str << endl;
-        this->which_taxa_is_below();
-        this->which_sample_is_below();
-    }
+    CoalGT ( string gt_str );
     ~CoalGT(){};
 };
 
@@ -115,85 +114,82 @@ class CoalST: public GraphBuilder {
     void build_gijoe();
     bool print_gijoemat();
     void building_S_matrix();
-    
-    CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
-        CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
-        this->which_taxa_is_below();
-        this->which_sample_is_below();
-        // TODO: consider, should these be done here??!!
-        this->build_gijoe();
-        this->building_S_matrix();
-    }
-    
-    CoalST ( const CoalST & spIn ) : GraphBuilder ( spIn ) {
-        this->brchlens_vec = spIn.brchlens_vec;
-        this->max_num_brch_vec = spIn.max_num_brch_vec;
-        this->S_matrix = spIn.S_matrix;
-        this->gijoemat = spIn.gijoemat;
-    }
+
+    CoalST ( string sp_str );
+    CoalST ( const CoalST & spIn );
     ~CoalST(){}
 };
 
 
-class CoalSN: public CoalST {
+class NetStrWizPrior {
+  friend class CoalSN;
+    string netStr;
+    //string netStrLabelled;
+    vector < valarray < int > > priorCladeList;
+    vector < int > priorCoalList;
+    //vector < vector < int > > lambdaSum;
+    string omegaStr(){
+        return to_string(this->omega_);
+    }
+    void setOmega ( double omega ){
+        this->omega_ = omega;
+    }
+    double omega() const {
+        return this->omega_;
+    }
+    double omega_;
+  public:
+    NetStrWizPrior( string firstStr ){
+        this->netStr = firstStr;
+        this->setOmega(1.0);
+    }
+
+    ~NetStrWizPrior(){}
+};
+
+
+class TmpSN : public GraphBuilder {
+  friend class CoalSN;
+  friend class TestRm;
+    int toBeRemovedNodeIndex_;
+    int toBeRemovedNodeIndex() const {return this->toBeRemovedNodeIndex_;}
+
+    TmpSN ( string tmpStr );
+    ~TmpSN(){}
+
+    void chooseRemoveNode();
+
+};
+
+
+class CoalSN : public CoalST {
   friend class CoalST;
   friend class HybridCoal;
-    CoalSN ( string sp_str ) : CoalST ( sp_str ){
-    }
+    bool maple_bool_local; // TODO, need to rework on this
+    vector < NetStrWizPrior > NetStrWizPriorList;
+    size_t currentSubNetworkIndex;
+    
+    void initializeNetStrWizPriorList ( string spStr );
+    void simplifyNetworks( string gt_string );
+    void removeSnode( size_t rmNodeIndex, string gtStr );
+    
+    
+    string new_node_name;
+    
+    void removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode = NONE );
+    string removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex,size_t i_one_hybrid_child);
+    void removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+
+    CoalSN ( string sp_str );
     ~CoalSN(){}
 };
 
-//class Net_wiz_prior_p{
-    //public:
-    //string s_net_string; /*!< species network string */
-    //string s_net_string_enum;
-    //int root_enum; //! \todo try remove this!, as enum of the root can be expressed in the expressions /
-    //vector < valarray < int > > prior_clade_list;
-    //vector <int> prior_coal_hist;
-    //vector < vector < int > > lambda_sum;
-    ////vector < vector <int> > e_num_vec;
-////    vector <int> prior_number_coal_list;
-    ////string prior_prob_string;
-    ////double prior_prob_num;
-    //string omega_string;
-    //double omega;
+vector < valarray <int> > all_possible_comb(int n);
+vector < vector < valarray < int > > > build_h_child(int n);
+vector < vector < valarray < int > > > build_s_child(int n);
+vector < valarray <int> > rearrange_A(vector < valarray <int> > A,int n);
+size_t hybrid_hash_index(string &in_str);
+string extract_hybrid_para_str(string &in_str);
+double extract_hybrid_para(string in_str);
 
-    
-    
-    
-    //Net_wiz_prior_p(){
-        //vector < valarray < int > > prior_clade_list;
-        //vector <int> prior_coal_hist;
-        //vector < vector < int > > lambda_sum;
-        ////vector < vector <int> > e_num_vec;
-        ////prior_prob_num=1;
-        ////prior_prob_string="";
-        //omega=1;
-        //omega_string="";
-        //s_net_string="";
-        //root_enum=0;
-    //}
-    
-    //void clear(){
-        //prior_clade_list.clear();
-        //prior_coal_hist.clear();
-        //lambda_sum.clear();
-        ////omega_string.clear();
-        //omega=1.0;
-        //omega_string="";
-        //s_net_string="";
-        //s_net_string_enum="";
-        //root_enum=0;
-        ////string s_net_string; /*!< species network string */
-    ////string s_net_string_enum;
-    ////int root_enum; //! \todo try remove this!, as enum of the root can be expressed in the expressions /
-    ////vector < valarray < int > > prior_clade_list;
-    ////vector <int> prior_coal_hist;
-    ////vector < vector < int > > lambda_sum;
-    ////string omega_string;
-    ////double omega;
-        
-    //}
-    
-//};
-
+#endif

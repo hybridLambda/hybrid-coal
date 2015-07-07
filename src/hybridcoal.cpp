@@ -180,6 +180,14 @@ void HybridCoal::HybridCoal_core(){
         // TODO: only working on the first tree at the moment
         //for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
         for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
+            string tmpGt = this->gt_tree_str_s[gt_i];
+            // simplify the networks
+            
+            //for (){
+                //CoalGT gt( this->gt_tree_str_s[gt_i] );
+                //CoalST sp ( spNet );
+                //gt.prob_given_sp_tree( sp );
+            //}
         }
         cout << "Not implemented yet!" << endl;
     }
