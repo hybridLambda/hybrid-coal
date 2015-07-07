@@ -123,6 +123,7 @@ class CoalST: public GraphBuilder {
 
 class NetStrWizPrior {
   friend class CoalSN;
+  friend class TestRm;
     string netStr;
     //string netStrLabelled;
     vector < valarray < int > > priorCladeList;
@@ -164,6 +165,7 @@ class TmpSN : public GraphBuilder {
 
 class CoalSN : public CoalST {
   friend class CoalST;
+  friend class TestRm;
   friend class HybridCoal;
     bool maple_bool_local; // TODO, need to rework on this
     vector < NetStrWizPrior > NetStrWizPriorList;
@@ -173,12 +175,16 @@ class CoalSN : public CoalST {
     void simplifyNetworks( string gt_string );
     void removeSnode( size_t rmNodeIndex, string gtStr );
     
-    
+    double left_hybrid_parameter_num;
+    double right_hybrid_parameter_num;
     string new_node_name;
-    
+    size_t hashSingIdx;
     void removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode = NONE );
-    string removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex,size_t i_one_hybrid_child);
-    void removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+       void removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+         string removeHnodeOneChildCore( TmpSN &tmpSN, size_t rmNodeIndex, size_t removingFromParentIndex);
+       void removeHnodeManyChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+         string removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, int numberOfChildAtRemovingNode, vector < valarray <int> > &A_matrix_ith_row, size_t A_matrix_i );
+         vector <int> build_left_or_right_vec(int n_child,vector < valarray <int> > A_matrix_ith_row,size_t A_matrix_i);
 
     CoalSN ( string sp_str );
     ~CoalSN(){}

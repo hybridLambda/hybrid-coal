@@ -182,14 +182,14 @@ void HybridCoal::HybridCoal_core(){
         for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
             string tmpGt = this->gt_tree_str_s[gt_i];
             // simplify the networks
-            
+            spNet.simplifyNetworks (tmpGt);
             //for (){
                 //CoalGT gt( this->gt_tree_str_s[gt_i] );
                 //CoalST sp ( spNet );
                 //gt.prob_given_sp_tree( sp );
             //}
         }
-        cout << "Not implemented yet!" << endl;
+        //cout << "Not implemented yet!" << endl;
     }
     else{
         CoalST sp ( spNet );

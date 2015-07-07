@@ -93,6 +93,7 @@ class TestCoal : public CppUnit::TestCase {
       CPPUNIT_ASSERT_NO_THROW( gt5.prob_given_sp_tree( sp5 ) ) ;
       CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0000068945, gt5.probability, 0.00000001 );
     }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestCoal );

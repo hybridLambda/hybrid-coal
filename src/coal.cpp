@@ -305,14 +305,15 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         vector <int> num_coal_in_branch_i_coal;
         vector <double> w_i_coal;
         vector <double> d_i_coal;
-    
+
         for ( size_t i = 0; i < spNumberOfInternalBranches; i++ ){
             for ( auto it = sp_net.nodes_.iterator(); it.good(); ++it){
                 if ( !(*it)->isTip() && (*it)->edge1.name() == i + 1 ){
                     num_enter_i_coal.push_back( (*it)->samples_below.sum() );
                 }
             }
-        }    
+        }
+
         for ( size_t i = 0; i < spNumberOfInternalBranches; i++ ){
             vector < int > clades_coal_in_branch;
             int num_coal_in_branch_i_coal_dummy = 0;
@@ -411,7 +412,7 @@ void CoalGT::build_coal_hist ( ){
         coal_hist_dummy.push_back( coal_hist_mat[0][first_coal_mat_i] );
         valid_coal_hist.push_back( coal_hist_dummy );
     }
-    
+
     int gt_max_enum = this->nodes_.back()->edge1.name();
     if ( gt_max_enum-1 > 1){
         valid_coal_hist = recur_coal_hist( valid_coal_hist, (size_t)1 );
@@ -428,6 +429,7 @@ void CoalGT::prob_given_sp_tree ( CoalST & sp_tree ){
     this->sum_coalescent_history_prob( sp_tree );
 }
 
+
 TmpSN::TmpSN ( string tmpStr ) : GraphBuilder ( tmpStr ){
     this->chooseRemoveNode();
 }
@@ -440,7 +442,7 @@ void TmpSN::chooseRemoveNode() {
             toBeRemovedNodeIndex_ = it.node_index();
         }
     }
-    
+
     if ( toBeRemovedNodeIndex_ == this->nodes()->size() - 1 ){
         toBeRemovedNodeIndex_ = -1;
     }
@@ -468,10 +470,9 @@ void CoalSN::simplifyNetworks( string gt_string ){
         if ( rm_node_index >=0 ){
             
             if ( current_net.nodes_.at((size_t)rm_node_index)->isHybrid () ){ // Removing a hybrid node 
-            //this->simplify_Networks_one_block(current_net.Net_nodes[rm_node_index].hybrid,rm_node_index,my_rmd_networks,i,maple_bool_local,gt_string);
-            //rm_H_node new_block(rm_node_index,my_rmd_networks.Net_vec[i],maple_bool_local);
-                cout << " not implemented yet returned " << endl;
-                return;
+                this->removeHnode(current_net, rm_node_index, this->NetStrWizPriorList[currentSubNetworkIndex], NONE);  
+                //cout << " not implemented yet returned " << endl;
+                //return;
             } 
             else{ // Removing a internal node which is below a hybrid node
                 dout << " Removie internal node " << current_net.nodes_.at(rm_node_index) << endl;
@@ -510,9 +511,9 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
     //current_lambda_sum=new_Net_wiz_prior_p.lambda_sum;
     
     // TODO size_t newly declared....
-    size_t new_node_name_i = hybrid_hash_index(new_node_name);
+    hashSingIdx = hybrid_hash_index(new_node_name);
 
-    assert( new_node_name_i < new_node_name.size() );
+    assert( hashSingIdx < new_node_name.size() );
     
     // TODO string newly declared....
     string hybrid_parameter = extract_hybrid_para_str(new_node_name);
@@ -520,12 +521,12 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
     string left_hybrid_parameter=hybrid_parameter;
     if ( sybolicMode == MAPLE ){
         cout << "nothing here" <<endl;
-        //left_hybrid_parameter_str="gamma["+new_node_name.substr(1,new_node_name_i-1)+"]";
+        //left_hybrid_parameter_str="gamma["+new_node_name.substr(1,hashSingIdx-1)+"]";
     }
     else if ( sybolicMode == SYMB_LATEX ){
         cout << "nothing here" <<endl;
 
-        //left_hybrid_parameter_str="\\gamma"+new_node_name.substr(1,new_node_name_i-1);
+        //left_hybrid_parameter_str="\\gamma"+new_node_name.substr(1,hashSingIdx-1);
     }
     else {
         cout << "nothing here" <<endl;
@@ -535,8 +536,8 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
     // TODO rework on the symbolic mode
     //right_hybrid_parameter="(1-"+hybrid_parameter+")";
     //right_hybrid_parameter_str="(1-"+left_hybrid_parameter_str+")";
-    //left_hybrid_parameter_num=extract_hybrid_para(new_node_name);
-    //right_hybrid_parameter_num=1-left_hybrid_parameter_num;
+    left_hybrid_parameter_num = extract_hybrid_para(new_node_name);
+    right_hybrid_parameter_num = 1.0 - left_hybrid_parameter_num;
     
     if ( tmpSN.nodes_.at(rmNodeIndex)->child.size() > 1 ){
         //block_rm_H=nchild_gt_one(rmNodeIndex,maple_bool_local,tmpSN.Net_nodes[rmNodeIndex].num_child);
@@ -554,46 +555,43 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
 
 string CoalSN::removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex, size_t removingFromParentIndex){        
     GraphBuilder localTmpSN(tmpSN);
-    
+    Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent[2];
-    //removingFromParent[0] = NULL;
-    //removingFromParent[1] = NULL;
-    removingFromParent[0] = localTmpSN.nodes_.at(rmNodeIndex)->parent1();
-    removingFromParent[1] = localTmpSN.nodes_.at(rmNodeIndex)->parent2();
+    removingFromParent[0] = removingNode->parent1();
+    removingFromParent[1] = removingNode->parent2();
     
     for ( size_t parentIndex = 0; parentIndex < 2; parentIndex++ ){
         int removingChildIndex = -1;
         dout << "From parent " << removingFromParent[parentIndex]->nodeName << "( " << removingFromParent[parentIndex]->child.size() << " ) child, ";
         for ( size_t childIndex = 0; removingFromParent[parentIndex]->child.size(); childIndex++){
-            if ( removingFromParent[parentIndex]->child[childIndex] == localTmpSN.nodes_.at(rmNodeIndex) ){
+            if ( removingFromParent[parentIndex]->child[childIndex] == removingNode ){
                 dout << "removing " << removingChildIndex << "th child" << endl;
                 removingChildIndex = childIndex;
                 break;
             }
         }
         assert ( removingChildIndex != -1 );
-        //removingFromParent[parentIndex]->num_child--;
         removingFromParent[parentIndex]->child.erase(removingFromParent[parentIndex]->child.begin() + (size_t)removingChildIndex);    
     }
-    //sp_nodes_ptr_rm[rm_node_index]->child[0]->descndnt_of_hybrid=0;
-    //sp_nodes_ptr_rm[rm_node_index]->child[0]->parent1=NULL;
-    //sp_nodes_ptr_rm[rm_node_index]->child[0]->parent2=NULL;        
-    removingFromParent[removingFromParentIndex]->add_child(localTmpSN.nodes_.at(rmNodeIndex)->child[0]);
-    localTmpSN.nodes_.at(rmNodeIndex)->child.clear();
+    removingNode->child[0]->setIsBelowHybrid(false);
+    removingNode->child[0]->set_parent1 (NULL);
+    removingNode->child[0]->set_parent2 (NULL);
+    removingNode->child[0]->edge1.setLength( removingNode->child[0]->edge1.bl() + removingNode->edge1.bl());
+    removingFromParent[removingFromParentIndex]->add_child(removingNode->child[0]);
+    removingNode->child.clear();
 
     //check hybrid node has zero kids
-    assert ( localTmpSN.nodes_.at(rmNodeIndex)->child.size() == 0);
+    assert ( removingNode->child.size() == 0);
     //rm_zero_kids_hybrid_node(sp_nodes_ptr_rm);
 
-    localTmpSN.nodes_.at(rmNodeIndex)->set_parent1(NULL);
-    localTmpSN.nodes_.at(rmNodeIndex)->set_parent2(NULL);
+    removingNode->set_parent1(NULL);
+    removingNode->set_parent2(NULL);
     
+    // Cleanning up the removing node, and remove one child internal node
+    localTmpSN.nodes_.remove(removingNode);
+    localTmpSN.rewrite_subTreeStr();    
     localTmpSN.removeOneChildInternalNode();
-    
-    //rewrite_node_content(sp_nodes_ptr_rm);
-    string adding_new_Net_string = localTmpSN.rewrite_internal_subTreeStr(localTmpSN.nodes_.back());
-    //string adding_new_Net_string=construct_adding_new_Net_str(current_removing_net);
-    return adding_new_Net_string;
+    return localTmpSN.reWritesubTreeStrAtRoot();
 }
 
 
@@ -602,12 +600,12 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
     for (size_t removingFromParentIndex = 0; removingFromParentIndex < 2; removingFromParentIndex++){
 
         string adding_new_Net_string = removeHnodeOneChildCore(tmpSN, rmNodeIndex, removingFromParentIndex);
+        cout << adding_new_Net_string <<endl;
         
         // Comment out the following line for now...
         //vector < vector < int > > new_lambda_sum=rm_one_child_interior_lambda_sum(adding_new_Net_string_enum, current_lambda_sum);                 
         
-        double left_hybrid_parameter_num = extract_hybrid_para(new_node_name);
-        double right_hybrid_parameter_num = 1-left_hybrid_parameter_num;
+
         double uni_hybrid_paramter_num = removingFromParentIndex == 0 ? left_hybrid_parameter_num : 
                                                                         right_hybrid_parameter_num;
         string uni_hybrid_paramter_string = removingFromParentIndex == 0 ? to_string(left_hybrid_parameter_num):
@@ -626,8 +624,6 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
                 //current_omega=prior_omega*uni_hybrid_paramter_num;
         }
         else {
-            cout << "nothing here" <<endl;
-        
             assert ( sybolicMode == NONE);
         }
 
@@ -637,6 +633,190 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
 
         this->NetStrWizPriorList.push_back(newNetStrWizPrior);
     }
+}
+
+
+string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, int numberOfChildAtRemovingNode, vector < valarray <int> > &A_matrix_ith_row, size_t A_matrix_i ){
+    GraphBuilder localTmpSN(tmpSN);
+    Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
+    Node * removingFromParent[2];
+    removingFromParent[0] = removingNode->parent1();
+    removingFromParent[1] = removingNode->parent2();
+    
+    //Net current_removing_net(current_removing_net_string);    
+    vector <Node*> sp_nodes_ptr_rm;
+
+    string nameToLeft  = new_node_name.substr(0,hashSingIdx) + "L";
+    string nameToRight = new_node_name.substr(0,hashSingIdx) + "R";
+    double blToLeft  = removingNode->edge1.bl();
+    double blToRight = removingNode->edge2.bl();
+
+    size_t max_of_taxa = removingNode->taxa_below.size();
+    size_t max_of_sample = removingNode->samples_below.size();
+
+    Node newLeft(max_of_taxa, max_of_sample, nameToLeft, string(""), blToLeft, false );
+    Node newRight(max_of_taxa, max_of_sample, nameToRight, string(""), blToRight, false );
+
+    for (size_t i_link_ptr_rm = 0; i_link_ptr_rm < current_removing_net.Net_nodes.size(); i_link_ptr_rm++){
+        Node* new_node_ptr=NULL;
+        sp_nodes_ptr_rm.push_back(new_node_ptr);
+        sp_nodes_ptr_rm[i_link_ptr_rm]=&current_removing_net.Net_nodes[i_link_ptr_rm];        
+    }
+
+    for ( size_t parentIndex = 0; parentIndex < 2; parentIndex++ ){
+        int removingChildIndex = -1;
+        for ( int childIndex = 0; removingFromParent[parentIndex]->child.size(); childIndex++ ){
+            if (removingFromParent[parentIndex]->child[childIndex] == removingNode){                                
+                removingChildIndex[parentIndex] = childIndex;
+                break;
+            }
+        }
+
+        removingFromParent[parentIndex]->child.erase(removingFromParent[parentIndex]->child.begin()+(size_t)removingChildIndex);
+
+        if ( A_matrix_i > 1 ){                
+            for ( int A_matrix_i_i_i = 0; A_matrix_i_i_i < n_child; A_matrix_i_i_i++ ){
+                sp_nodes_ptr_rm[rm_node_index]->child[A_matrix_i_i_i]->parent1 = NULL;
+                if (A_matrix_ith_row[parentIndex][A_matrix_i_i_i]==1){
+                    if ( parentIndex == 0){
+                        // adding to left
+                    } else {
+                        assert ( parentIndex == 1);
+                        // adding to the right
+                    }
+                    add_node(sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()+parentIndex-2],sp_nodes_ptr_rm[rm_node_index]->child[A_matrix_i_i_i]);
+                }
+            }        
+            if ( parentIndex == 0){
+                // adding to left
+            } else {
+                assert ( parentIndex == 1);
+                // adding to the right
+            }
+            add_node(removingFromParent[parentIndex],sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()+parentIndex-2]);            
+        }
+        else{
+            if (A_matrix_i==parentIndex){
+                for (int A_matrix_i_i_i=0;A_matrix_i_i_i<n_child;A_matrix_i_i_i++){
+                    //sp_nodes_ptr_rm[rm_node_index]->child[A_matrix_i_i_i]->parent1=NULL;
+                    if ( parentIndex == 0){
+                        // adding to left
+                    } else {
+                        assert ( parentIndex == 1);
+                        // adding to the right
+                    }
+                    add_node(sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()+parentIndex-2],sp_nodes_ptr_rm[rm_node_index]->child[A_matrix_i_i_i]);
+                }
+                if ( parentIndex == 0){
+                    // adding to left
+                } else {
+                    assert ( parentIndex == 1);
+                    // adding to the right
+                }
+                add_node(removingFromParent[parentIndex],sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()+parentIndex-2]);
+            }
+        }
+    }
+
+    removingNode->set_parent1(NULL);
+    removingNode->set_parent2(NULL);
+
+    //check hybrid node has zero kids
+    rm_zero_kids_hybrid_node(sp_nodes_ptr_rm);
+    
+    for (size_t sp_nodes_ptr_rm_i=0;sp_nodes_ptr_rm_i<sp_nodes_ptr_rm.size();sp_nodes_ptr_rm_i++){
+        sp_nodes_ptr_rm[sp_nodes_ptr_rm_i]->num_descndnt=0;
+        for (size_t tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
+            if (find_descndnt(sp_nodes_ptr_rm[sp_nodes_ptr_rm_i],current_removing_net.tax_name[tax_name_i])){
+                current_removing_net.descndnt[sp_nodes_ptr_rm_i][tax_name_i]=1;
+                }
+            sp_nodes_ptr_rm[sp_nodes_ptr_rm_i]->num_descndnt=current_removing_net.descndnt[sp_nodes_ptr_rm_i].sum();
+        }
+    }
+    
+    current_removing_net.Net_nodes[rm_node_index].clear();
+    Node * swap_dummy;
+    swap_dummy=sp_nodes_ptr_rm.back();
+    find_hybrid_descndnt(sp_nodes_ptr_rm.back());
+    sp_nodes_ptr_rm.back()=sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()-3];
+    sp_nodes_ptr_rm[sp_nodes_ptr_rm.size()-3]=swap_dummy;
+
+    rewrite_node_content(sp_nodes_ptr_rm);
+    string adding_new_Net_string;    
+    adding_new_Net_string=current_removing_net.Net_nodes[current_removing_net.Net_nodes.size()-3].node_content;
+    adding_new_Net_string=adding_new_Net_string+current_removing_net.Net_nodes[current_removing_net.Net_nodes.size()-3].label;
+    adding_new_Net_string.push_back(';');
+
+    return adding_new_Net_string;
+}
+
+
+void CoalSN::removeHnodeManyChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode ){
+    int numberOfChildAtRemovingNode = (int)tmpSN.nodes_.size();
+    vector < vector < valarray <int> > > A_matrix = build_h_child(numberOfChildAtRemovingNode);
+    
+    for ( size_t A_matrix_i = 0; A_matrix_i < A_matrix.size(); A_matrix_i++ ){
+        string adding_new_Net_string = this->removeHnodeManyChildCore( tmpSN, rmNodeIndex, netStrWizPrior, numberOfChildAtRemovingNode, A_matrix[A_matrix_i], A_matrix_i);
+        //string adding_new_Net_string_enum=nchild_gt_one_core(current_removing_net_string_enum,new_node_name,rm_node_index,numberOfChildAtRemovingNode, A_matrix[A_matrix_i],A_matrix_i);
+        
+        vector <int> left_or_right = this->build_left_or_right_vec(numberOfChildAtRemovingNode, A_matrix[A_matrix_i], A_matrix_i);
+        //vector <string> left_or_right_string = build_left_or_right_string(left_or_right);
+        vector < vector < int > > new_lambda_sum=rm_one_child_interior_lambda_sum(adding_new_Net_string_enum, current_lambda_sum);
+                
+        //bool enum_false=false;
+        //string adding_new_Net_string_updated=rm_one_child_interior_node(adding_new_Net_string,enum_false);    
+        
+        //bool enum_true=true;
+        //string adding_new_Net_string_updated_enum=rm_one_child_interior_node(adding_new_Net_string_enum,enum_true);                        
+    
+        //string new_left_hybrid="("+left_hybrid_parameter_str+"^"+left_or_right_string[0]+")";
+        //string new_right_hybrid="("+right_hybrid_parameter_str+"^"+left_or_right_string[1]+")";                            
+        
+        double current_omega = ( netStrWizPrior.omega() * 
+                                 pow(1.0*left_hybrid_parameter_num, 1.0*left_or_right[0]) * 
+                                 pow(1.0*right_hybrid_parameter_num,1.0*left_or_right[1]) );
+        
+        if ( sybolicMode == MAPLE ){
+            cout << "nothing here" <<endl;
+                //current_omega_string=new_left_hybrid+"*"+new_right_hybrid;
+        }
+        else if ( sybolicMode == SYMB_LATEX ){
+            cout << "nothing here" <<endl;
+            //current_omega=prior_omega*pow(1.0*left_hybrid_parameter_num,1.0*left_or_right[0])*pow(1.0*right_hybrid_parameter_num,1.0*left_or_right[1]);                            
+            //current_omega_string=prior_omega_string+new_left_hybrid+new_right_hybrid;    
+        }
+        else {
+            assert ( sybolicMode == NONE);
+        }
+
+        NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
+        newNetStrWizPrior.netStr = adding_new_Net_string;
+        newNetStrWizPrior.setOmega ( current_omega );
+
+        this->NetStrWizPriorList.push_back(newNetStrWizPrior);
+    }
+}
+
+
+vector <int> CoalSN::build_left_or_right_vec( int n_child,vector < valarray <int> > A_matrix_ith_row, size_t A_matrix_i ){
+    vector <int> left_or_right(2, 0);
+    for (size_t parent_i = 0; parent_i < 2; parent_i++ ){
+        if ( A_matrix_i > 1 ){
+            for ( int A_matrix_i_i_i = 0; A_matrix_i_i_i < n_child; A_matrix_i_i_i++ ){
+                if ( A_matrix_ith_row[parent_i][A_matrix_i_i_i] == 1 ){
+                    left_or_right[parent_i]++;
+                }
+            }
+        }
+        else{
+            if (A_matrix_i == parent_i){
+                for (int A_matrix_i_i_i=0;A_matrix_i_i_i<n_child;A_matrix_i_i_i++){
+                    left_or_right[parent_i]++;
+                }
+            }
+        }
+    }
+    return left_or_right;
 }
 
 
@@ -1111,11 +1291,11 @@ vector < valarray <int> > all_possible_comb(int n){
     for (int ii=0;ii<n;ii++){
         int i=pow(1.0*2,1.0*ii);
         while (i<=pow(1.0*2,1.0*n)){
-        vector <int> ones(pow(1.0*2,1.0*ii),1);
-        vector <int> zeros(pow(1.0*2,1.0*ii),0);
-        Avec.insert(Avec.begin(),zeros.begin(),zeros.end());
-        Avec.insert(Avec.begin(),ones.begin(),ones.end());
-        i=i+pow(1.0*2,1.0*(ii+1));
+            vector <int> ones(pow(1.0*2,1.0*ii),1);
+            vector <int> zeros(pow(1.0*2,1.0*ii),0);
+            Avec.insert(Avec.begin(),zeros.begin(),zeros.end());
+            Avec.insert(Avec.begin(),ones.begin(),ones.end());
+            i=i+pow(1.0*2,1.0*(ii+1));
         }
     }
     vector < valarray <int> > A;
@@ -1222,9 +1402,8 @@ vector < vector < valarray <int> > > build_s_child(int n){
             new_all_list.push_back(all_list_in_vec[i]);
 
         }
-
     }
-    
+
     vector < vector < valarray <int> > > descdent_all_list;
     for (size_t i=0;i<new_all_list.size();i++){
         vector < valarray <int> > current_descent;

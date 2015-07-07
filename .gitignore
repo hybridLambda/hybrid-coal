@@ -35,3 +35,4 @@ unittest
 unittest.log
 unittest.trs
 
+doxygen_sqlite3.db
