@@ -174,30 +174,32 @@ void HybridCoal::HybridCoal_core(){
     // If there is one species tree, species tree should be built outside the loop
     CoalSN spNet( this->sp_str );
 
-    double total_prob = 0;
+    string gt_out = this->prefix+".prob";
+    ifstream tmp_file( gt_out.c_str() );
+    if ( tmp_file.good() )     {  remove(gt_out.c_str()); }
+
+    gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
+    double total_prob = 0.0;
     
     if ( spNet.isNet() ){
         // TODO: only working on the first tree at the moment
-        //for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
-        for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
+        for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
             string tmpGt = this->gt_tree_str_s[gt_i];
             // simplify the networks
             spNet.simplifyNetworks (tmpGt);
-            //for (){
-                //CoalGT gt( this->gt_tree_str_s[gt_i] );
-                //CoalST sp ( spNet );
-                //gt.prob_given_sp_tree( sp );
-            //}
+            double gtTotalProb = 0.0;
+            for ( size_t i = 0; i < spNet.NetStrWizPriorList.size(); i++ ){
+                CoalGT gt(tmpGt );
+                CoalST sp ( spNet.NetStrWizPriorList[i].netStr );
+                gt.prob_given_sp_tree( sp );
+                gtTotalProb += spNet.NetStrWizPriorList[i].omega() * gt.probability;
+            }
+            total_prob += gtTotalProb;
+            gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gtTotalProb << "\n";
         }
-        //cout << "Not implemented yet!" << endl;
     }
     else{
         CoalST sp ( spNet );
-        string gt_out = this->prefix+".prob";
-        ifstream tmp_file( gt_out.c_str() );
-        if ( tmp_file.good() )     {  remove(gt_out.c_str()); }
-    
-        gt_ofstream.open ( gt_out.c_str(), ios::out | ios::app | ios::binary );
         for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
             dout << this->gt_tree_str_s[gt_i] << endl;
             CoalGT gt( this->gt_tree_str_s[gt_i] );

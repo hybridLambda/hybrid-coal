@@ -124,6 +124,7 @@ class CoalST: public GraphBuilder {
 class NetStrWizPrior {
   friend class CoalSN;
   friend class TestRm;
+  friend class HybridCoal;
     string netStr;
     //string netStrLabelled;
     vector < valarray < int > > priorCladeList;
