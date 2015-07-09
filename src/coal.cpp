@@ -758,27 +758,10 @@ double extract_hybrid_para(string in_str){
 
 
 string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode ){
-// This should be a core function
-
-    //cout <<A_matrix_i<<endl;
-    //Net current_removing_net(current_removing_net_string);
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent = removingNode->parent1();;
-    //Net current_removing_net_enum(current_s_net_string_enum);
-    //cout<<current_s_net_string_enum<<endl;
     //vector < vector <int> > new_lambda_sum=current_lambda_sum;
-    //vector <Node*> sp_nodes_ptr_rm;
-    //vector <Node*> sp_nodes_ptr_rm_enum;
-
-    //for (size_t i_link_ptr_rm=0;i_link_ptr_rm<current_removing_net.Net_nodes.size();i_link_ptr_rm++){
-        //Node* new_node_ptr=NULL;
-        //sp_nodes_ptr_rm.push_back(new_node_ptr);
-        //sp_nodes_ptr_rm[i_link_ptr_rm]=&current_removing_net.Net_nodes[i_link_ptr_rm];
-        //Node* new_node_ptr_enum=NULL;
-        //sp_nodes_ptr_rm_enum.push_back(new_node_ptr_enum);
-        //sp_nodes_ptr_rm_enum[i_link_ptr_rm]=&current_removing_net_enum.Net_nodes[i_link_ptr_rm];
-    //}
 
     int removingChildIndex = -1;
     for ( int childIndex = 0; removingFromParent->child.size(); childIndex++ ){
@@ -875,16 +858,7 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
         remainingNodes[nodeIdx]->set_parent1(NULL);
         remainingNodes[nodeIdx]->set_parent2(NULL);
         removingFromParent->add_child(remainingNodes[nodeIdx]);
-        //rm_child_dummy_enum[dummy_i]->parent1=NULL;
-        //rm_child_dummy_enum[dummy_i]->parent2=NULL;
-        //add_node(rm_parent_dummy_enum,rm_child_dummy_enum[dummy_i]);    
     }
-
-    //current_removing_net_enum.Net_nodes[rm_node_index].clear();
-    //new_current_enum_vec.erase(new_current_enum_vec.begin()+rm_node_index);//[rm_node_index].clear();
-    //rewrite_node_content(sp_nodes_ptr_rm);
-    //rewrite_node_content(sp_nodes_ptr_rm_enum);
-    //localTmpSN.print();
 
     //string adding_new_Net_string=construct_adding_new_Net_str(current_removing_net);
     localTmpSN.nodes_.remove(removingNode);      // 1. Remove the node which was supposed to be removed
@@ -892,13 +866,24 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
     localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
     localTmpSN.removeOneChildInternalNode();     // 4. Remove internal nodes who has only one child
     localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
-    localTmpSN.print();
+    //localTmpSN.print();
     return localTmpSN.reWritesubTreeStrAtRoot();
 }
 
 
 void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic, bool latexSymbolic ){
-//vec_Net_wiz_prior_p rm_S_node(int rm_node_index,string gt_str,Net_wiz_prior_p new_Net_wiz_prior_p,bool maple_bool_local_in){
+
+    /*!
+     * 1. check if the current tmpSN contains a coalesced Tip node
+     *       If so, check the previous coalscent history of such node, whether it is consistant with the coalescet process of the gene tree.
+     *          If so, merge the gene tree, then carry on.
+     *          Otherwise, return
+     *       Otherwise, carry on to step 2
+     * 2. For each possibility of new topology, for the case of that coalsecent event has happened, check if gt coalsecnt could actually happen.
+     *       If so, record the coalescent event, update the weight
+     *       Othersiwe, return
+     */
+
     //NetStrWizPrior new_Net_wiz_prior_p = this->NetStrWizPriorList[currentSubNetworkIndex];
     //vec_Net_wiz_prior_p my_rmd_networks;
     //Net current_net;
@@ -989,7 +974,7 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
     for ( size_t A_matrix_i = 0; A_matrix_i < A_matrix.size(); A_matrix_i++ ){
         string adding_new_Net_string = removeSnodeCore( tmpSN, rmNodeIndex, netStrWizPrior, A_matrix[A_matrix_i], numberOfChildAtRemovingNode );
         cout << adding_new_Net_string << endl;
-        bool spInvalid = true;
+        bool spIsInvalid = true;
 
         //if (gt_str.size()>0){
 ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                
@@ -1005,8 +990,9 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         //if (gt_tree.Net_nodes.size()==0 && coal_ed){
             //sp_coal_valid=true;
         //}
-                    
-        if ( spInvalid ) continue;
+        
+        // If the current sp is invalid, exit
+        if ( spIsInvalid ) continue;
             
 
 

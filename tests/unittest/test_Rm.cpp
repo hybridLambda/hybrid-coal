@@ -33,6 +33,8 @@ class TestRm : public CppUnit::TestCase {
   CPPUNIT_TEST ( testExtract_hybrid_para );
   CPPUNIT_TEST ( testRemoveHnodeOneChild );
   CPPUNIT_TEST ( testRemoveHnodeManyChild );
+  CPPUNIT_TEST ( testRemoveSnode1 );
+  CPPUNIT_TEST ( testRemoveSnode2 );
   CPPUNIT_TEST_SUITE_END();
  private:
   string gtstr;
@@ -103,6 +105,31 @@ class TestRm : public CppUnit::TestCase {
                                spNet.NetStrWizPriorList[3].netStr);
         CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.21, spNet.NetStrWizPriorList[3].prior.omega(), 0.00000001 );
 
+    }
+
+    void testRemoveSnode1(){
+        string gtStr = "";
+        string netStr = "((((B:1,C:1)s1:1)h1#.3:1,A:3)s2:1,(h1#.3:13,D:3)s3:1)r;";
+        CoalSN spNet (netStr);
+        TmpSN tmpSN ( netStr );
+        int rm_node_index = tmpSN.toBeRemovedNodeIndex();
+        CPPUNIT_ASSERT_EQUAL (2, rm_node_index);
+        CPPUNIT_ASSERT_NO_THROW( spNet.removeSnode ( gtStr, tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], true, true) );
+        CPPUNIT_ASSERT_NO_THROW( spNet.NetStrWizPriorList.erase(spNet.NetStrWizPriorList.begin() + spNet.currentSubNetworkIndex));
+        CPPUNIT_ASSERT_EQUAL ( (size_t)2, spNet.NetStrWizPriorList.size() );
+    }
+
+
+    void testRemoveSnode2(){
+        string gtStr = "";
+        string netStr = "((((B:1,C:1,E:1)s1:1)h1#.3:1,A:3)s2:1,(h1#.3:13,D:3)s3:1)r;";
+        CoalSN spNet (netStr);
+        TmpSN tmpSN ( netStr );
+        int rm_node_index = tmpSN.toBeRemovedNodeIndex();
+        CPPUNIT_ASSERT_EQUAL (3, rm_node_index);
+        CPPUNIT_ASSERT_NO_THROW( spNet.removeSnode ( gtStr, tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], true, true) );
+        CPPUNIT_ASSERT_NO_THROW( spNet.NetStrWizPriorList.erase(spNet.NetStrWizPriorList.begin() + spNet.currentSubNetworkIndex));
+        CPPUNIT_ASSERT_EQUAL ( (size_t)5, spNet.NetStrWizPriorList.size() );
     }
 
 };
