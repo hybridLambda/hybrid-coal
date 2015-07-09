@@ -70,15 +70,15 @@ class TestRm : public CppUnit::TestCase {
         TmpSN tmpSN ( netStr );
         int rm_node_index = tmpSN.toBeRemovedNodeIndex();
         CPPUNIT_ASSERT_EQUAL (1, rm_node_index);
-        CPPUNIT_ASSERT_NO_THROW( spNet.removeHnode ( tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], NONE) );
+        CPPUNIT_ASSERT_NO_THROW( spNet.removeHnode ( tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], true, true ) );
         CPPUNIT_ASSERT_NO_THROW( spNet.NetStrWizPriorList.erase(spNet.NetStrWizPriorList.begin() + spNet.currentSubNetworkIndex));
         CPPUNIT_ASSERT_EQUAL ( (size_t)2, spNet.NetStrWizPriorList.size() );
         CPPUNIT_ASSERT_EQUAL ( string("((C:1.000000,A:2.000000)Int1:1.000000,D:2.000000)r;"),
                                spNet.NetStrWizPriorList[0].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.3, spNet.NetStrWizPriorList[0].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.3, spNet.NetStrWizPriorList[0].prior.omega(), 0.00000001 );
         CPPUNIT_ASSERT_EQUAL ( string("((D:1.000000,A:2.000000)Int2:1.000000,C:2.000000)r;"),
                                spNet.NetStrWizPriorList[1].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.7, spNet.NetStrWizPriorList[1].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.7, spNet.NetStrWizPriorList[1].prior.omega(), 0.00000001 );
     }
 
     void testRemoveHnodeManyChild(){
@@ -87,21 +87,21 @@ class TestRm : public CppUnit::TestCase {
         TmpSN tmpSN ( netStr );
         int rm_node_index = tmpSN.toBeRemovedNodeIndex();
         CPPUNIT_ASSERT_EQUAL (2, rm_node_index);
-        CPPUNIT_ASSERT_NO_THROW( spNet.removeHnode ( tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], NONE) );
+        CPPUNIT_ASSERT_NO_THROW( spNet.removeHnode ( tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], true, true) );
         CPPUNIT_ASSERT_NO_THROW( spNet.NetStrWizPriorList.erase(spNet.NetStrWizPriorList.begin() + spNet.currentSubNetworkIndex));
         CPPUNIT_ASSERT_EQUAL ( (size_t)4, spNet.NetStrWizPriorList.size() );
         CPPUNIT_ASSERT_EQUAL ( string("((C:1.000000,(A:1.000000,B:1.000000)H1L:1.000000)Int1:1.000000,D:2.000000)r;"),
                                spNet.NetStrWizPriorList[0].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.09, spNet.NetStrWizPriorList[0].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.09, spNet.NetStrWizPriorList[0].prior.omega(), 0.00000001 );
         CPPUNIT_ASSERT_EQUAL ( string("((D:1.000000,(A:1.000000,B:1.000000)H1R:1.000000)Int2:1.000000,C:2.000000)r;"),
                                spNet.NetStrWizPriorList[1].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.49, spNet.NetStrWizPriorList[1].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.49, spNet.NetStrWizPriorList[1].prior.omega(), 0.00000001 );
         CPPUNIT_ASSERT_EQUAL ( string("((C:1.000000,A:2.000000)Int1:1.000000,(D:1.000000,B:2.000000)Int2:1.000000)r;"),
                                spNet.NetStrWizPriorList[2].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.21, spNet.NetStrWizPriorList[2].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.21, spNet.NetStrWizPriorList[2].prior.omega(), 0.00000001 );
         CPPUNIT_ASSERT_EQUAL ( string("((C:1.000000,B:2.000000)Int1:1.000000,(D:1.000000,A:2.000000)Int2:1.000000)r;"),
                                spNet.NetStrWizPriorList[3].netStr);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.21, spNet.NetStrWizPriorList[3].omega(), 0.00000001 );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.21, spNet.NetStrWizPriorList[3].prior.omega(), 0.00000001 );
 
     }
 

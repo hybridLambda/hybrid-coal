@@ -121,12 +121,12 @@ class CoalST: public GraphBuilder {
 };
 
 
-class NetStrWizPrior {
+class PriorInformation{
+  friend class NetStrWizPrior;
   friend class CoalSN;
   friend class TestRm;
   friend class HybridCoal;
-    string netStr;
-    //string netStrLabelled;
+    // omega goes here
     vector < valarray < int > > priorCladeList;
     vector < int > priorCoalList;
     //vector < vector < int > > lambdaSum;
@@ -140,10 +140,42 @@ class NetStrWizPrior {
         return this->omega_;
     }
     double omega_;
+
+    string latexOmegaStr;
+    void setLatexOmegaAtH ( double leftParam, int leftPower, double rightParam, int rightPower ){
+        latexOmegaStr += "(" + to_string(leftParam) + "^" + to_string(leftPower) + ")*(" + to_string(rightParam) + "^" + to_string(rightPower) + ")";
+    }
+
+    void setLatexOmegaAtS (){
+        cout << "not implemented yet "<<endl;
+        //latexOmegaStr +=
+    }
+        //string new_left_hybrid="("+left_hybrid_parameter_str+"^"+left_or_right_string[0]+")";
+        //string new_right_hybrid="("+right_hybrid_parameter_str+"^"+left_or_right_string[1]+")";            
+    string mapleOmegaStr;
+    void setMapleOmegaAtH ( double leftParam, int leftPower, double rightParam, int rightPower ){
+        mapleOmegaStr += "(" + to_string(leftParam) + "^" + to_string(leftPower) + ")*(" + to_string(rightParam) + "^" + to_string(rightPower) + ")";
+
+    }
+    void setMapleOmegaAtS (){
+        cout << "not implemented yet "<<endl;
+    } 
+};
+
+
+class NetStrWizPrior {
+  friend class CoalSN;
+  friend class TestRm;
+  friend class HybridCoal;
+    string netStr;
+    PriorInformation prior;
+    //string netStrLabelled;
   public:
     NetStrWizPrior( string firstStr ){
         this->netStr = firstStr;
-        this->setOmega(1.0);
+        this->prior.setOmega(1.0);
+        this->prior.latexOmegaStr = "";
+        this->prior.mapleOmegaStr = "";
     }
 
     ~NetStrWizPrior(){}
@@ -173,17 +205,26 @@ class CoalSN : public CoalST {
     size_t currentSubNetworkIndex;
     
     void initializeNetStrWizPriorList ( string spStr );
-    void simplifyNetworks( string gt_string );
-    void removeSnode( size_t rmNodeIndex, string gtStr );
-    
+    void simplifyNetworks( string gt_string, bool mapleSymbolic = false, bool latexSymbolic = false );
+
+    // Members and Methods used while removing the S node
+    vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A);    
+    void removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false );
+      string removeSnodeCore ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode );
+    // Members and Methods used while removing the H node
     double left_hybrid_parameter_num;
     double right_hybrid_parameter_num;
     string new_node_name;
     size_t hashSingIdx;
-    void removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode = NONE );
-       void removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+    vector < vector < valarray < int > > > build_h_child(int n);
+    vector < valarray <int> > all_possible_comb(int n);
+    vector < vector < valarray < int > > > build_s_child(int n);
+    vector < valarray <int> > rearrange_A(vector < valarray <int> > A,int n);
+    int disjoint_list_h( int n, int i, vector <valarray <int> >A );
+    void removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false  );
+       void removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false  );
          string removeHnodeOneChildCore( TmpSN &tmpSN, size_t rmNodeIndex, size_t removingFromParentIndex);
-       void removeHnodeManyChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, SYMBOLIC_MODE sybolicMode );
+       void removeHnodeManyChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false  );
          string removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, int numberOfChildAtRemovingNode, vector < valarray <int> > &A_matrix_ith_row, size_t A_matrix_i );
          vector <int> build_left_or_right_vec(int n_child,vector < valarray <int> > A_matrix_ith_row,size_t A_matrix_i);
 
@@ -191,10 +232,6 @@ class CoalSN : public CoalST {
     ~CoalSN(){}
 };
 
-vector < valarray <int> > all_possible_comb(int n);
-vector < vector < valarray < int > > > build_h_child(int n);
-vector < vector < valarray < int > > > build_s_child(int n);
-vector < valarray <int> > rearrange_A(vector < valarray <int> > A,int n);
 size_t hybrid_hash_index(string &in_str);
 string extract_hybrid_para_str(string &in_str);
 double extract_hybrid_para(string in_str);
