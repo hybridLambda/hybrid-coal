@@ -127,7 +127,7 @@ class PriorInformation{
   friend class TestRm;
   friend class HybridCoal;
     // omega goes here
-    vector < valarray < int > > priorCladeList;
+    vector < valarray < size_t > > priorCladeList;
     vector < int > priorCoalList;
     //vector < vector < int > > lambdaSum;
     string omegaStr(){
@@ -210,7 +210,10 @@ class CoalSN : public CoalST {
     // Members and Methods used while removing the S node
     vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A);    
     void removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false );
-      string removeSnodeCore ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode );
+      valarray <size_t> convertNewCoalChildToClade ( string nodeName );
+      bool checkSpCoalValid( string gtStr, vector < valarray <size_t> > new_coal_clade );
+
+      NetStrWizPrior removeSnodeCore ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode );
     // Members and Methods used while removing the H node
     double left_hybrid_parameter_num;
     double right_hybrid_parameter_num;

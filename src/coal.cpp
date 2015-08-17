@@ -756,11 +756,15 @@ double extract_hybrid_para(string in_str){
     return strtod(extract_hybrid_para_str(in_str).c_str(), NULL);
 }
 
-
-string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode ){
+// This need to return:
+// 1. net string
+// 2. indicator of which child were coalesced
+// 3. omega
+NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode ){
+    NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
-    Node * removingFromParent = removingNode->parent1();;
+    Node * removingFromParent = removingNode->parent1();
     //vector < vector <int> > new_lambda_sum=current_lambda_sum;
 
     int removingChildIndex = -1;
@@ -775,14 +779,13 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
 
     vector < Node* > remainingNodes;
 
-    bool coal_ed=false;
+    //bool coal_ed=false;
     
     //int brch_lambda=sp_nodes_ptr_rm_enum[rm_node_index]->brchlen1;
 
     //vector <int> new_prior_coal_hist=current_prior_coal_hist;
     //vector < valarray < int > > new_current_prior_coal_clades=current_prior_coal_list;
     //vector < valarray < int > > brand_new_current_prior_coal_clades;
-
     for ( size_t A_matrix_i_i = 0; A_matrix_i_i < A_matrix_ith_row.size(); A_matrix_i_i++ ){
         Node* remainingChild = NULL;    
         int howmany_coaled = 0;
@@ -792,7 +795,7 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
             if ( A_matrix_ith_row[A_matrix_i_i][A_matrix_i_i_i] == 1 ){
                 if (remainingChild){
                     remainingChild->nodeName += "&" + removingNode->child[A_matrix_i_i_i]->nodeName;
-                    coal_ed = true;
+                    //coal_ed = true;
                     howmany_coaled++;
                     A_matrix_i_i_coaled = true;
                     localTmpSN.nodes_.remove (removingNode->child[A_matrix_i_i_i]);
@@ -802,54 +805,12 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
                 }
             }
         }
-
         remainingNodes.push_back( remainingChild );
+        if (A_matrix_i_i_coaled){
+            valarray <size_t> newClade = convertNewCoalChildToClade ( remainingChild->nodeName );
+            newNetStrWizPrior.prior.priorCladeList.push_back(newClade);
+        }                    
     }
-        //if (A_matrix_i_i_coaled){
-            //valarray <int> A_matrix_i_i_valarray (0,current_removing_net.tax_name.size());
-            //vector <string> contained_tax_s;
-            //for (size_t current_rm_child_dummy_label_i=0;current_rm_child_dummy_label_i<current_rm_child_dummy->label.size();){
-                    //string contained_tax;
-                    //size_t current_rm_child_dummy_label_j;
-                    //for (current_rm_child_dummy_label_j=current_rm_child_dummy_label_i;current_rm_child_dummy_label_j<current_rm_child_dummy->label.size();current_rm_child_dummy_label_j++){
-                        //if (current_rm_child_dummy->label[current_rm_child_dummy_label_j+1]=='&'){
-                            //break;
-                        //}
-                    //}
-                    //contained_tax=current_rm_child_dummy->label.substr(current_rm_child_dummy_label_i,current_rm_child_dummy_label_j-current_rm_child_dummy_label_i+1);
-                    //contained_tax_s.push_back(contained_tax);
-                    //current_rm_child_dummy_label_i=current_rm_child_dummy_label_j+2;
-            //}
-            //for (size_t contained_tax_i=0;contained_tax_i<contained_tax_s.size();contained_tax_i++){
-                //for (size_t tax_name_i=0;tax_name_i<current_removing_net.tax_name.size();tax_name_i++){
-                    //if (contained_tax_s[contained_tax_i]==current_removing_net.tax_name[tax_name_i]){
-                        //A_matrix_i_i_valarray[tax_name_i]=1;
-                    //}
-                //}
-            //}
-            
-            ////for (int howmany_i=0;howmany_i<howmany_coaled;howmany_i++){
-                ////new_prior_coal_hist.push_back(brch_lambda);
-            ////}
-            ////string A_matrix_i_i_clade=current_rm_child_dummy->nodeName;//="(";
-
-            ////valarray <int> A_matrix_i_i_valarray_new(original_tax_name.size());
-
-            ////for (size_t tax_i=0;tax_i<original_tax_name.size();tax_i++){
-                ////size_t found;
-                //////cout<<original_tax_name[tax_i]<<endl;
-                ////found=A_matrix_i_i_clade.find(original_tax_name[tax_i]);
-                ////if (found!=string::npos){
-                    ////A_matrix_i_i_valarray_new[tax_i]++;
-                ////}
-            ////}
-            //////cout<<A_matrix_i_i_clade<<endl;
-            ////new_current_prior_coal_clades.push_back(A_matrix_i_i_valarray_new);    
-            
-            ////current_prior_coal_list.push_back(A_matrix_i_i_valarray);    
-            ////brand_new_current_prior_coal_clades.push_back(A_matrix_i_i_valarray);    
-        //}                    
-    //}
 
     double blOfRemovingNode = removingNode->edge1.bl();
 
@@ -866,10 +827,57 @@ string CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior
     localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
     localTmpSN.removeOneChildInternalNode();     // 4. Remove internal nodes who has only one child
     localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
-    //localTmpSN.print();
-    return localTmpSN.reWritesubTreeStrAtRoot();
+
+    newNetStrWizPrior.netStr = localTmpSN.reWritesubTreeStrAtRoot();
+
+    return newNetStrWizPrior;
 }
 
+
+bool CoalSN::checkSpCoalValid( string gtStr, vector < valarray <size_t> > new_coal_clade ){
+    GraphBuilder tmpGt(gtStr);
+    tmpGt.which_sample_is_below();
+    bool spIsValid = true;
+    //cout << endl << " checkSpCoalValid begin: " << endl;
+    //cout << "new_coal_clade.size(): "<<new_coal_clade.size()<<endl;
+    for ( size_t coal_clade_i = 0; coal_clade_i < new_coal_clade.size(); coal_clade_i++ ){
+        //for (size_t tmpi =0; tmpi < new_coal_clade[coal_clade_i].size(); tmpi++){
+            //cout <<  new_coal_clade[coal_clade_i][tmpi] <<" ";
+         //}
+         //cout<<endl;
+        bool currentCladeIsValid = false;
+        for ( auto it = tmpGt.nodes_.iterator(); it.good(); ++it){
+            valarray <bool> comp = ( new_coal_clade[coal_clade_i] == (*it)->samples_below );
+         //for (size_t tmpi =0; tmpi < (*it)->samples_below.size(); tmpi++){
+            //cout <<  (*it)->samples_below[tmpi] <<" ";
+         //}
+         //cout<<endl;
+            if ( comp.min() == true ){
+                currentCladeIsValid = true;
+                break;
+            }
+        }
+        
+        if ( !currentCladeIsValid ){ 
+            spIsValid = false;
+            break;
+        }
+    }
+    return spIsValid;
+}
+
+
+
+valarray <size_t> CoalSN::convertNewCoalChildToClade ( string nodeName ){
+    valarray <size_t> A_matrix_i_i_valarray ( (size_t)0, this->tip_name.size() ); // We need to look at the actual tip of the network.
+    for ( size_t i = 0; i < this->tip_name.size(); i++ ){
+        size_t found = nodeName.find(this->tip_name[i]);
+        if ( found != string::npos){
+            A_matrix_i_i_valarray[i] = 1;
+        }
+    }
+    return A_matrix_i_i_valarray;
+}
 
 void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic, bool latexSymbolic ){
 
@@ -970,11 +978,11 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         //gt_tree.print_all_node();
             //cout<<"gt_tree.print_all_node(); not changed?"<<endl;
 
-    cout << " A_matrix.size() = " << A_matrix.size()<<endl;
+    //cout << " A_matrix.size() = " << A_matrix.size()<<endl;
     for ( size_t A_matrix_i = 0; A_matrix_i < A_matrix.size(); A_matrix_i++ ){
-        string adding_new_Net_string = removeSnodeCore( tmpSN, rmNodeIndex, netStrWizPrior, A_matrix[A_matrix_i], numberOfChildAtRemovingNode );
-        cout << adding_new_Net_string << endl;
-        bool spIsInvalid = true;
+        
+        NetStrWizPrior newNetStrWizPrior = removeSnodeCore( tmpSN, rmNodeIndex, netStrWizPrior, A_matrix[A_matrix_i], numberOfChildAtRemovingNode );
+
 
         //if (gt_str.size()>0){
 ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                
@@ -984,19 +992,10 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         //else{
             //sp_coal_valid=true;
         //}
-        
-        
-        //check!!!! i dont think this is needed!!!
-        //if (gt_tree.Net_nodes.size()==0 && coal_ed){
-            //sp_coal_valid=true;
-        //}
+        bool spIsValid = checkSpCoalValid (gtStr, newNetStrWizPrior.prior.priorCladeList );
         
         // If the current sp is invalid, exit
-        if ( spIsInvalid ) continue;
-            
-
-
-            
+        if ( !spIsValid ) continue;
             ////string adding_new_Net_string_enum=construct_adding_new_Net_str(current_removing_net_enum);
 
             ////cout<<new_omega_prob<<endl;
@@ -1057,10 +1056,6 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
                 //current_omega_string=current_omega_string+")";
             //}
 
-            NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
-            newNetStrWizPrior.netStr = adding_new_Net_string;
-            //newNetStrWizPrior.setOmega ( current_omega );
-        
             this->NetStrWizPriorList.push_back(newNetStrWizPrior);
         }
     cout<<"        End of rm_S_node "<< tmpSN.nodes_.at(rmNodeIndex)->nodeName << " from " << netStrWizPrior.netStr << endl;
@@ -1214,7 +1209,7 @@ vector < vector < valarray <int> > > CoalSN::build_s_child(int n){
                         break;
                     }
                 }
-                all_compare=all_compare+compare;
+                all_compare=all_compare+compare; // all_compare += compare;
             }
         }
         if (all_compare==0){
