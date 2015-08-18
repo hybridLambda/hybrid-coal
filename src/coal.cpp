@@ -436,15 +436,18 @@ TmpSN::TmpSN ( string tmpStr ) : GraphBuilder ( tmpStr ){
 
 void TmpSN::chooseRemoveNode() {
     this->toBeRemovedNodeIndex_ = this->nodes()->size()-1;
+    size_t nodeIndex = 0;
     for ( auto it = nodes_.iterator(); it.good(); ++it ){
         if ((((*it)->isHybrid() + (*it)->isBelowHybrid()) * ( 1 - (*it)->isTip())) >=1 && (*it)->rank() < nodes()->at(toBeRemovedNodeIndex_)->rank()){ /*! \todo Check if a tip node should be removed or not */
-            toBeRemovedNodeIndex_ = it.node_index();
+            toBeRemovedNodeIndex_ = nodeIndex;
         }
+        nodeIndex++;
     }
 
     if ( toBeRemovedNodeIndex_ == this->nodes()->size() - 1 ){
         toBeRemovedNodeIndex_ = -1;
     }
+
     return;
 }
 
@@ -684,7 +687,7 @@ string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStr
     // Cleanning up the removing node, and remove one child internal node
     localTmpSN.nodes_.remove(removingNode);      // 1. Remove the node which was supposed to be removed
     localTmpSN.nodes_.back()->CalculateRank();   // 2. Calculate the node rank including the new nodes
-    localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
+    //localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
     localTmpSN.removeOneChildInternalNode();     // 4. Remove internal nodes who has only one child
     localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
     return localTmpSN.reWritesubTreeStrAtRoot();
