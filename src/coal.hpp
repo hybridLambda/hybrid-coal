@@ -169,6 +169,7 @@ class NetStrWizPrior {
   friend class HybridCoal;
     string netStr;
     PriorInformation prior;
+    vector < valarray < size_t > > tmpCladeList;
     //string netStrLabelled;
   public:
     NetStrWizPrior( string firstStr ){
@@ -211,7 +212,10 @@ class CoalSN : public CoalST {
     vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A);    
     void removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false );
       valarray <size_t> convertNewCoalChildToClade ( string nodeName );
-      bool checkSpCoalValid( string gtStr, vector < valarray <size_t> > new_coal_clade );
+      bool checkSpCoalValid( GraphBuilder &tmpGt, vector < valarray <size_t> > new_coal_clade );
+      double computeNumOfRepTopo ( size_t uBranchIn, size_t vBranchOut, vector < valarray < size_t > > tmpCladeList, GraphBuilder &tmpGt );
+      double computeWaysToCoal( size_t uBranchIn, size_t vBranchOut );
+      double gijoe( size_t u, size_t v, double T); /*!< branch length*/
 
       NetStrWizPrior removeSnodeCore ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode );
     // Members and Methods used while removing the H node

@@ -473,21 +473,13 @@ void CoalSN::simplifyNetworks( string gt_string, bool mapleSymbolic, bool latexS
         if ( rm_node_index >=0 ){
             if ( current_net.nodes_.at((size_t)rm_node_index)->isHybrid () ){ // Removing a hybrid node 
                 this->removeHnode(current_net, rm_node_index, this->NetStrWizPriorList[currentSubNetworkIndex], true, true );  
-            } 
-            else{ // Removing a internal node which is below a hybrid node
+            } else{ // Removing a internal node which is below a hybrid node
                 dout << " Removie internal node " << current_net.nodes_.at(rm_node_index) << endl;
                 assert ( current_net.nodes_.at(rm_node_index)->isBelowHybrid () );
-            //this->simplify_Networks_one_block(current_net.Net_nodes[rm_node_index].hybrid,rm_node_index,my_rmd_networks,i,maple_bool_local,gt_string);
-            //vec_Net_wiz_prior_p new_block=rm_S_node(rm_node_index,gt_tree_str,my_rmd_networks.Net_vec[i],maple_bool_local);
                 this->removeSnode( gt_string, current_net, rm_node_index, this->NetStrWizPriorList[currentSubNetworkIndex], true, true );
-
-                //cout << " not implemented yet returned " << endl;
-                //return;
             }
-
             this->NetStrWizPriorList.erase(this->NetStrWizPriorList.begin() + currentSubNetworkIndex);
-        }
-        else{
+        } else{
             currentSubNetworkIndex++;
         }
     }
@@ -535,8 +527,7 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
     if ( tmpSN.nodes_.at(rmNodeIndex)->child.size() > 1 ){
         //block_rm_H=nchild_gt_one(rmNodeIndex,maple_bool_local,tmpSN.Net_nodes[rmNodeIndex].num_child);
         this->removeHnodeManyChild( tmpSN, rmNodeIndex, netStrWizPrior, false, false ); // TODO, change the mapleBool and latexBool
-    }
-    else{
+    } else{
         assert ( tmpSN.nodes_.at(rmNodeIndex)->child.size() == 1 );
         this->removeHnodeOneChild( tmpSN, rmNodeIndex, netStrWizPrior, false, false ); // TODO, change the mapleBool and latexBool
     }
@@ -604,7 +595,7 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
 
         NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
         newNetStrWizPrior.netStr = adding_new_Net_string;
-        newNetStrWizPrior.prior.setOmega ( current_omega );
+        newNetStrWizPrior.prior.setOmega ( current_omega * newNetStrWizPrior.prior.omega() );
         if ( mapleSymbolic ) newNetStrWizPrior.prior.setMapleOmegaAtH ( uni_hybrid_paramter_num, leftPower, uni_hybrid_paramter_num, 1 - leftPower );
         if ( latexSymbolic ) newNetStrWizPrior.prior.setLatexOmegaAtH ( uni_hybrid_paramter_num, leftPower, uni_hybrid_paramter_num, 1 - leftPower );
         this->NetStrWizPriorList.push_back(newNetStrWizPrior);
@@ -762,9 +753,9 @@ double extract_hybrid_para(string in_str){
 // This need to return:
 // 1. net string
 // 2. indicator of which child were coalesced
-// 3. omega
 NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode ){
     NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
+    newNetStrWizPrior.tmpCladeList.clear();
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent = removingNode->parent1();
@@ -793,7 +784,7 @@ NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         Node* remainingChild = NULL;    
         int howmany_coaled = 0;
         bool A_matrix_i_i_coaled = false;
-        
+
         for ( int A_matrix_i_i_i = 0; A_matrix_i_i_i < numberOfChildAtRemovingNode; A_matrix_i_i_i++ ){
             if ( A_matrix_ith_row[A_matrix_i_i][A_matrix_i_i_i] == 1 ){
                 if (remainingChild){
@@ -809,9 +800,10 @@ NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStr
             }
         }
         remainingNodes.push_back( remainingChild );
-        if (A_matrix_i_i_coaled){
+        if ( A_matrix_i_i_coaled ){
             valarray <size_t> newClade = convertNewCoalChildToClade ( remainingChild->nodeName );
-            newNetStrWizPrior.prior.priorCladeList.push_back(newClade);
+            //newNetStrWizPrior.prior.priorCladeList.push_back(newClade);
+            newNetStrWizPrior.tmpCladeList.push_back(newClade);
         }                    
     }
 
@@ -837,30 +829,19 @@ NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStr
 }
 
 
-bool CoalSN::checkSpCoalValid( string gtStr, vector < valarray <size_t> > new_coal_clade ){
-    GraphBuilder tmpGt(gtStr);
+bool CoalSN::checkSpCoalValid( GraphBuilder &tmpGt, vector < valarray <size_t> > new_coal_clade ){
     tmpGt.which_sample_is_below();
     bool spIsValid = true;
-    //cout << endl << " checkSpCoalValid begin: " << endl;
-    //cout << "new_coal_clade.size(): "<<new_coal_clade.size()<<endl;
     for ( size_t coal_clade_i = 0; coal_clade_i < new_coal_clade.size(); coal_clade_i++ ){
-        //for (size_t tmpi =0; tmpi < new_coal_clade[coal_clade_i].size(); tmpi++){
-            //cout <<  new_coal_clade[coal_clade_i][tmpi] <<" ";
-         //}
-         //cout<<endl;
         bool currentCladeIsValid = false;
         for ( auto it = tmpGt.nodes_.iterator(); it.good(); ++it){
             valarray <bool> comp = ( new_coal_clade[coal_clade_i] == (*it)->samples_below );
-         //for (size_t tmpi =0; tmpi < (*it)->samples_below.size(); tmpi++){
-            //cout <<  (*it)->samples_below[tmpi] <<" ";
-         //}
-         //cout<<endl;
             if ( comp.min() == true ){
                 currentCladeIsValid = true;
                 break;
             }
         }
-        
+
         if ( !currentCladeIsValid ){ 
             spIsValid = false;
             break;
@@ -868,7 +849,6 @@ bool CoalSN::checkSpCoalValid( string gtStr, vector < valarray <size_t> > new_co
     }
     return spIsValid;
 }
-
 
 
 valarray <size_t> CoalSN::convertNewCoalChildToClade ( string nodeName ){
@@ -881,6 +861,43 @@ valarray <size_t> CoalSN::convertNewCoalChildToClade ( string nodeName ){
     }
     return A_matrix_i_i_valarray;
 }
+
+
+double CoalSN::computeNumOfRepTopo ( size_t uBranchIn, size_t vBranchOut, vector < valarray < size_t > > tmpCladeList, GraphBuilder &tmpGt ){
+// Refer to thesis page 75
+    double w = 1.0 * factorial( uBranchIn - vBranchOut );
+    for ( size_t cladeIndex = 0; cladeIndex < tmpCladeList.size(); cladeIndex++){
+        if (tmpCladeList[cladeIndex].sum() == 1) 
+            continue;
+
+        for ( auto it = tmpGt.nodes_.iterator(); it.good(); ++it ){
+            valarray <bool> comp = (tmpCladeList[cladeIndex] == (*it)->samples_below );
+            if ( comp.min() == true ){
+                // j = 1
+                w /= ( 1.0 * ( 1 + (*it)->NumberOfInteriorNodesBelow() ) );
+
+                if ( (*it)->NumberOfInteriorNodesBelow() > 1 ){
+                    assert ( (uBranchIn - vBranchOut) > 2 );
+                    for ( size_t interiorIndex = 0; interiorIndex < (*it)->interior_nodes_below.size(); interiorIndex++ ){
+                        double aj = (*it)->interior_nodes_below[interiorIndex]->NumberOfInteriorNodesBelow();
+                        w /= ( 1.0 + aj);
+                    }
+                }
+            }
+        }
+    }
+    return w;
+}
+
+double CoalSN::computeWaysToCoal( size_t uBranchIn, size_t vBranchOut ){
+    // Refer to thesis, page 75, Eq.4.3
+    double c = 1;
+    for ( size_t i = uBranchIn; i > vBranchOut; i-- ){
+        c *= (double)i * ((double)i-1.0) / 2.0;
+    }
+    return c;
+}
+
 
 void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic, bool latexSymbolic ){
 
@@ -982,88 +999,61 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
             //cout<<"gt_tree.print_all_node(); not changed?"<<endl;
 
     //cout << " A_matrix.size() = " << A_matrix.size()<<endl;
+    
+    
     for ( size_t A_matrix_i = 0; A_matrix_i < A_matrix.size(); A_matrix_i++ ){
         
         NetStrWizPrior newNetStrWizPrior = removeSnodeCore( tmpSN, rmNodeIndex, netStrWizPrior, A_matrix[A_matrix_i], numberOfChildAtRemovingNode );
 
-
         //if (gt_str.size()>0){
-////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                
             ////sp_coal_valid=check_sp_coal_valid( coal_ed, gt_tree, new_current_prior_coal_clades);
             //sp_coal_valid=check_sp_coal_valid( coal_ed, my_gt_tree, new_current_prior_coal_clades);
         //}
         //else{
             //sp_coal_valid=true;
         //}
-        bool spIsValid = checkSpCoalValid (gtStr, newNetStrWizPrior.prior.priorCladeList );
+
+        GraphBuilder tmpGt(gtStr);
+        bool spIsValid = checkSpCoalValid ( tmpGt, newNetStrWizPrior.tmpCladeList );
         
         // If the current sp is invalid, exit
         if ( !spIsValid ) continue;
-            ////string adding_new_Net_string_enum=construct_adding_new_Net_str(current_removing_net_enum);
-
-            ////cout<<new_omega_prob<<endl;
-            //Net gt_tree(updated_gt_str);
-            //int k_clade=A_matrix[A_matrix_i].size();
-            //double new_omega_prob=compute_rm_S_omega(n_child,k_clade, brand_new_current_prior_coal_clades, gt_tree);
-            //if (rm_debug_bool){
-                //cout<<new_omega_prob<<"/";
-            //}
-            //ostringstream omega_w_str;
-            //omega_w_str<<new_omega_prob;
-            //ostringstream omega_d_str;
-            //int checking_n_minus_k=0;
-            //int omega_d=1;
-            //for (double coal_i=n_child;coal_i>double(k_clade);coal_i--){
-                ////for (int coal_i=n_child;coal_i>k_clade;coal_i--){
-                    ////new_trial_prob=new_trial_prob/(coal_i*1.0)/((coal_i-1)*1.0)*2.0;
-                    ////new_trial_prob=new_trial_prob/coal_i/(coal_i-1)*2.0;
-                    //new_omega_prob=new_omega_prob/coal_i/(coal_i-1)*2.0;
-                    //checking_n_minus_k++;
-                    //omega_d=omega_d*coal_i*(coal_i-1)/2;
-            //}
-            //omega_d_str<<omega_d;
-            //if (rm_debug_bool){
-                //cout<<omega_d<<endl;
-                //cout<<"checking #coal"<<checking_n_minus_k<<endl;
-            //}
-            
-            
-            //ostringstream num_in;
-            //num_in<<n_child;
-            //ostringstream num_out;
-            //num_out<<k_clade;
-            //string current_omega_string;
-            //double current_omega;
-            //ostringstream brch_num;
-            //brch_num<<brch_lambda;
-////!!!!!!!!!!!!!!!!!!! error is here!!!!!!                
-            //if (maple_bool_local){
-                    //current_omega_string=omega_w_str.str()+"/"+omega_d_str.str()+"*puvT("+num_in.str()+","+num_out.str()+","+"lambda["+brch_num.str()+"]";
-                    //for (size_t lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
-                        //ostringstream brch_num_new;
-                        //brch_num_new<<current_lambda_sum[brch_lambda-1][lambda_sum_i];
-                        //current_omega_string=current_omega_string+"+lambda["+brch_num_new.str()+"]";
-                    //}
-                    //current_omega_string=current_omega_string+")";
-            
-            //}
-            //else{                
+        size_t numberBranchOut = A_matrix[A_matrix_i].size();
+        double w = this->computeNumOfRepTopo ( numberOfChildAtRemovingNode, numberBranchOut, newNetStrWizPrior.tmpCladeList, tmpGt );
+        double c = this->computeWaysToCoal ( numberOfChildAtRemovingNode, numberBranchOut );
+        cout << " c = " << c <<endl;
+        cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
+        double omega = w/c * gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl());
+        cout << "omega is " << omega <<endl; 
+        newNetStrWizPrior.prior.setOmega ( newNetStrWizPrior.prior.omega() * omega );
+        // If it is valid, then compute omega
         
-                //current_omega=prior_prior_prob_num*gijoe(n_child,A_matrix[A_matrix_i].size(),current_brchlen)*new_omega_prob;
-                //current_omega_string=prior_prior_prob_string+"\\frac{"+omega_w_str.str()+ "}{"+omega_d_str.str()+"}p_{"+num_in.str()+num_out.str()+"}(\\lambda_{"+brch_num.str()+"}";
-                //for (size_t lambda_sum_i=0; lambda_sum_i<current_lambda_sum[brch_lambda-1].size();lambda_sum_i++){
-                    //ostringstream brch_num_new;
-                    //brch_num_new<<current_lambda_sum[brch_lambda-1][lambda_sum_i];
-                    //current_omega_string=current_omega_string+"+\\lambda_{"+brch_num_new.str()+"}";
-                //}
-                //current_omega_string=current_omega_string+")";
-            //}
 
-            this->NetStrWizPriorList.push_back(newNetStrWizPrior);
-        }
+        this->NetStrWizPriorList.push_back(newNetStrWizPrior);
+    }
     cout<<"        End of rm_S_node "<< tmpSN.nodes_.at(rmNodeIndex)->nodeName << " from " << netStrWizPrior.netStr << endl;
-
 }
+
+double CoalSN::gijoe(
+size_t u, /*!< number of branch in */
+size_t v, /*!< number of branch out */
+double T) /*!< branch length*/
+{
+	//if (T==0){
+		//return 1;
+	//}
+	//else{
+	double sums=0;
+	for (size_t k=v;k<=u;k++){
+		double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
+		for (size_t y=0;y<k;y++){
+			prods=prods*(v+y)*(u-y)/(u+y);
+		}
+		sums=sums+prods;
+	}
+	return sums;//}
+}
+
 
 
 vector <int> CoalSN::disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A){
