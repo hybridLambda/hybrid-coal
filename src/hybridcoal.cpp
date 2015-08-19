@@ -183,20 +183,20 @@ void HybridCoal::HybridCoal_core(){
     
     if ( spNet.isNet() ){
         // TODO: only working on the first tree at the moment
-        //for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
-        for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
+        for ( size_t gt_i = 0; gt_i < this->gt_tree_str_s.size(); gt_i++ ){
+        //for ( size_t gt_i = 0; gt_i < 1; gt_i++ ){
             string tmpGt = this->gt_tree_str_s[gt_i];
             // simplify the networks
             spNet.simplifyNetworks (tmpGt);
-            //double gtTotalProb = 0.0;
-            //for ( size_t i = 0; i < spNet.NetStrWizPriorList.size(); i++ ){
-                //CoalGT gt(tmpGt );
-                //CoalST sp ( spNet.NetStrWizPriorList[i].netStr );
-                //gt.prob_given_sp_tree( sp );
-                //gtTotalProb += spNet.NetStrWizPriorList[i].omega() * gt.probability;
-            //}
-            //total_prob += gtTotalProb;
-            //gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gtTotalProb << "\n";
+            double gtTotalProb = 0.0;
+            for ( size_t i = 0; i < spNet.NetStrWizPriorList.size(); i++ ){
+                CoalGT gt(tmpGt );
+                CoalST sp ( spNet.NetStrWizPriorList[i].netStr );
+                gt.prob_given_sp_tree( sp );
+                gtTotalProb += spNet.NetStrWizPriorList[i].prior.omega() * gt.probability;
+            }
+            total_prob += gtTotalProb;
+            gt_ofstream << this->gt_tree_str_s[gt_i] << "\t" << gtTotalProb << "\n";
         }
     }
     else{

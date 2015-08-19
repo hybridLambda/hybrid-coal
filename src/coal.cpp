@@ -1021,10 +1021,11 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         size_t numberBranchOut = A_matrix[A_matrix_i].size();
         double w = this->computeNumOfRepTopo ( numberOfChildAtRemovingNode, numberBranchOut, newNetStrWizPrior.tmpCladeList, tmpGt );
         double c = this->computeWaysToCoal ( numberOfChildAtRemovingNode, numberBranchOut );
-        cout << " c = " << c <<endl;
-        cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
+        //cout << " c = " << c <<endl;
+        //cout <<" u = "<<numberOfChildAtRemovingNode <<", v = " << numberBranchOut <<", T = "<< tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()<<endl;
+        //cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
         double omega = w/c * gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl());
-        cout << "omega is " << omega <<endl; 
+        //cout << "omega is " << omega <<endl; 
         newNetStrWizPrior.prior.setOmega ( newNetStrWizPrior.prior.omega() * omega );
         // If it is valid, then compute omega
         
@@ -1039,20 +1040,20 @@ size_t u, /*!< number of branch in */
 size_t v, /*!< number of branch out */
 double T) /*!< branch length*/
 {
-	//if (T==0){
-		//return 1;
-	//}
-	//else{
-	double sums=0;
-	for (size_t k=v;k<=u;k++){
-		double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
-		for (size_t y=0;y<k;y++){
-			prods=prods*(v+y)*(u-y)/(u+y);
-		}
-		sums=sums+prods;
-	}
-	return sums;//}
-}
+    if ( T == 0 ){ return 1.0; }
+    if ( u == v ){ return 1.0; }
+
+    //else{
+    double sums=0;
+    for (size_t k=v;k<=u;k++){
+    double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
+    for (size_t y=0;y<k;y++){
+    prods=prods*(v+y)*(u-y)/(u+y);
+    }
+    sums=sums+prods;
+    }
+    return sums;//}
+    }
 
 
 
