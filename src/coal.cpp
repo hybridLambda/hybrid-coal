@@ -651,8 +651,7 @@ string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStr
                 assert ( parentIndex == 1);
                 removingFromParent[parentIndex]->add_child( newRight );
             }
-        }
-        else if (A_matrix_i == parentIndex){
+        } else if (A_matrix_i == parentIndex){
             for ( int A_matrix_i_i_i = 0; A_matrix_i_i_i < numberOfChildAtRemovingNode; A_matrix_i_i_i++ ){
                 removingNode->child[A_matrix_i_i_i]->set_parent1( NULL );
                 if ( parentIndex == 0){
@@ -725,8 +724,7 @@ vector <int> CoalSN::build_left_or_right_vec( int n_child,vector < valarray <int
                     left_or_right[parent_i]++;
                 }
             }
-        }
-        else{
+        } else{
             if (A_matrix_i == parent_i){
                 for (int A_matrix_i_i_i=0;A_matrix_i_i_i<n_child;A_matrix_i_i_i++){
                     left_or_right[parent_i]++;
@@ -741,14 +739,18 @@ vector <int> CoalSN::build_left_or_right_vec( int n_child,vector < valarray <int
 size_t hybrid_hash_index(string &in_str){
     return in_str.find('#');
 }
+
+
 string extract_hybrid_para_str(string &in_str){
     size_t hash_index=hybrid_hash_index(in_str);
     return in_str.substr(hash_index+1);//,in_str.size()-1);
 }
 
+
 double extract_hybrid_para(string in_str){
     return strtod(extract_hybrid_para_str(in_str).c_str(), NULL);
 }
+
 
 // This need to return:
 // 1. net string
@@ -1035,26 +1037,36 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
     cout<<"        End of rm_S_node "<< tmpSN.nodes_.at(rmNodeIndex)->nodeName << " from " << netStrWizPrior.netStr << endl;
 }
 
-double CoalSN::gijoe(
-size_t u, /*!< number of branch in */
-size_t v, /*!< number of branch out */
-double T) /*!< branch length*/
-{
+
+double CoalSN::gijoe( size_t u, /*!< number of branch in */
+                      size_t v, /*!< number of branch out */
+                      double T) /*!< branch length*/ {
     if ( T == 0 ){ return 1.0; }
     if ( u == v ){ return 1.0; }
 
-    //else{
     double sums=0;
     for (size_t k=v;k<=u;k++){
-    double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
-    for (size_t y=0;y<k;y++){
-    prods=prods*(v+y)*(u-y)/(u+y);
+        double prods = exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
+        for (size_t y=0;y<k;y++){
+            prods *= (v+y)*(u-y)/(u+y);
+        }
+        sums += prods;
     }
-    sums=sums+prods;
-    }
-    return sums;//}
-    }
+    return sums;
+}
 
+
+double CoalSN::gtProbGivenNet ( string tmpGt ){
+    this->simplifyNetworks (tmpGt);
+    double gtTotalProb = 0.0;
+    for ( size_t i = 0; i < spNet.NetStrWizPriorList.size(); i++ ){
+        CoalGT gt(tmpGt );
+        CoalST sp ( spNet.NetStrWizPriorList[i].netStr );
+        gt.prob_given_sp_tree( sp );
+        gtTotalProb += spNet.NetStrWizPriorList[i].prior.omega() * gt.probability;
+    }
+    return gtTotalProb; 
+}
 
 
 vector <int> CoalSN::disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A){
@@ -1074,6 +1086,7 @@ vector <int> CoalSN::disjoint_list_s(int n, valarray <int> A_i,int i,vector <val
     }
     return  disjoint_list_s_return;
 }
+
 
 int CoalSN::disjoint_list_h( int n, int i, vector <valarray <int> >A ){
     valarray <int> A_i=A[i];
