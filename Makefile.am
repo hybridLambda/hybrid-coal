@@ -26,7 +26,7 @@ hybrid_coal_SOURCES      = $(shared_src) src/main.cpp
 hybrid_coal_dbg_SOURCES  = $(shared_src) src/main.cpp
 hybrid_coal_prof_SOURCES = $(shared_src) src/main.cpp
 
-test_src = tests/unittest/test_runner.cpp tests/unittest/test_coal.cpp tests/unittest/test_Rm.cpp
+test_src = tests/unittest/test_runner.cpp tests/unittest/test_coal.cpp tests/unittest/test_Rm.cpp tests/unittest/test_4taxa_dist.cpp tests/unittest/test_ZeroBL.cpp
 unittest_CXXFLAGS = -DUNITTEST -DNDEBUG -std=c++0x -Isrc/graph/ -Isrc/
 unittest_LDADD = -lcppunit -ldl
 unittest_SOURCES = ${shared_src} ${test_src}

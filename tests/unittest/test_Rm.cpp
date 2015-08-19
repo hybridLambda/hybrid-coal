@@ -132,7 +132,7 @@ class TestRm : public CppUnit::TestCase {
 
     void testRemoveSnode1case1(){
         string gtStr = "(((B,C),A),D);";
-        string netStr = "((((B:1,C:1)s1:1)h1#.3:1,A:3)s2:1,(h1#.3:13,D:3)s3:1)r;";
+        string netStr = "((((B:0,C:0)s1:0)h1#.3:0,A:0)s2:0,(h1#.3:0,D:0)s3:0)r;";
         CoalSN spNet (netStr);
         TmpSN tmpSN ( netStr );
         int rm_node_index = tmpSN.toBeRemovedNodeIndex();
@@ -140,11 +140,12 @@ class TestRm : public CppUnit::TestCase {
         CPPUNIT_ASSERT_NO_THROW( spNet.removeSnode ( gtStr, tmpSN, rm_node_index, spNet.NetStrWizPriorList[0], true, true) );
         CPPUNIT_ASSERT_NO_THROW( spNet.NetStrWizPriorList.erase(spNet.NetStrWizPriorList.begin() + spNet.currentSubNetworkIndex));
         CPPUNIT_ASSERT_EQUAL ( (size_t)2, spNet.NetStrWizPriorList.size() );
+        //CPPUNIT_ASSERT_NO_THROW( spNet.DEBUGprintSubNetwork() );
     }
     
     void testRemoveSnode1case2(){
         string gtStr = "(((A,D),B,C));";
-        string netStr = "((((B:1,C:1)s1:1)h1#.3:1,A:3)s2:1,(h1#.3:13,D:3)s3:1)r;";
+        string netStr = "((((B:0,C:0)s1:0)h1#.3:0,A:0)s2:0,(h1#.3:0,D:0)s3:0)r;";
         CoalSN spNet (netStr);
         TmpSN tmpSN ( netStr );
         int rm_node_index = tmpSN.toBeRemovedNodeIndex();

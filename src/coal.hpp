@@ -70,6 +70,7 @@ template < class T > bool print_2D_matrix( vector < vector < T > > & mat ){
 class CoalST;
 class CoalGT: public GraphBuilder {
     friend class HybridCoal;
+    friend class CoalSN;
     friend class TestCoal;
     // Members
     vector < vector < int > >    R_matrix;
@@ -170,6 +171,12 @@ class NetStrWizPrior {
     string netStr;
     PriorInformation prior;
     vector < valarray < size_t > > tmpCladeList;
+    void updateTmpCladeList (){
+        for ( size_t i = 0; i < tmpCladeList.size(); i++ ){
+            this->prior.priorCladeList.push_back(tmpCladeList[i]);
+        }
+        this->tmpCladeList.clear();
+    }
     //string netStrLabelled;
   public:
     NetStrWizPrior( string firstStr ){
@@ -200,12 +207,16 @@ class TmpSN : public GraphBuilder {
 class CoalSN : public CoalST {
   friend class CoalST;
   friend class TestRm;
+  friend class TestRmTrees4taxa;
   friend class HybridCoal;
+    double computeGtProbGivenNet ( string tmpGt );
     bool maple_bool_local; // TODO, need to rework on this
     vector < NetStrWizPrior > NetStrWizPriorList;
     size_t currentSubNetworkIndex;
+    string originalSpNetworkStr;
     
-    void initializeNetStrWizPriorList ( string spStr );
+    void initializeNetStrWizPriorList ();
+    void reset();
     void simplifyNetworks( string gt_string, bool mapleSymbolic = false, bool latexSymbolic = false );
 
     // Members and Methods used while removing the S node
@@ -237,6 +248,9 @@ class CoalSN : public CoalST {
 
     CoalSN ( string sp_str );
     ~CoalSN(){}
+
+    // DEBUG tools
+    void DEBUGprintSubNetwork();
 };
 
 size_t hybrid_hash_index(string &in_str);

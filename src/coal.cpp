@@ -24,7 +24,8 @@
 CoalST::CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
     CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
     this->which_taxa_is_below();
-    this->which_sample_is_below();
+    this->which_tip_is_below();
+    //this->which_sample_is_below();
     // TODO: consider, should these be done here??!!
     this->build_gijoe();
     this->building_S_matrix();
@@ -47,13 +48,12 @@ void CoalST::assign_bl_to_vec(){
     this->max_num_brch_vec = vector < int > ( numberOfInternalBranches,0);
 
     for ( auto it = nodes_.iterator(); it.good(); ++it ){
-        //Node * (*it) = &this->NodeContainer[node_i];
         size_t tmpEdge = (*it)->edge1.name();
 
         if ( tmpEdge != 0 ){
             size_t edgeIndex = tmpEdge - 1;
             brchlens_vec[edgeIndex]     = (*it)->edge1.bl();
-            max_num_brch_vec[edgeIndex] = (*it)->samples_below.sum();
+            max_num_brch_vec[edgeIndex] = (*it)->tips_below.sum();
         }
         CoalSTdout << " Node " << (*it) << "  " << tmpEdge << " " <<(*it)->edge1.bl()<<endl;
         
@@ -61,7 +61,7 @@ void CoalST::assign_bl_to_vec(){
             tmpEdge = (*it)->edge2.name();
             size_t edgeIndex = tmpEdge - 1;
             brchlens_vec[edgeIndex]     = (*it)->edge2.bl();
-            max_num_brch_vec[edgeIndex] = (*it)->samples_below.sum();
+            max_num_brch_vec[edgeIndex] = (*it)->tips_below.sum();
             dout << edgeIndex << " " << (*it)->edge2.bl() <<endl;
         }
     }
@@ -139,7 +139,8 @@ bool CoalST::print_gijoemat(){
 CoalGT::CoalGT ( string gt_str ) : GraphBuilder ( gt_str ){
     CoalSTdout << "Constrcut gene tree: " << gt_str << endl;
     this->which_taxa_is_below();
-    this->which_sample_is_below();
+    this->which_tip_is_below();
+    //this->which_sample_is_below();
 }
 
 
@@ -188,7 +189,6 @@ void CoalGT::building_R_matrix( ){
     }
     
     for ( auto i = nodes_.iterator(); i.good(); ++i){
-    //for ( size_t i = 0; i < this->nodes_.size()-1; i++ ){
         if ( (*i)->isTip()) continue;
         auto j = nodes_.iterator();
         for ( ; ; ++j){
@@ -216,7 +216,6 @@ void CoalST::building_S_matrix(){
         S_matrix_row[i_sp_enum] = 0;
         this->S_matrix.push_back( S_matrix_row );
     }
-        //for ( auto it = nodes_.iterator(); it.good(); ++it){
 
     for ( auto i = nodes_.iterator(); i.good(); ++i ){
         if ( (*i)->isTip() || (*i)->parent1() == NULL ) continue;
@@ -308,7 +307,7 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         for ( size_t i = 0; i < spNumberOfInternalBranches; i++ ){
             for ( auto it = sp_net.nodes_.iterator(); it.good(); ++it){
                 if ( !(*it)->isTip() && (*it)->edge1.name() == i + 1 ){
-                    num_enter_i_coal.push_back( (*it)->samples_below.sum() );
+                    num_enter_i_coal.push_back( (*it)->tips_below.sum() );
                 }
             }
         }
@@ -453,20 +452,28 @@ void TmpSN::chooseRemoveNode() {
 
 
 CoalSN::CoalSN ( string sp_str ) : CoalST ( sp_str ){
-    this->initializeNetStrWizPriorList( sp_str );
+    this->originalSpNetworkStr = sp_str;
+    this->initializeNetStrWizPriorList();
 }
 
 
-void CoalSN::initializeNetStrWizPriorList ( string spStr ) {
+void CoalSN::initializeNetStrWizPriorList ( ) {
     this->maple_bool_local = false;
-    NetStrWizPrior initNetStr ( spStr );
+    NetStrWizPrior initNetStr ( this->originalSpNetworkStr );
     this->NetStrWizPriorList.push_back( initNetStr );
     this->currentSubNetworkIndex = 0;
 }
 
 
+void CoalSN::reset(){
+    this->NetStrWizPriorList.clear();
+    this->initializeNetStrWizPriorList( );
+}
+
+
 void CoalSN::simplifyNetworks( string gt_string, bool mapleSymbolic, bool latexSymbolic ){
     // parse in currentSubNetworkIndex
+    this->reset();
     while ( currentSubNetworkIndex < this->NetStrWizPriorList.size() ){
         TmpSN current_net ( this->NetStrWizPriorList[currentSubNetworkIndex].netStr );
         int rm_node_index = current_net.toBeRemovedNodeIndex();
@@ -482,6 +489,14 @@ void CoalSN::simplifyNetworks( string gt_string, bool mapleSymbolic, bool latexS
         } else{
             currentSubNetworkIndex++;
         }
+    }
+}
+
+
+void CoalSN::DEBUGprintSubNetwork(){
+    cout << endl;
+    for ( size_t i = 0; i < this->NetStrWizPriorList.size(); i++ ){
+        cout << this->NetStrWizPriorList[i].prior.omega() << " " << this->NetStrWizPriorList[i].netStr << endl;
     }
 }
 
@@ -592,10 +607,10 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
         int leftPower = removingFromParentIndex == 0 ? 0 : 1;
 
         double current_omega = ( netStrWizPrior.prior.omega() * uni_hybrid_paramter_num );
-
+//cout << "removing H, 
         NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
         newNetStrWizPrior.netStr = adding_new_Net_string;
-        newNetStrWizPrior.prior.setOmega ( current_omega * newNetStrWizPrior.prior.omega() );
+        newNetStrWizPrior.prior.setOmega ( current_omega );
         if ( mapleSymbolic ) newNetStrWizPrior.prior.setMapleOmegaAtH ( uni_hybrid_paramter_num, leftPower, uni_hybrid_paramter_num, 1 - leftPower );
         if ( latexSymbolic ) newNetStrWizPrior.prior.setLatexOmegaAtH ( uni_hybrid_paramter_num, leftPower, uni_hybrid_paramter_num, 1 - leftPower );
         this->NetStrWizPriorList.push_back(newNetStrWizPrior);
@@ -617,9 +632,10 @@ string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStr
 
     size_t max_of_taxa = removingNode->taxa_below.size();
     size_t max_of_sample = removingNode->samples_below.size();
+    size_t max_of_tips = removingNode->tips_below.size();
 
-    Node * newLeft = new Node(max_of_taxa, max_of_sample, nameToLeft, string(""), blToLeft, false );
-    Node * newRight= new Node(max_of_taxa, max_of_sample, nameToRight, string(""), blToRight, false );
+    Node * newLeft = new Node(max_of_taxa, max_of_tips, max_of_sample, nameToLeft, string(""), blToLeft, false );
+    Node * newRight= new Node(max_of_taxa, max_of_tips, max_of_sample, nameToRight, string(""), blToRight, false );
     localTmpSN.nodes_.add_before(newLeft, localTmpSN.nodes_.back());
     localTmpSN.nodes_.add_before(newRight, localTmpSN.nodes_.back());
 
@@ -757,7 +773,6 @@ double extract_hybrid_para(string in_str){
 // 2. indicator of which child were coalesced
 NetStrWizPrior CoalSN::removeSnodeCore( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, vector < valarray <int> > &A_matrix_ith_row, int numberOfChildAtRemovingNode ){
     NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
-    newNetStrWizPrior.tmpCladeList.clear();
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent = removingNode->parent1();
@@ -854,9 +869,9 @@ bool CoalSN::checkSpCoalValid( GraphBuilder &tmpGt, vector < valarray <size_t> >
 
 
 valarray <size_t> CoalSN::convertNewCoalChildToClade ( string nodeName ){
-    valarray <size_t> A_matrix_i_i_valarray ( (size_t)0, this->tip_name.size() ); // We need to look at the actual tip of the network.
-    for ( size_t i = 0; i < this->tip_name.size(); i++ ){
-        size_t found = nodeName.find(this->tip_name[i]);
+    valarray <size_t> A_matrix_i_i_valarray ( (size_t)0, this->sampleNames.size() ); // We need to look at the actual tip of the network.
+    for ( size_t i = 0; i < this->sampleNames.size(); i++ ){
+        size_t found = nodeName.find(this->sampleNames[i]);
         if ( found != string::npos){
             A_matrix_i_i_valarray[i] = 1;
         }
@@ -1023,47 +1038,83 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         size_t numberBranchOut = A_matrix[A_matrix_i].size();
         double w = this->computeNumOfRepTopo ( numberOfChildAtRemovingNode, numberBranchOut, newNetStrWizPrior.tmpCladeList, tmpGt );
         double c = this->computeWaysToCoal ( numberOfChildAtRemovingNode, numberBranchOut );
-        //cout << " c = " << c <<endl;
-        //cout <<" u = "<<numberOfChildAtRemovingNode <<", v = " << numberBranchOut <<", T = "<< tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()<<endl;
-        //cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
+        cout << "w = "<< w<<" c = " << c <<endl;
+        cout <<" u = "<<numberOfChildAtRemovingNode <<", v = " << numberBranchOut <<", T = "<< tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()<<endl;
+        cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
         double omega = w/c * gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl());
-        //cout << "omega is " << omega <<endl; 
+        cout << "old omega is " << newNetStrWizPrior.prior.omega() <<endl; 
         newNetStrWizPrior.prior.setOmega ( newNetStrWizPrior.prior.omega() * omega );
         // If it is valid, then compute omega
-        
+
+        newNetStrWizPrior.updateTmpCladeList();
 
         this->NetStrWizPriorList.push_back(newNetStrWizPrior);
     }
-    cout<<"        End of rm_S_node "<< tmpSN.nodes_.at(rmNodeIndex)->nodeName << " from " << netStrWizPrior.netStr << endl;
+    dout<<"        End of rm_S_node "<< tmpSN.nodes_.at(rmNodeIndex)->nodeName << " from " << netStrWizPrior.netStr << endl;
 }
 
 
 double CoalSN::gijoe( size_t u, /*!< number of branch in */
                       size_t v, /*!< number of branch out */
                       double T) /*!< branch length*/ {
-    if ( T == 0 ){ return 1.0; }
-    if ( u == v ){ return 1.0; }
+    //if ( u == v ){ return 1.0; }
+    //if ( T == 0.0 ){ return 0.0; }
 
     double sums=0;
-    for (size_t k=v;k<=u;k++){
-        double prods = exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
-        for (size_t y=0;y<k;y++){
-            prods *= (v+y)*(u-y)/(u+y);
-        }
-        sums += prods;
-    }
+	for (int k=v;k<=u;k++){
+		double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
+		for (int y=0;y<k;y++){
+			prods=prods*(v+y)*(u-y)/(u+y);
+		}
+		sums += prods;
+	}
     return sums;
 }
 
 
-double CoalSN::gtProbGivenNet ( string tmpGt ){
-    this->simplifyNetworks (tmpGt);
+double CoalSN::computeGtProbGivenNet ( string gtStr ){
     double gtTotalProb = 0.0;
-    for ( size_t i = 0; i < spNet.NetStrWizPriorList.size(); i++ ){
-        CoalGT gt(tmpGt );
-        CoalST sp ( spNet.NetStrWizPriorList[i].netStr );
+    this->simplifyNetworks (gtStr);
+    for ( size_t i = 0; i < this->NetStrWizPriorList.size(); i++ ){
+        string tmpGt = gtStr;
+        if ( this->NetStrWizPriorList[i].prior.priorCladeList.size() > 0 ){
+            for ( size_t clade_i = 0; clade_i < this->NetStrWizPriorList[i].prior.priorCladeList.size(); clade_i++){
+                //cout << "clade_i "<< clade_i << " ";
+                //for (size_t ii =0 ; ii < this->NetStrWizPriorList[i].prior.priorCladeList[clade_i].size(); ii++ ){
+                    //cout << this->NetStrWizPriorList[i].prior.priorCladeList[clade_i][ii] ;
+                    //}
+                //cout <<endl;
+                GraphBuilder gt( tmpGt );
+                gt.which_sample_is_below();
+                for ( auto it = gt.nodes_.iterator(); it.good(); ++it){
+                    //(*it)->print();
+                    //cout<<endl;
+                    valarray <bool> comp = ( this->NetStrWizPriorList[i].prior.priorCladeList[clade_i] == (*it)->samples_below );
+                    if ( comp.min() == true ){
+                        //cout <<"ok, found it "<<endl;
+                        (*it)->setIsTip (true);
+                        (*it)->nodeName = "";
+                        for ( size_t sample_i = 0; sample_i < (*it)->samples_below.size(); sample_i++ ){
+                            if ((*it)->samples_below[sample_i] == 1){
+                                if ((*it)->nodeName.size() > 0){(*it)->nodeName += "&";}
+                                (*it)->nodeName += gt.sampleNames[sample_i];
+                            }
+                        }
+                        (*it)->setRank(1);
+                        break;
+                    }
+                }
+                gt.rewrite_subTreeStr();
+                tmpGt = gt.reWritesubTreeStrAtRoot();
+                //cout << tmpGt << endl;
+            }
+        }
+        cout << "tmpGt: " << tmpGt << " in " << this->NetStrWizPriorList[i].netStr << " prior of " << this->NetStrWizPriorList[i].prior.omega() << endl;
+        CoalGT gt( tmpGt );
+        CoalST sp ( this->NetStrWizPriorList[i].netStr );
         gt.prob_given_sp_tree( sp );
-        gtTotalProb += spNet.NetStrWizPriorList[i].prior.omega() * gt.probability;
+        cout << " prob is " << gt.probability << endl;
+        gtTotalProb += this->NetStrWizPriorList[i].prior.omega() * gt.probability;
     }
     return gtTotalProb; 
 }
