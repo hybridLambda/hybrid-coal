@@ -607,7 +607,6 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
         int leftPower = removingFromParentIndex == 0 ? 0 : 1;
 
         double current_omega = ( netStrWizPrior.prior.omega() * uni_hybrid_paramter_num );
-//cout << "removing H, 
         NetStrWizPrior newNetStrWizPrior(netStrWizPrior);
         newNetStrWizPrior.netStr = adding_new_Net_string;
         newNetStrWizPrior.prior.setOmega ( current_omega );
@@ -1038,11 +1037,11 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
         size_t numberBranchOut = A_matrix[A_matrix_i].size();
         double w = this->computeNumOfRepTopo ( numberOfChildAtRemovingNode, numberBranchOut, newNetStrWizPrior.tmpCladeList, tmpGt );
         double c = this->computeWaysToCoal ( numberOfChildAtRemovingNode, numberBranchOut );
-        cout << "w = "<< w<<" c = " << c <<endl;
-        cout <<" u = "<<numberOfChildAtRemovingNode <<", v = " << numberBranchOut <<", T = "<< tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()<<endl;
-        cout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
+        dout << "w = "<< w<<" c = " << c <<endl;
+        dout <<" u = "<<numberOfChildAtRemovingNode <<", v = " << numberBranchOut <<", T = "<< tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()<<endl;
+        dout << " gijoe = " << gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl()) << endl; 
         double omega = w/c * gijoe (numberOfChildAtRemovingNode, numberBranchOut, tmpSN.nodes_.at(rmNodeIndex)->edge1.bl());
-        cout << "old omega is " << newNetStrWizPrior.prior.omega() <<endl; 
+        dout << "old omega is " << newNetStrWizPrior.prior.omega() <<endl; 
         newNetStrWizPrior.prior.setOmega ( newNetStrWizPrior.prior.omega() * omega );
         // If it is valid, then compute omega
 
@@ -1079,19 +1078,11 @@ double CoalSN::computeGtProbGivenNet ( string gtStr ){
         string tmpGt = gtStr;
         if ( this->NetStrWizPriorList[i].prior.priorCladeList.size() > 0 ){
             for ( size_t clade_i = 0; clade_i < this->NetStrWizPriorList[i].prior.priorCladeList.size(); clade_i++){
-                //cout << "clade_i "<< clade_i << " ";
-                //for (size_t ii =0 ; ii < this->NetStrWizPriorList[i].prior.priorCladeList[clade_i].size(); ii++ ){
-                    //cout << this->NetStrWizPriorList[i].prior.priorCladeList[clade_i][ii] ;
-                    //}
-                //cout <<endl;
                 GraphBuilder gt( tmpGt );
                 gt.which_sample_is_below();
                 for ( auto it = gt.nodes_.iterator(); it.good(); ++it){
-                    //(*it)->print();
-                    //cout<<endl;
                     valarray <bool> comp = ( this->NetStrWizPriorList[i].prior.priorCladeList[clade_i] == (*it)->samples_below );
                     if ( comp.min() == true ){
-                        //cout <<"ok, found it "<<endl;
                         (*it)->setIsTip (true);
                         (*it)->nodeName = "";
                         for ( size_t sample_i = 0; sample_i < (*it)->samples_below.size(); sample_i++ ){
@@ -1106,14 +1097,15 @@ double CoalSN::computeGtProbGivenNet ( string gtStr ){
                 }
                 gt.rewrite_subTreeStr();
                 tmpGt = gt.reWritesubTreeStrAtRoot();
-                //cout << tmpGt << endl;
             }
         }
-        cout << "tmpGt: " << tmpGt << " in " << this->NetStrWizPriorList[i].netStr << " prior of " << this->NetStrWizPriorList[i].prior.omega() << endl;
         CoalGT gt( tmpGt );
         CoalST sp ( this->NetStrWizPriorList[i].netStr );
         gt.prob_given_sp_tree( sp );
-        cout << " prob is " << gt.probability << endl;
+        dout << "tmpGt: " << tmpGt 
+             << " in " << this->NetStrWizPriorList[i].netStr 
+             << " prior of " << this->NetStrWizPriorList[i].prior.omega()
+             << ", prob is " << gt.probability << endl;
         gtTotalProb += this->NetStrWizPriorList[i].prior.omega() * gt.probability;
     }
     return gtTotalProb; 
