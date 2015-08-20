@@ -553,6 +553,7 @@ void CoalSN::removeHnode ( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netS
 
 
 string CoalSN::removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex, size_t removingFromParentIndex){        
+    dout << "removeHnodeOneChildCore" << endl;
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent[2];
@@ -597,7 +598,6 @@ string CoalSN::removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex, size_t 
 
 
 void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic, bool latexSymbolic ){
-
     for (size_t removingFromParentIndex = 0; removingFromParentIndex < 2; removingFromParentIndex++){
         string adding_new_Net_string = removeHnodeOneChildCore(tmpSN, rmNodeIndex, removingFromParentIndex);
         
@@ -621,6 +621,7 @@ void CoalSN::removeHnodeOneChild( TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPri
 
 
 string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, int numberOfChildAtRemovingNode, vector < valarray <int> > &A_matrix_ith_row, size_t A_matrix_i ){
+    dout << "removeHnodeManyChildCore" << endl;
     GraphBuilder localTmpSN(tmpSN);
     Node * removingNode = localTmpSN.nodes_.at(rmNodeIndex);
     Node * removingFromParent[2];
@@ -695,9 +696,11 @@ string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStr
     // Cleanning up the removing node, and remove one child internal node
     localTmpSN.nodes_.remove(removingNode);      // 1. Remove the node which was supposed to be removed
     localTmpSN.nodes_.back()->CalculateRank();   // 2. Calculate the node rank including the new nodes
-    //localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
     localTmpSN.removeOneChildInternalNode();     // 4. Remove internal nodes who has only one child
-    localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
+    //localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
+    localTmpSN.removeZeroChildInternalNode();
+    localTmpSN.rewrite_subTreeStr();             // 3. Rewrite the sub tree string at each node
+
     return localTmpSN.reWritesubTreeStrAtRoot();
 }
 
