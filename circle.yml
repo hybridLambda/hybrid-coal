@@ -22,3 +22,4 @@ test:
     - make 
     - make check
     - tests/checkbinary.sh 
+    - tests/checkTotalProb.sh
