@@ -696,6 +696,8 @@ string CoalSN::removeHnodeManyChildCore(TmpSN &tmpSN, size_t rmNodeIndex, NetStr
     // Cleanning up the removing node, and remove one child internal node
     localTmpSN.nodes_.remove(removingNode);      // 1. Remove the node which was supposed to be removed
     localTmpSN.nodes_.back()->CalculateRank();   // 2. Calculate the node rank including the new nodes
+    localTmpSN.removeZeroChildHybridNode();
+
     localTmpSN.removeOneChildInternalNode();     // 4. Remove internal nodes who has only one child
     //localTmpSN.rewrite_subTreeStr();             // 5. Rewrite the sub tree string at each node
     localTmpSN.removeZeroChildInternalNode();
