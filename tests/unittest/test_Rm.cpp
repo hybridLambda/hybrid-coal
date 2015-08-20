@@ -30,6 +30,7 @@ class TestRm : public CppUnit::TestCase {
   CPPUNIT_TEST_SUITE( TestRm );
   CPPUNIT_TEST ( testChooseRmNode1 );
   CPPUNIT_TEST ( testChooseRmNode2 );
+  CPPUNIT_TEST ( testChooseRmNode3 );
   CPPUNIT_TEST ( testExtract_hybrid_para );
   CPPUNIT_TEST ( testRemoveHnodeOneChild );
   CPPUNIT_TEST ( testRemoveHnodeOneChildMulLabeled );
@@ -65,6 +66,13 @@ class TestRm : public CppUnit::TestCase {
       CPPUNIT_ASSERT_NO_THROW( TmpSN sp( spstr ) );
       TmpSN sp(spstr);
       CPPUNIT_ASSERT_EQUAL (2, sp.toBeRemovedNodeIndex());
+    }
+
+    void testChooseRmNode3(){
+      string spstr = "((((B:2.1)h1#0.5:0.2,C:1)s3:3.4,(h1#0.5:2.1)h2#0.5:2.01)s4:0.1,(A:8.1,h2#0.5:0.3)s5:0.2)r;";
+      CPPUNIT_ASSERT_NO_THROW( TmpSN sp( spstr ) );
+      TmpSN sp(spstr);
+      CPPUNIT_ASSERT_EQUAL (1, sp.toBeRemovedNodeIndex());
     }
 
     void testExtract_hybrid_para (){

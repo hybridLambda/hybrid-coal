@@ -564,8 +564,8 @@ string CoalSN::removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex, size_t 
         dout << "From parent " << removingFromParent[parentIndex]->nodeName << "( " << removingFromParent[parentIndex]->child.size() << " ) child, ";
         for ( size_t childIndex = 0; removingFromParent[parentIndex]->child.size(); childIndex++){
             if ( removingFromParent[parentIndex]->child[childIndex] == removingNode ){
-                dout << "removing " << removingChildIndex << "th child" << endl;
                 removingChildIndex = childIndex;
+                dout << "removing " << removingChildIndex << "th child" << endl;
                 break;
             }
         }
@@ -587,8 +587,11 @@ string CoalSN::removeHnodeOneChildCore(TmpSN &tmpSN, size_t rmNodeIndex, size_t 
     
     // Cleanning up the removing node, and remove one child internal node
     localTmpSN.nodes_.remove(removingNode);
-    localTmpSN.rewrite_subTreeStr();    
+    localTmpSN.rewrite_subTreeStr();
+    // The order does matter! remove zero child hybrid node first, then remove one child internal node
+    localTmpSN.removeZeroChildHybridNode();
     localTmpSN.removeOneChildInternalNode();
+    localTmpSN.rewrite_subTreeStr();
     return localTmpSN.reWritesubTreeStrAtRoot();
 }
 
@@ -928,19 +931,6 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
      *       Othersiwe, return
      */
 
-    //NetStrWizPrior new_Net_wiz_prior_p = this->NetStrWizPriorList[currentSubNetworkIndex];
-    //vec_Net_wiz_prior_p my_rmd_networks;
-    //Net current_net;
-    
-    //Net pre_current_net(new_Net_wiz_prior_p.s_net_string);
-
-    
-    //Net my_gt_tree(gt_str);
-    //string updated_gt_str;
-    
-    //string net_str=new_Net_wiz_prior_p.s_net_string;
-    //vector <string> original_tax_name=pre_current_net.tax_name;
-    
     //bool multiple_sp_tip=false;
     //bool gt_tip_already_coaled=false;
     //if (gt_str.size()>0){
@@ -1056,17 +1046,15 @@ void CoalSN::removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStr
 double CoalSN::gijoe( size_t u, /*!< number of branch in */
                       size_t v, /*!< number of branch out */
                       double T) /*!< branch length*/ {
-    //if ( u == v ){ return 1.0; }
-    //if ( T == 0.0 ){ return 0.0; }
 
     double sums=0;
-	for (int k=v;k<=u;k++){
-		double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
-		for (int y=0;y<k;y++){
-			prods=prods*(v+y)*(u-y)/(u+y);
-		}
-		sums += prods;
-	}
+    for (int k=v;k<=u;k++){
+        double prods=exp(-k*(k-1)*T/2)*(2*k-1)*pow(-1.0,1.0*(k-v))/factorial(v*1.0)/factorial((k-v)*1.0)/(v+k-1);
+        for (int y=0;y<k;y++){
+            prods=prods*(v+y)*(u-y)/(u+y);
+        }
+        sums += prods;
+    }
     return sums;
 }
 
@@ -1102,11 +1090,13 @@ double CoalSN::computeGtProbGivenNet ( string gtStr ){
         CoalGT gt( tmpGt );
         CoalST sp ( this->NetStrWizPriorList[i].netStr );
         gt.prob_given_sp_tree( sp );
+        gtTotalProb += this->NetStrWizPriorList[i].prior.omega() * gt.probability;
+
         dout << "tmpGt: " << tmpGt 
              << " in " << this->NetStrWizPriorList[i].netStr 
              << " prior of " << this->NetStrWizPriorList[i].prior.omega()
              << ", prob is " << gt.probability << endl;
-        gtTotalProb += this->NetStrWizPriorList[i].prior.omega() * gt.probability;
+
     }
     return gtTotalProb; 
 }
