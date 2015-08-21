@@ -222,6 +222,7 @@ class CoalSN : public CoalST {
     // Members and Methods used while removing the S node
     vector <int> disjoint_list_s(int n, valarray <int> A_i,int i,vector <valarray <int> >A);    
     void removeSnode( string gtStr, TmpSN &tmpSN, size_t rmNodeIndex, NetStrWizPrior netStrWizPrior, bool mapleSymbolic = false, bool latexSymbolic = false );
+      string mergeGtTipsAccordingToHistory( string tmpGt, valarray < size_t > clade );
       valarray <size_t> convertNewCoalChildToClade ( string nodeName );
       bool checkSpCoalValid( GraphBuilder &tmpGt, vector < valarray <size_t> > new_coal_clade );
       double computeNumOfRepTopo ( size_t uBranchIn, size_t vBranchOut, vector < valarray < size_t > > tmpCladeList, GraphBuilder &tmpGt );
