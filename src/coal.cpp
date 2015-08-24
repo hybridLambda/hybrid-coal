@@ -22,10 +22,9 @@
 #include "coal.hpp"
 
 CoalST::CoalST ( string sp_str ) : GraphBuilder ( sp_str ){ 
-    CoalSTdout << "Constrcut species tree: " << sp_str << endl; 
+    CoalSTdout << "Constrcut species tree: " << sp_str << endl;
     this->which_taxa_is_below();
     this->which_tip_is_below();
-    //this->which_sample_is_below();
     // TODO: consider, should these be done here??!!
     this->build_gijoe();
     this->building_S_matrix();
@@ -175,7 +174,7 @@ void CoalGT::building_M_matrix( CoalST & sp_net ) {
             }
         }
     }
-    
+
     dout<<"M matrix"<<endl;
     assert( print_2D_matrix( M_matrix ) );
 }
@@ -187,7 +186,7 @@ void CoalGT::building_R_matrix( ){
         vector <int> R_matrix_row( i_gt_enum, 1 );
         this->R_matrix.push_back(R_matrix_row);
     }
-    
+
     for ( auto i = nodes_.iterator(); i.good(); ++i){
         if ( (*i)->isTip()) continue;
         auto j = nodes_.iterator();
@@ -281,13 +280,13 @@ void CoalGT::sum_coalescent_history_prob( CoalST & sp_net ){
                 }
             }    
             double current_gijoe = ( (i+1) == sp_net.nodes_.back()->edge1.name() ) ? 1 :
-                                                                              sp_net.gijoemat[current_enum-1][num_enter[hist_i][i]-1][num_out[hist_i][i]-1];
+                                                                                     sp_net.gijoemat[current_enum-1][num_enter[hist_i][i]-1][num_out[hist_i][i]-1];
             dout << " current_gijoe ["<<num_enter[hist_i][i]<<"]["<<num_out[hist_i][i]<<"]" <<current_gijoe << " all_w[hist_i][i] " <<all_w[hist_i][i] <<" all_d[hist_i][i] "<<all_d[hist_i][i] << endl;
             current_prob_of_hist *= ( (double)all_w[hist_i][i] / (double)all_d[hist_i][i] * current_gijoe );            
         }
         dout<<current_prob_of_hist<<endl;
         this->probability += current_prob_of_hist;
-        //dout<<"gt prob = "<<probability<<endl;
+        dout<<"gt prob = "<<probability<<endl;
     }
 }
 
@@ -369,11 +368,11 @@ void CoalGT::enumerate_coal_events( CoalST & sp_net ){
         all_w.push_back( w_i_coal );
         all_d.push_back( d_i_coal );
         valid_coal_hist[i_coal_hist].push_back( spNumberOfInternalBranches );
-    }    
-    
-    dout<<"valid_coal_hist"<<endl;    
+    }
+
+    dout<<"valid_coal_hist"<<endl;
     assert( print_2D_matrix(this->valid_coal_hist) );
-}            
+}
 
 
 vector < vector < size_t > > CoalGT::recur_coal_hist( vector < vector <size_t > > coal_hist, size_t  node_i ) {
@@ -880,7 +879,7 @@ bool CoalSN::checkSpCoalValid( GraphBuilder &tmpGt, vector < valarray <size_t> >
 valarray <size_t> CoalSN::convertNewCoalChildToClade ( string nodeName ){
     valarray <size_t> A_matrix_i_i_valarray ( (size_t)0, this->sampleNames.size() ); // We need to look at the actual tip of the network.
     for ( size_t i = 0; i < this->sampleNames.size(); i++ ){
-        size_t found = nodeName.find(this->sampleNames[i]);
+        size_t found = nodeName.find( this->sampleNames[i] );
         if ( found != string::npos){
             A_matrix_i_i_valarray[i] = 1;
         }
@@ -1094,6 +1093,11 @@ double CoalSN::gijoe( size_t u, /*!< number of branch in */
 
 
 string CoalSN::mergeGtTipsAccordingToHistory( string tmpGt, valarray < size_t > clade ){
+    //cout << "mergeGtTipsAccordingToHistory: " ;
+    //for ( size_t i = 0; i < clade.size() ; i++ ){
+        //cout <<clade[i]<<" ";
+    //}
+    //cout << endl;
     GraphBuilder gt( tmpGt );
     gt.which_sample_is_below();
     for ( auto it = gt.nodes_.iterator(); it.good(); ++it){
@@ -1114,6 +1118,7 @@ string CoalSN::mergeGtTipsAccordingToHistory( string tmpGt, valarray < size_t > 
     gt.rewrite_subTreeStr();
     return gt.reWritesubTreeStrAtRoot();
 }
+
 
 double CoalSN::computeGtProbGivenNet ( string gtStr ){
     double gtTotalProb = 0.0;
