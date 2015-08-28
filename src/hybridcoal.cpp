@@ -28,12 +28,12 @@ void HybridCoal::init(){
     this->prefix    = "OUT";    
     this->argc_i = 1;
     this->helpBool = false;
-    this->symb_bool = false;
+    //this->symb_bool = false;
     this->print_tree_bool = false;
     this->print_gene_topo_bool = false; 
     this->plot_bool       = false;
-    this->latex_bool = false;
-    this->maple_bool = false;
+    //this->latex_bool = false;
+    //this->maple_bool = false;
     this->all_gt_tree_bool = true;
     this->enumerate_gt_bool = true;
 }
@@ -81,11 +81,11 @@ void HybridCoal::parse(){
         std::string argv_i(argv_[argc_i]);
         if      ( argv_i == "-h" || argv_i == "-help" ){ helpBool = true; }
         else if ( argv_i == "-gt"    ){ readNextStringto( this->gt_file_name , this->argc_i, this->argc_,  this->argv_ ); this->enumerate_gt_bool = false; }
-        else if ( argv_i == "-latex" ){  this->latex_bool=true;    }
+        //else if ( argv_i == "-latex" ){  this->latex_bool=true;    }
         else if ( argv_i == "-sp"    ){ this->read_sp_str(argv_i); }
         else if ( argv_i == "-o"     ){ readNextStringto( this->prefix , this->argc_i, this->argc_,  this->argv_ );}
-        else if ( argv_i == "-maple" ){ this->maple_bool=true; }
-        else if ( argv_i == "-symb"  ){ this->symb_bool=true; }
+        //else if ( argv_i == "-maple" ){ this->maple_bool=true; }
+        //else if ( argv_i == "-symb"  ){ this->symb_bool=true; }
         else if ( argv_i == "-plot"  || argv_i == "-dot" ){ this->plot_bool = true; }
         else if ( argv_i == "-label" || argv_i == "-branch" ){ argc_i++; continue; }        
         else if ( argv_i == "-print" ){ this->print_tree_bool = true; }
@@ -227,7 +227,7 @@ void HybridCoal::print_example(){
     cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -print"<<endl;
     cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -gtopo"<<endl;
     cout << "hybrid-coal -sp trees/4_tax_sp_nt1_para -sub"<<endl;
-    cout << "./hybrid-coal_dbg -sp trees/7_tax_sp_james02.tre -gt trees/7_tax_gt_james"<<endl;
+    //cout << "./hybrid-coal_dbg -sp trees/7_tax_sp_james02.tre -gt trees/7_tax_gt_james"<<endl;
     cout << endl;    
 }
 
@@ -242,9 +242,9 @@ void HybridCoal::print_option(){
     cout << setw(20) << "-h or -help"         << "  --  " << "Help. List the following content."<<endl;
     cout << setw(20) << "-gt STR"             << "  --  " << "Input the gene tree string string through command line or a file."<<endl;
     cout << setw(20) << "-sp STR"             << "  --  " << "Input the species network/tree string through command line or a file."<<endl;
-    cout << setw(20) << "-maple [option]"     << "  --  " << "Generate a Maple executeable script file to calculate the gene tree probabilities given species networks."<<endl;
-    cout << setw(20) << "[-symb]"             << "  --  " << "To enable the Maple script calculate the symbolic gene tree probabilities."<<endl;
-    cout << setw(20) << "-latex"              << "  --  " << "Generate the coalescent history of a gene tree within a species network."<<endl;
+    //cout << setw(20) << "-maple [option]"     << "  --  " << "Generate a Maple executeable script file to calculate the gene tree probabilities given species networks."<<endl;
+    //cout << setw(20) << "[-symb]"             << "  --  " << "To enable the Maple script calculate the symbolic gene tree probabilities."<<endl;
+    //cout << setw(20) << "-latex"              << "  --  " << "Generate the coalescent history of a gene tree within a species network."<<endl;
     cout << setw(20) << "-gtopo"              << "  --  " << "To generate the gene tree topologies of a given set of taxa."<<endl;
     //cout<<"-sub -- Produce file sub_networks, which contanis all sub trees of a species network"<<endl;
 

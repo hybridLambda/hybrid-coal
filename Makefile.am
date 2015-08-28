@@ -4,7 +4,7 @@ distdir = $(PACKAGE)-$(VERSION)
 
 bin_PROGRAMS = hybrid-coal
 PROG = HYBRID-COAL
-check_PROGRAMS = hybrid-coal_dbg hybrid-coal_prof unit_tests
+check_PROGRAMS = hybrid-coal_dbg hybrid-coal_prof unittest
 TESTS = unittest
 
 common_flags = -O3 -g -std=c++0x -Isrc/graph/

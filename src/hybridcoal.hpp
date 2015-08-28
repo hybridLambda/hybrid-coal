@@ -52,11 +52,11 @@ class HybridCoal{
     bool helpBool;
     bool print_tree_bool;
     bool plot_bool;
-    bool symb_bool;            
-    bool latex_bool;
+    //bool symb_bool;
+    //bool latex_bool;
     bool print_gene_topo_bool;
     bool enumerate_gt_bool;
-    bool maple_bool;
+    //bool maple_bool;
     bool all_gt_tree_bool ;
     string gt_file_name;
     vector <string> gt_tree_str_s;
