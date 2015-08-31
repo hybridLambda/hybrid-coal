@@ -30,4 +30,11 @@ unittest_CXXFLAGS = -DUNITTEST -DNDEBUG -std=c++0x -Isrc/graph/ -Isrc/
 unittest_LDADD = -lcppunit -ldl
 unittest_SOURCES = ${shared_src} ${test_src}
 
-#include_HEADERS = src/graph.hpp src/node.hpp src/utility.hpp src/export.hpp
+include_HEADERS = src/graph/exceptions.hpp \
+                  src/graph/nodeContainer.hpp \
+                  src/graph/graph.hpp \
+                  src/graph/node.hpp \
+                  src/plot/figure.hpp \
+                  src/tree_topo/all_gene_topo.hpp \
+                  src/coal.hpp \
+                  src/hybridcoal.hpp
