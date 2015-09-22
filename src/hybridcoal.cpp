@@ -32,6 +32,7 @@ void HybridCoal::init(){
     this->print_tree_bool = false;
     this->print_gene_topo_bool = false; 
     this->plot_bool       = false;
+    this->sage_bool = false;
     //this->latex_bool = false;
     //this->maple_bool = false;
     this->all_gt_tree_bool = true;
@@ -90,6 +91,7 @@ void HybridCoal::parse(){
         else if ( argv_i == "-label" || argv_i == "-branch" ){ argc_i++; continue; }        
         else if ( argv_i == "-print" ){ this->print_tree_bool = true; }
         else if ( argv_i == "-gtopo" ){ this->print_gene_topo_bool = true; }
+        else if ( argv_i == "-sage"  ){ this->sage_bool = true; }
         //else if (argv_i=="-sub"){ list_sub_network_bool=true;}
         //else if (argv_i=="-acc"){ acc_bool=true;    }
         else { throw std::invalid_argument ( "Unknown flag:" + argv_i); }
@@ -128,13 +130,17 @@ void HybridCoal::finalize(){
     if ( this->gt_file_name.size() > 0 ) {
         this->read_input_lines( this->gt_file_name.c_str(), this->gt_tree_str_s);
     }
-    
+
     if ( this->print_tree_bool || this->plot_bool ) return;
-    
+
     if ( this->enumerate_gt_bool ){
         Net net( this->sp_str );
         GeneTopoList topologies( net.tip_name );
         this->gt_tree_str_s = topologies.TreeList;
+    }
+
+    if ( this->sage_bool ){
+        sage_header();
     }
 }
 
@@ -202,6 +208,10 @@ void HybridCoal::HybridCoal_core(){
     gt_ofstream.close();
 }
 
+
+void HybridCoal::checkAndRemove( string fileName ){
+
+}
 
 void HybridCoal::print(){
     Net net( this->sp_str );

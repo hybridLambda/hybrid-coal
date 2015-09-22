@@ -57,6 +57,7 @@ class HybridCoal{
     bool print_gene_topo_bool;
     bool enumerate_gt_bool;
     //bool maple_bool;
+    bool sage_bool;
     bool all_gt_tree_bool ;
     string gt_file_name;
     vector <string> gt_tree_str_s;
