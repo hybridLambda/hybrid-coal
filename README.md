@@ -19,9 +19,8 @@ Development Version | dev     | [![Build Status](https://api.travis-ci.org/hybri
 ##DOCUMENTATION
 [Download](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
 
-##INSTALLATION
+##BEFORE INSTALLATION
 
-### For developers
 To install _hybrid-coal_, first install the following packages and libraries
 
 on Debian/Ubuntu based systems:
@@ -32,6 +31,8 @@ on Mac OS:
 ```bash
 port install git cppunit automake autoconf autoconf-archive graphviz
 ```
+
+## DOWNLOAD AND COMPILE
 
 then type the following commands:
 ```bash
@@ -64,7 +65,6 @@ Options              | Useage |
 ```bash
 hybrid-coal -sp '((((B:1,C:1)s1:1)h1#.5:1,A:3)s2:1,(h1#.5:1,D:3)s3:1)r;'
 hybrid-coal -sp trees/4_tax_sp_nt1_para -gt '(((A,D),C),B);'
-hybrid-coal -sp trees/4_tax_sp_nt1_para -gt trees/4_tax_gt4.tre -latex
 hybrid-coal -sp trees/4_tax_sp_nt1_para -plot
 hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -branch
 hybrid-coal -sp trees/4_tax_sp_nt1_para -plot -label
