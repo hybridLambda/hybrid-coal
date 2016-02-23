@@ -20,7 +20,7 @@ AC_PROG_CXX
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_LANG(C++) 
+AC_LANG(C++)
 #AC_CHECK_HEADERS([iostream string sstream fstream vector iomanip valarray math.h stdio.h ctime])
 #AC_CHECK_HEADERS([iostream string sstream fstream vector iomanip valarray math.h stdio.h ctime gmp.h])
 # Checks for typedefs, structures, and compiler characteristics.
@@ -46,6 +46,9 @@ DX_XML_FEATURE(OFF)
 DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
 
-AC_CONFIG_FILES([Makefile])
+AC_CHECK_PROG(PDFLATEX, pdflatex, pdflatex)
+AM_CONDITIONAL([HAVE_PDFLATEX], test -n "$PDFLATEX")
+
+AC_CONFIG_FILES([Makefile doc/Makefile])
 AC_OUTPUT
 
