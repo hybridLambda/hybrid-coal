@@ -13,7 +13,7 @@ make;
 
 Version             | Branch  | Travis CI Build Status                                                                                                                   | Circle CI Build Status
 ------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |--------------------------
-Development Version | dev     | [![Build Status](https://travis-ci.com/hybridLambda/hybrid-coal.svg?branch=dev)](https://travis-ci.com/hybridLambda/hybrid-coal)         | [![Circle CI](https://circleci.com/gh/hybridLambda/hybrid-coal.svg?style=svg)](https://circleci.com/gh/hybridLambda/hybrid-coal)
+Development Version | dev     | [![Build Status](https://api.travis-ci.org/hybridLambda/hybrid-coal.svg?branch=dev)](https://travis-ci.com/hybridLambda/hybrid-coal)         | [![Circle CI](https://circleci.com/gh/hybridLambda/hybrid-coal.svg?style=svg)](https://circleci.com/gh/hybridLambda/hybrid-coal)
 
 
 ##DOCUMENTATION
