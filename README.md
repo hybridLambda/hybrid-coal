@@ -1,13 +1,13 @@
 Hybrid-coal
 ===========
 
-Hybrid-coal is used to compute gene tree probabilities given species network under coalescent process. We use a new representation of the species network likelihood that expresses
+_Hybrid-coal_ is used to compute gene tree probabilities given species network under coalescent process. We use a new representation of the species network likelihood that expresses
 the probability distribution of the gene tree topolgies as a linear combination of gene tree distributions given a set of species trees.
 
 
 ##INSTALLATION
 
-To install hybrid-coal, type the following commands:
+To install _hybrid-coal_, type the following commands:
 ./bootstrap
 make;
 
@@ -22,7 +22,7 @@ Development Version | dev     | [![Build Status](https://travis-ci.com/hybridLam
 ##INSTALLATION
 
 ### For developers
-To install hybrid-coal, first install the following packages and libraries
+To install _hybrid-coal_, first install the following packages and libraries
 
 on Debian/Ubuntu based systems:
 ```bash
