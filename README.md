@@ -4,20 +4,15 @@ Hybrid-coal
 _Hybrid-coal_ is used to compute gene tree probabilities given species network under coalescent process. We use a new representation of the species network likelihood that expresses
 the probability distribution of the gene tree topolgies as a linear combination of gene tree distributions given a set of species trees.
 
-
-##INSTALLATION
-
-To install _hybrid-coal_, type the following commands:
-./bootstrap
-make;
-
 Version             | Branch  | Travis CI Build Status                                                                                                                   | Circle CI Build Status
 ------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |--------------------------
 Development Version | dev     | [![Build Status](https://api.travis-ci.org/hybridLambda/hybrid-coal.svg?branch=dev)](https://travis-ci.com/hybridLambda/hybrid-coal)         | [![Circle CI](https://circleci.com/gh/hybridLambda/hybrid-coal.svg?style=svg)](https://circleci.com/gh/hybridLambda/hybrid-coal)
 
+##NEWS
+ - 24-Feb-2016 v0.2-beta
+ - 30-Aug-2015 v0.1-beta 
 
-##DOCUMENTATION
-[Download](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
+##[DOCUMENTATION](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
 
 ##BEFORE INSTALLATION
 
@@ -34,7 +29,11 @@ port install git cppunit automake autoconf autoconf-archive graphviz
 
 ## DOWNLOAD AND COMPILE
 
-then type the following commands:
+Download and extract source code from 
+ - [tar.gz](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
+ - [zip](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
+ 
+or use `git checkout`, then type the following commands:
 ```bash
 ./bootstrap
 make
