@@ -30,8 +30,8 @@ port install git cppunit automake autoconf autoconf-archive graphviz
 ## DOWNLOAD AND COMPILE
 
 Download and extract source code from 
- - [tar.gz](https://github.com/hybridLambda/hybrid-coal/raw/doc/archive/hybrid-coal-v0.2-beta.tar.gz)
- - [zip](https://github.com/hybridLambda/hybrid-coal/raw/doc/archive/hybrid-coal-v0.2-beta.zip)
+ - [tar.gz](https://github.com/hybridLambda/hybrid-coal/raw/doc/archive/hybrid-coal-v0.2.1-beta.tar.gz)
+ - [zip](https://github.com/hybridLambda/hybrid-coal/raw/doc/archive/hybrid-coal-v0.2.1-beta.zip)
  
 or use `git checkout`, then type the following commands:
 ```bash

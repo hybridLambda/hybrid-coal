@@ -60,7 +60,7 @@ void HybridCoal::read_input_lines(const char inchar[], vector <string> & out_vec
             out_str=dummy_str;
             out_vec.push_back(out_str);
         } else{
-            throw std::invalid_argument("Invalid input file. " + string (inchar) );
+            throw InvalidInputFile( string (inchar) );
         }
     }
     in_file.close();
@@ -69,7 +69,7 @@ void HybridCoal::read_input_lines(const char inchar[], vector <string> & out_vec
 
 void HybridCoal::check_gt_str_and_sign( string &gt_str ){
     if ( gt_str.find('&') != string::npos ){
-        throw std::invalid_argument ( "Error: gene tree " + gt_str + " can not be a gene tree string" );
+        throw InvalidInput ( "Error: gene tree " + gt_str + " can not be a gene tree string" );
     }
 }
 
@@ -92,7 +92,7 @@ void HybridCoal::parse(){
         else if ( argv_i == "-gtopo" ){ this->print_gene_topo_bool = true; }
         //else if (argv_i=="-sub"){ list_sub_network_bool=true;}
         //else if (argv_i=="-acc"){ acc_bool=true;    }
-        else { throw std::invalid_argument ( "Unknown flag:" + argv_i); }
+        else { throw UnknowArg(argv_i); }
         // else if (argv_i=="-pdf"){
             //latex_bool=true;
             //pdf_bool=true;
@@ -115,7 +115,7 @@ string HybridCoal::read_input_line(const char *inchar){
     else{
         string dummy_str(inchar);
         if (dummy_str.find('(')!=string::npos && dummy_str.find(')')!=string::npos) out_str=dummy_str;
-        else  throw std::invalid_argument("Invalid input file. " + string (inchar) );
+        else  throw InvalidInputFile( string (inchar) );
     }
     in_file.close();
     return     out_str;
