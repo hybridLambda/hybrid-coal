@@ -9,8 +9,14 @@ Version             | Branch  | Travis CI Build Status                          
 Development Version | dev     | [![Build Status](https://api.travis-ci.org/hybridLambda/hybrid-coal.svg?branch=dev)](https://travis-ci.com/hybridLambda/hybrid-coal)         | [![Circle CI](https://circleci.com/gh/hybridLambda/hybrid-coal.svg?style=svg)](https://circleci.com/gh/hybridLambda/hybrid-coal)
 
 ##NEWS
+ - 31-Oct-2016 Paper accepted by Systematic Biology.
  - 24-Feb-2016 v0.2-beta
  - 30-Aug-2015 v0.1-beta 
+ 
+##CITATION
+Sha Zhu and James H. Degnan 
+Displayed Trees Do Not Determine Distinguishability Under the Network Multispecies Coalescent
+Syst Biol 2016 : syw097v1-syw097.
 
 ##[DOCUMENTATION](https://github.com/hybridLambda/hybrid-coal/raw/doc/doc/manual.pdf)
 
